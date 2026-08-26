@@ -15,12 +15,16 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const isHome = location.pathname === '/';
+
   return (
     <nav
       className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-        scrolled
-          ? 'bg-surface-container-lowest shadow-sm'
-          : 'bg-surface-container-lowest/80 backdrop-blur-md'
+        isHome
+          ? 'bg-surface-container-lowest'
+          : scrolled
+          ? 'bg-background/95 shadow-sm'
+          : 'bg-background/80 backdrop-blur-md'
       }`}
       id="main-nav"
     >
@@ -91,7 +95,11 @@ export default function Navbar() {
 
       {mobileMenuOpen && (
         <div className={`md:hidden border-t border-outline-variant/30 px-5 py-6 ${
-          scrolled ? 'bg-surface-container-lowest' : 'bg-surface-container-lowest/95 backdrop-blur-md'
+          isHome
+            ? 'bg-surface-container-lowest'
+            : scrolled
+            ? 'bg-background/95'
+            : 'bg-background/95 backdrop-blur-md'
         }`}>
           <nav className="flex flex-col gap-4 font-label text-label-caps">
             {navLinks.map((link) => (
