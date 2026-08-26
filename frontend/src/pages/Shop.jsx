@@ -5,9 +5,9 @@ import { products } from '../data/products';
 
 export default function Shop() {
   const [filters, setFilters] = useState({
-    types: ['Sapphire'],
-    carats: ['2.00 - 5.00 ct'],
-    cut: 'Cushion',
+    types: [],
+    carats: [],
+    cut: '',
     priceRange: { min: 1000, max: 50000 },
     sortBy: 'Featured',
   });
@@ -62,7 +62,7 @@ export default function Shop() {
       </div>
 
       <div className="flex flex-col md:flex-row gap-6 md:gap-24">
-        <FilterSidebar onFilterChange={handleFilterChange} />
+        <FilterSidebar onFilterChange={handleFilterChange} initialFilters={filters} />
 
         <div className="flex-grow">
           <div className="flex justify-between items-center mb-8 pb-4 border-b border-outline-variant/30">

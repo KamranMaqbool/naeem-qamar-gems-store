@@ -4,11 +4,11 @@ const gemstoneTypes = ['Ruby', 'Sapphire', 'Emerald', 'Diamond'];
 const caratRanges = ['Under 1.00 ct', '1.00 - 2.00 ct', '2.00 - 5.00 ct', 'Over 5.00 ct'];
 const cuts = ['Oval', 'Cushion', 'Round', 'Emerald', 'Pear'];
 
-export default function FilterSidebar({ onFilterChange }) {
-  const [selectedTypes, setSelectedTypes] = useState(['Sapphire']);
-  const [selectedCarats, setSelectedCarats] = useState(['2.00 - 5.00 ct']);
-  const [selectedCut, setSelectedCut] = useState('Cushion');
-  const [priceRange, setPriceRange] = useState({ min: 1000, max: 50000 });
+export default function FilterSidebar({ onFilterChange, initialFilters = {} }) {
+  const [selectedTypes, setSelectedTypes] = useState(initialFilters.types || []);
+  const [selectedCarats, setSelectedCarats] = useState(initialFilters.carats || []);
+  const [selectedCut, setSelectedCut] = useState(initialFilters.cut || '');
+  const [priceRange, setPriceRange] = useState(initialFilters.priceRange || { min: 1000, max: 50000 });
 
   const handleTypeChange = (type) => {
     const newSelected = selectedTypes.includes(type)
