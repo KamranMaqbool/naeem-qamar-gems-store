@@ -1,6 +1,31 @@
-<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="20" cy="20" r="18" stroke="#043927" stroke-width="2"/>
-  <path d="M20 10 L20 30" stroke="#D4AF37" stroke-width="1.5"/>
-  <path d="M10 20 L30 20" stroke="#D4AF37" stroke-width="1.5"/>
-  <circle cx="20" cy="20" r="6" fill="#D4AF37"/>
+<svg width="120" height="40" viewBox="0 0 120 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gemGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#043927;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#002215;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#D4AF37;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#735c00;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Gemstone Icon -->
+  <g transform="translate(0, 0)">
+    <!-- Outer octagon shape (gemstone cut) -->
+    <path d="M6 2 L14 2 L18 6 L18 14 L14 18 L6 18 L2 14 L2 6 Z" fill="url(#gemGradient)" />
+    <!-- Inner facets -->
+    <path d="M9 5 L13 5 L15 7 L15 13 L13 15 L9 15 L7 13 L7 7 Z" fill="url(#gemGradient)" opacity="0.7" />
+    <!-- Center table facet -->
+    <path d="M10 8 L12 8 L13 9 L13 11 L12 12 L10 12 L9 11 L9 9 Z" fill="url(#goldGradient)" />
+    <!-- Top crown facet highlight -->
+    <path d="M9 5 L11 5 L12 6 L10 6 Z" fill="#ffffff" opacity="0.3" />
+  </g>
+  
+  <!-- Brand Text -->
+  <text x="22" y="26" font-family="Playfair Display, Georgia, serif" font-size="22" font-weight="400" fill="#002215" letter-spacing="-0.01em">VIRTUOSO'S</text>
+  <text x="22" y="38" font-family="Playfair Display, Georgia, serif" font-size="14" font-weight="400" fill="#735c00" letter-spacing="0.15em">GEMS</text>
+  
+  <!-- Gold accent line -->
+  <line x1="22" y1="28" x2="70" y2="28" stroke="url(#goldGradient)" stroke-width="1.5" stroke-linecap="round" />
 </svg>
