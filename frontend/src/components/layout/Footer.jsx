@@ -56,7 +56,7 @@ export default function Footer() {
 
       <div className="max-w-[1440px] mx-auto px-5 md:px-20 mt-16 pt-8 border-t border-outline-variant/30 flex flex-col md:flex-row justify-between items-center gap-4">
         <p className="font-body text-body-md text-on-surface-variant text-sm">
-          {brandConfig.copyright}
+          {brandConfig.getCopyright()}
         </p>
         <div className="flex gap-6">
           {brandConfig.socialLinks.map((social) => (

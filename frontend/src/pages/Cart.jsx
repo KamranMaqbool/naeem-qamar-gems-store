@@ -2,6 +2,7 @@ import { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { CartContext } from '../context/CartContext';
 import { formatPrice } from '../utils/helpers';
+import { brandConfig, footerLinks } from '../config/brand';
 
 export default function CartPage() {
   const { items, subtotal, removeItem, updateQuantity, clearCart } = useContext(CartContext);
@@ -18,8 +19,8 @@ export default function CartPage() {
       <div className="min-h-screen bg-background flex flex-col">
         <header className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-md">
           <div className="max-w-[1440px] mx-auto px-5 md:px-20 flex justify-between items-center h-20">
-            <Link to="/" className="flex items-center gap-2" aria-label="Aurora Gems - Home">
-              <span className="font-headline text-headline-md text-primary tracking-tighter">AURORA GEMS</span>
+            <Link to="/" className="flex items-center gap-2" aria-label={`${brandConfig.name} - Home`}>
+              <span className="font-headline text-headline-md text-primary tracking-tighter">{brandConfig.name}</span>
             </Link>
             <div className="flex items-center gap-4 text-primary">
               <Link to="/cart" aria-label="Cart" className="cursor-pointer transition-all active:scale-95 hover:opacity-70 p-2">
@@ -50,12 +51,19 @@ export default function CartPage() {
         <footer className="bg-surface-container-low border-t border-outline-variant/30 w-full py-section-gap mt-auto">
           <div className="max-w-[1440px] mx-auto px-5 md:px-20 grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-24">
             <div className="flex flex-col space-y-4">
-              <span className="font-headline text-headline-md text-primary">AURORA GEMS</span>
-              <p className="font-body text-body-md text-on-surface-variant">© 2024 Aurora Gems. All rights reserved.</p>
+              <span className="font-headline text-headline-md text-primary">{brandConfig.name}</span>
+              <p className="font-body text-body-md text-on-surface-variant">{brandConfig.getCopyright()}</p>
             </div>
             <div className="flex flex-col space-y-2 font-body text-body-md">
-              <Link className="text-on-surface-variant hover:text-secondary transition-colors duration-200 w-fit" to="/sourcing">Sourcing</Link>
-              <Link className="text-on-surface-variant hover:text-secondary transition-colors duration-200 w-fit" to="/warranty">Warranty</Link>
+              {footerLinks.support.map((link) => (
+                <Link
+                  key={link.href}
+                  to={link.href}
+                  className="text-on-surface-variant hover:text-secondary transition-colors duration-200 w-fit"
+                >
+                  {link.label}
+                </Link>
+              ))}
             </div>
             <div className="flex flex-col space-y-2 font-body text-body-md">
               <Link className="text-on-surface-variant hover:text-secondary transition-colors duration-200 w-fit" to="/terms">Terms</Link>
@@ -71,8 +79,8 @@ export default function CartPage() {
     <div className="min-h-screen bg-background flex flex-col">
       <header className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-md">
         <div className="max-w-[1440px] mx-auto px-5 md:px-20 flex justify-between items-center h-20">
-          <Link to="/" className="flex items-center gap-2" aria-label="Aurora Gems - Home">
-            <span className="font-headline text-headline-md text-primary tracking-tighter">AURORA GEMS</span>
+          <Link to="/" className="flex items-center gap-2" aria-label={`${brandConfig.name} - Home`}>
+            <span className="font-headline text-headline-md text-primary tracking-tighter">{brandConfig.name}</span>
           </Link>
           <div className="flex items-center gap-4 text-primary">
             <Link to="/cart" aria-label="Cart" className="cursor-pointer transition-all active:scale-95 hover:opacity-70 p-2">
@@ -154,12 +162,19 @@ export default function CartPage() {
       <footer className="bg-surface-container-low border-t border-outline-variant/30 w-full py-section-gap mt-auto">
         <div className="max-w-[1440px] mx-auto px-5 md:px-20 grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-24">
           <div className="flex flex-col space-y-4">
-            <span className="font-headline text-headline-md text-primary">AURORA GEMS</span>
-            <p className="font-body text-body-md text-on-surface-variant">© 2024 Aurora Gems. All rights reserved.</p>
+            <span className="font-headline text-headline-md text-primary">{brandConfig.name}</span>
+            <p className="font-body text-body-md text-on-surface-variant">{brandConfig.getCopyright()}</p>
           </div>
           <div className="flex flex-col space-y-2 font-body text-body-md">
-            <Link className="text-on-surface-variant hover:text-secondary transition-colors duration-200 w-fit" to="/sourcing">Sourcing</Link>
-            <Link className="text-on-surface-variant hover:text-secondary transition-colors duration-200 w-fit" to="/warranty">Warranty</Link>
+            {footerLinks.support.map((link) => (
+              <Link
+                key={link.href}
+                to={link.href}
+                className="text-on-surface-variant hover:text-secondary transition-colors duration-200 w-fit"
+              >
+                {link.label}
+              </Link>
+            ))}
           </div>
           <div className="flex flex-col space-y-2 font-body text-body-md">
             <Link className="text-on-surface-variant hover:text-secondary transition-colors duration-200 w-fit" to="/terms">Terms</Link>

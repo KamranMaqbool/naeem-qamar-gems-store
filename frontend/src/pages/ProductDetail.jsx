@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { products } from '../data/products';
 import { useCart } from '../context/CartContext';
+import { brandConfig, footerLinks } from '../config/brand';
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -36,7 +37,7 @@ export default function ProductDetail() {
           </nav>
 
           <div className="flex-shrink-0 flex items-center justify-center cursor-pointer hover:opacity-70 transition-opacity duration-300">
-            <span className="font-headline text-headline-md text-primary tracking-tighter">AURORA GEMS</span>
+            <span className="font-headline text-headline-md text-primary tracking-tighter">{brandConfig.name}</span>
           </div>
 
           <div className="flex items-center space-x-2 cursor-pointer transition-all active:scale-95">
@@ -163,12 +164,19 @@ export default function ProductDetail() {
       <footer className="bg-surface-container-low border-t border-outline-variant/30 w-full py-section-gap mt-auto">
         <div className="max-w-[1440px] mx-auto px-5 md:px-20 grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-24">
           <div className="flex flex-col space-y-4">
-            <span className="font-headline text-headline-md text-primary">AURORA GEMS</span>
-            <p className="font-body text-body-md text-on-surface-variant">© 2024 Aurora Gems. All rights reserved.</p>
+            <span className="font-headline text-headline-md text-primary">{brandConfig.name}</span>
+            <p className="font-body text-body-md text-on-surface-variant">{brandConfig.getCopyright()}</p>
           </div>
           <div className="flex flex-col space-y-2 font-body text-body-md">
-            <Link className="text-on-surface-variant hover:text-secondary transition-colors duration-200 w-fit" to="/sourcing">Sourcing</Link>
-            <Link className="text-on-surface-variant hover:text-secondary transition-colors duration-200 w-fit" to="/warranty">Warranty</Link>
+            {footerLinks.support.map((link) => (
+              <Link
+                key={link.href}
+                to={link.href}
+                className="text-on-surface-variant hover:text-secondary transition-colors duration-200 w-fit"
+              >
+                {link.label}
+              </Link>
+            ))}
           </div>
           <div className="flex flex-col space-y-2 font-body text-body-md">
             <Link className="text-on-surface-variant hover:text-secondary transition-colors duration-200 w-fit" to="/terms">Terms</Link>

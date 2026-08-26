@@ -1,13 +1,13 @@
 export const brandConfig = {
-  name: 'AURORA GEMS',
+  name: 'NAEEM QAMAR GEMS',
   logo: {
     src: '/logo.svg',
-    alt: 'Aurora Gems Logo',
+    alt: 'Naeem Qamar Gems Logo',
     width: 40,
     height: 40,
   },
-  tagline: 'Discover Earth\'s Rarest Treasures',
-  copyright: '© 2024 Aurora Gems. All rights reserved.',
+  tagline: "Discover Earth's Rarest Treasures",
+  getCopyright: () => `© ${new Date().getFullYear()} Naeem Qamar Gems. All rights reserved.`,
   socialLinks: [
     { name: 'Instagram', icon: 'photo_camera', href: '#' },
     { name: 'Share', icon: 'share', href: '#' },
