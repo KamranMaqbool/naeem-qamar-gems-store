@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Loose Gemstones | Aurora Gems</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-fixed-dim": "#c8c6c5",
+                    "surface-tint": "#396752",
+                    "on-tertiary-fixed": "#1c1b1b",
+                    "error-container": "#ffdad6",
+                    "on-primary-container": "#73a48c",
+                    "secondary": "#735c00",
+                    "surface-container": "#efeeeb",
+                    "on-tertiary-fixed-variant": "#474746",
+                    "error": "#ba1a1a",
+                    "secondary-fixed": "#ffe088",
+                    "on-secondary-container": "#745c00",
+                    "inverse-on-surface": "#f2f1ee",
+                    "inverse-surface": "#2f312f",
+                    "inverse-primary": "#a0d1b8",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-bright": "#faf9f6",
+                    "on-secondary": "#ffffff",
+                    "primary": "#002215",
+                    "surface-container-low": "#f4f3f0",
+                    "primary-fixed-dim": "#a0d1b8",
+                    "on-primary": "#ffffff",
+                    "surface-container-highest": "#e3e2e0",
+                    "on-error": "#ffffff",
+                    "surface-dim": "#dbdad7",
+                    "tertiary": "#1c1c1c",
+                    "primary-container": "#043927",
+                    "background": "#faf9f6",
+                    "tertiary-container": "#313131",
+                    "outline": "#717973",
+                    "on-error-container": "#93000a",
+                    "surface-variant": "#e3e2e0",
+                    "secondary-container": "#fed65b",
+                    "on-surface-variant": "#414944",
+                    "on-tertiary": "#ffffff",
+                    "secondary-fixed-dim": "#e9c349",
+                    "outline-variant": "#c0c9c2",
+                    "on-background": "#1a1c1a",
+                    "on-secondary-fixed": "#241a00",
+                    "surface-container-high": "#e9e8e5",
+                    "on-tertiary-container": "#9a9998",
+                    "on-primary-fixed-variant": "#204f3c",
+                    "on-primary-fixed": "#002114",
+                    "surface": "#faf9f6",
+                    "on-surface": "#1a1c1a",
+                    "tertiary-fixed": "#e5e2e1",
+                    "primary-fixed": "#bbeed3",
+                    "on-secondary-fixed-variant": "#574500"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "section-gap": "120px",
+                    "margin-desktop": "64px",
+                    "margin-mobile": "20px",
+                    "unit": "8px",
+                    "container-max": "1440px",
+                    "gutter": "24px"
+            },
+            "fontFamily": {
+                    "headline-lg": [
+                            "Playfair Display"
+                    ],
+                    "headline-md": [
+                            "Playfair Display"
+                    ],
+                    "body-lg": [
+                            "Inter"
+                    ],
+                    "body-md": [
+                            "Inter"
+                    ],
+                    "display-lg-mobile": [
+                            "Playfair Display"
+                    ],
+                    "button": [
+                            "Inter"
+                    ],
+                    "display-lg": [
+                            "Playfair Display"
+                    ],
+                    "label-caps": [
+                            "Inter"
+                    ]
+            },
+            "fontSize": {
+                    "headline-lg": [
+                            "48px",
+                            {
+                                    "lineHeight": "1.2",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "headline-md": [
+                            "32px",
+                            {
+                                    "lineHeight": "1.3",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "body-lg": [
+                            "18px",
+                            {
+                                    "lineHeight": "1.6",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "body-md": [
+                            "16px",
+                            {
+                                    "lineHeight": "1.6",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "display-lg-mobile": [
+                            "40px",
+                            {
+                                    "lineHeight": "1.2",
+                                    "letterSpacing": "-0.01em",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "button": [
+                            "14px",
+                            {
+                                    "lineHeight": "1.0",
+                                    "letterSpacing": "0.05em",
+                                    "fontWeight": "500"
+                            }
+                    ],
+                    "display-lg": [
+                            "64px",
+                            {
+                                    "lineHeight": "1.1",
+                                    "letterSpacing": "-0.02em",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "label-caps": [
+                            "12px",
+                            {
+                                    "lineHeight": "1.0",
+                                    "letterSpacing": "0.1em",
+                                    "fontWeight": "600"
+                            }
+                    ]
+            }
+    },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #faf9f6; /* Pearl background */
+            color: #1a1c1a;
+        }
+        .minimal-border {
+            border: 1px solid rgba(212, 175, 55, 0.3); /* Champagne Gold at 30% */
+        }
+        .minimal-bottom-border {
+            border-bottom: 1px solid #002215; /* Emerald Green */
+        }
+        .minimal-bottom-border:focus-within {
+            border-bottom: 1px solid rgba(212, 175, 55, 0.5);
+        }
+        .hover-lift {
+            transition: all 0.3s ease;
+        }
+        .hover-lift:hover {
+            box-shadow: 0px 10px 30px rgba(4, 57, 39, 0.05);
+            transform: translateY(-2px);
+        }
+        .image-scale:hover img {
+            transform: scale(1.05);
+        }
+        .image-scale img {
+            transition: transform 0.5s ease;
+        }
+    </style>
+</head>
+<body class="font-body-md text-body-md antialiased min-h-screen flex flex-col">
+<!-- TopNavBar (Shared Component) -->
+<header class="bg-background dark:bg-background font-label-caps text-label-caps fixed top-0 w-full z-50 bg-background/80 backdrop-blur-md">
+<div class="max-w-container-max mx-auto px-margin-desktop flex justify-between items-center h-20">
+<!-- Brand Logo -->
+<a class="font-headline-md text-headline-md text-primary dark:text-primary-fixed-dim tracking-tighter cursor-pointer transition-all active:scale-95 hover:opacity-70 transition-opacity duration-300 flex items-center gap-2" href="#">
+<img alt="Aurelian Gems Logo" class="h-10 w-10 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYbkY9B7lk4zrbAM58pIV1-E_OlMUvQpcssZxROBT-Bfyj7pCtYT3E0KHCx_3uo94RHIZV-nxvxa_bOVKsefBC_ngrFA_pjHVtYkWJhrrVIM8KEhbxx8dvlfMWzGQm__KKtDd8ATMNpSQMfltLRTVUkFhV_iJ88ST1vLxTUtK46qw5kx9YKvue4qWAP_JEk9mnqqQl9FcbMPv1m3eKos6IEqcWT2Ab_gMjvS7S_9Xo-xdMyGqwMW0f"/>
+<span>AURORA GEMS</span>
+</a>
+<!-- Navigation Links (Desktop) -->
+<nav class="hidden md:flex gap-8 items-center">
+<a class="text-on-surface-variant dark:text-on-tertiary-container hover:text-primary hover:opacity-70 transition-opacity duration-300 cursor-pointer transition-all active:scale-95" href="#">Shop</a>
+<a class="text-secondary dark:text-secondary-fixed relative after:content-[''] after:absolute after:-bottom-1 after:left-1/2 after:-translate-x-1/2 after:w-1 after:h-1 after:bg-secondary after:rounded-full hover:opacity-70 transition-opacity duration-300 cursor-pointer transition-all active:scale-95" href="#">Loose Gems</a>
+<a class="text-on-surface-variant dark:text-on-tertiary-container hover:text-primary hover:opacity-70 transition-opacity duration-300 cursor-pointer transition-all active:scale-95" href="#">Education</a>
+<a class="text-on-surface-variant dark:text-on-tertiary-container hover:text-primary hover:opacity-70 transition-opacity duration-300 cursor-pointer transition-all active:scale-95" href="#">About</a>
+</nav>
+<!-- Trailing Icons -->
+<div class="flex gap-4 items-center">
+<button class="text-primary dark:text-primary-fixed-dim hover:opacity-70 transition-opacity duration-300 cursor-pointer transition-all active:scale-95 flex items-center justify-center p-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">search</span>
+</button>
+<button class="text-primary dark:text-primary-fixed-dim hover:opacity-70 transition-opacity duration-300 cursor-pointer transition-all active:scale-95 flex items-center justify-center p-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">person</span>
+</button>
+<button class="text-primary dark:text-primary-fixed-dim hover:opacity-70 transition-opacity duration-300 cursor-pointer transition-all active:scale-95 flex items-center justify-center p-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">shopping_bag</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-grow pt-28 pb-section-gap max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop w-full">
+<!-- Page Header -->
+<div class="mb-16 text-center max-w-2xl mx-auto">
+<h1 class="font-display-lg text-display-lg text-primary mb-4">Loose Gemstones</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Discover our curated collection of ethically sourced, masterfully cut loose gemstones. Ready to be set in your bespoke creation.</p>
+</div>
+<div class="flex flex-col md:flex-row gap-gutter">
+<!-- Left Sidebar Filters -->
+<aside class="w-full md:w-64 flex-shrink-0 pr-8">
+<div class="sticky top-32 space-y-10">
+<!-- Filter Section: Gemstone Type -->
+<div>
+<h3 class="font-label-caps text-label-caps text-primary mb-4 tracking-widest border-b minimal-border pb-2">GEMSTONE TYPE</h3>
+<div class="space-y-3">
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="form-checkbox h-4 w-4 text-primary-container border-outline-variant rounded-sm focus:ring-primary-container focus:ring-offset-background bg-transparent transition duration-200" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface-variant group-hover:text-primary transition-colors">Ruby</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input checked="" class="form-checkbox h-4 w-4 text-primary-container border-outline-variant rounded-sm focus:ring-primary-container focus:ring-offset-background bg-transparent transition duration-200" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface-variant group-hover:text-primary transition-colors">Sapphire</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="form-checkbox h-4 w-4 text-primary-container border-outline-variant rounded-sm focus:ring-primary-container focus:ring-offset-background bg-transparent transition duration-200" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface-variant group-hover:text-primary transition-colors">Emerald</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="form-checkbox h-4 w-4 text-primary-container border-outline-variant rounded-sm focus:ring-primary-container focus:ring-offset-background bg-transparent transition duration-200" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface-variant group-hover:text-primary transition-colors">Diamond</span>
+</label>
+</div>
+</div>
+<!-- Filter Section: Carat Weight -->
+<div>
+<h3 class="font-label-caps text-label-caps text-primary mb-4 tracking-widest border-b minimal-border pb-2">CARAT WEIGHT</h3>
+<div class="space-y-3">
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="form-checkbox h-4 w-4 text-primary-container border-outline-variant rounded-sm focus:ring-primary-container focus:ring-offset-background bg-transparent transition duration-200" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface-variant group-hover:text-primary transition-colors">Under 1.00 ct</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="form-checkbox h-4 w-4 text-primary-container border-outline-variant rounded-sm focus:ring-primary-container focus:ring-offset-background bg-transparent transition duration-200" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface-variant group-hover:text-primary transition-colors">1.00 - 2.00 ct</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input checked="" class="form-checkbox h-4 w-4 text-primary-container border-outline-variant rounded-sm focus:ring-primary-container focus:ring-offset-background bg-transparent transition duration-200" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface-variant group-hover:text-primary transition-colors">2.00 - 5.00 ct</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="form-checkbox h-4 w-4 text-primary-container border-outline-variant rounded-sm focus:ring-primary-container focus:ring-offset-background bg-transparent transition duration-200" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface-variant group-hover:text-primary transition-colors">Over 5.00 ct</span>
+</label>
+</div>
+</div>
+<!-- Filter Section: Cut -->
+<div>
+<h3 class="font-label-caps text-label-caps text-primary mb-4 tracking-widest border-b minimal-border pb-2">CUT</h3>
+<div class="flex flex-wrap gap-2">
+<button class="px-3 py-1 font-button text-button border minimal-border rounded-sm text-on-surface-variant hover:text-primary hover:border-primary transition-colors bg-transparent">Oval</button>
+<button class="px-3 py-1 font-button text-button border border-primary bg-primary-container text-on-primary rounded-sm transition-colors">Cushion</button>
+<button class="px-3 py-1 font-button text-button border minimal-border rounded-sm text-on-surface-variant hover:text-primary hover:border-primary transition-colors bg-transparent">Round</button>
+<button class="px-3 py-1 font-button text-button border minimal-border rounded-sm text-on-surface-variant hover:text-primary hover:border-primary transition-colors bg-transparent">Emerald</button>
+<button class="px-3 py-1 font-button text-button border minimal-border rounded-sm text-on-surface-variant hover:text-primary hover:border-primary transition-colors bg-transparent">Pear</button>
+</div>
+</div>
+<!-- Filter Section: Price Range -->
+<div>
+<h3 class="font-label-caps text-label-caps text-primary mb-4 tracking-widest border-b minimal-border pb-2">PRICE RANGE</h3>
+<div class="flex items-center gap-4">
+<div class="minimal-bottom-border w-full py-1">
+<span class="text-on-surface-variant text-sm mr-1">$</span>
+<input class="bg-transparent border-none p-0 w-16 text-primary focus:ring-0 text-sm" placeholder="Min" type="number" value="1000"/>
+</div>
+<span class="text-outline">-</span>
+<div class="minimal-bottom-border w-full py-1">
+<span class="text-on-surface-variant text-sm mr-1">$</span>
+<input class="bg-transparent border-none p-0 w-20 text-primary focus:ring-0 text-sm" placeholder="Max" type="number" value="50000"/>
+</div>
+</div>
+</div>
+</div>
+</aside>
+<!-- Product Grid Area -->
+<div class="flex-grow">
+<!-- Toolbar -->
+<div class="flex justify-between items-center mb-8 pb-4 border-b minimal-border">
+<p class="font-body-md text-body-md text-on-surface-variant">Showing 48 exceptional stones</p>
+<div class="flex items-center gap-2">
+<span class="font-label-caps text-label-caps text-on-surface-variant">SORT BY:</span>
+<select class="bg-transparent border-none text-primary font-button text-button focus:ring-0 cursor-pointer py-1 pl-2 pr-8 minimal-bottom-border">
+<option>Featured</option>
+<option>Price: Low to High</option>
+<option>Price: High to Low</option>
+<option>Carat: High to Low</option>
+<option>Newest Arrivals</option>
+</select>
+</div>
+</div>
+<!-- 3-Column Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
+<!-- Product Card 1 -->
+<a class="group block image-scale" href="#">
+<div class="relative bg-surface-container-lowest aspect-square mb-6 overflow-hidden flex items-center justify-center p-4">
+<!-- Tag -->
+<div class="absolute top-4 left-4 z-10 px-3 py-1 border border-[#D4AF37] font-label-caps text-label-caps text-primary bg-background/80 backdrop-blur-sm rounded-sm uppercase tracking-widest text-[10px]">
+                                New Arrival
+                            </div>
+<img alt="Placeholder image for a brilliant blue sapphire, cushion cut, vivid color, macro photography, luxury jewelry." class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDKewHUQbwVF5HHTQJWvEuL8tvqJdcN1u41bOIfuWSLUMJ_fw3dfvNrIFEw9r89BzxF9JZJTfCkHKnDW_QNSyRVMrZ-X029zJTp53mrZ_13QdirabQgK4QfAmayrWK_UZ6hBbtv2VTHWwk84Y0OO_M3aWaqgVgj80qwAlOCgr19x92MpI3_uzqaWZU8TzSNApiMy8SBgZvmEMeavUIj0j0P6B4kP8l4gGpE2QAyJDk6c6whIhxztGzJ"/>
+</div>
+<div class="text-center">
+<h4 class="font-headline-md text-headline-md text-primary mb-1">Ceylon Sapphire</h4>
+<p class="font-body-md text-body-md text-on-surface-variant mb-2">3.15 Carat • Cushion Cut</p>
+<p class="font-button text-button text-primary">$12,500</p>
+</div>
+</a>
+<!-- Product Card 2 -->
+<a class="group block image-scale" href="#">
+<div class="relative bg-surface-container-lowest aspect-square mb-6 overflow-hidden flex items-center justify-center p-4">
+<!-- Tag -->
+<div class="absolute top-4 left-4 z-10 px-3 py-1 border border-[#D4AF37] font-label-caps text-label-caps text-primary bg-background/80 backdrop-blur-sm rounded-sm uppercase tracking-widest text-[10px]">
+                                Rare Find
+                            </div>
+<img alt="Macro product shot of a 1.5-carat pigeon blood ruby, oval cut, deep red, luxury jewelry photography." class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAxKAmBIR0MAftZpjKdpmfC4XBHPlVgpZwtEH16Au4_n_ymh8wuT1ASNlF9C9q-sy3gjbzyTmhuXtlm-H7Fd8wUz8xiylzy1FVRN3E8RO5yibaG_Cu4Z6GaO73C0QTc7E6rZM0yoZVwxkMcfR26sIyVcyfl0LVZTpwpLoyPvYhZCGXcEt0Y0_n3hyRG-fnFZd7T3TVQWexn8pf_QgWsSg1uX6YLed46cXqaW304i2NhfrYwu6WaBvgO"/>
+</div>
+<div class="text-center">
+<h4 class="font-headline-md text-headline-md text-primary mb-1">Burmese Ruby</h4>
+<p class="font-body-md text-body-md text-on-surface-variant mb-2">1.50 Carat • Oval Cut</p>
+<p class="font-button text-button text-primary">$18,200</p>
+</div>
+</a>
+<!-- Product Card 3 -->
+<a class="group block image-scale" href="#">
+<div class="relative bg-surface-container-lowest aspect-square mb-6 overflow-hidden flex items-center justify-center p-4">
+<img alt="Macro product shot of a 2.5-carat Colombian emerald, pear cut, lush green, luxury jewelry photography." class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC6hfMj2z27VvR9Bj4Wn895Hmq1WB7fUCKd6P1QFk5CGPKVktiuZYmRkIZSHlmoeHO9sNkrDN-sffL1KVRNP5nBArFZoyCOpper6M_-IDKv00F9PB-cbAjMoXXH9zuQde_-WAc-rdbS_fVBhpCy1wcQdNabRvGvSRZkTm78zusNJyrTa6wbVw5WPtyIn44BhS0rJKVg5eyePr_V3TYJKd9rxYcE3YrN2IpkMTK3SYG6e4uVuqIMNjDk"/>
+</div>
+<div class="text-center">
+<h4 class="font-headline-md text-headline-md text-primary mb-1">Colombian Emerald</h4>
+<p class="font-body-md text-body-md text-on-surface-variant mb-2">2.50 Carat • Pear Cut</p>
+<p class="font-button text-button text-primary">$9,800</p>
+</div>
+</a>
+<!-- Product Card 4 -->
+<a class="group block image-scale" href="#">
+<div class="relative bg-surface-container-lowest aspect-square mb-6 overflow-hidden flex items-center justify-center p-4">
+<img alt="Macro product shot of a 3-carat brilliant white diamond, round cut, sparkling facets, luxury jewelry photography." class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCG5TuhG5OFNPwqpB0HF_pbKiOwfjXdRD4_aD-I822w3oCOHuomSUrZ_uHMwm-coTtuhGai3AQ4EooFOApZAduQ0GBOuir-V9gzcNE7hntl5agyqX3es-5bsIxJ2BY2V21tfPisImRs8-PhUwmB1XhAaw209s4BUK5XeK8j3J0anrYVAY5XgPMVo61rX8291whU5QuG6Vkat-hUOitSjczODbyzXfn2rVaiEzMtFuXzArewoSb4h3sH"/>
+</div>
+<div class="text-center">
+<h4 class="font-headline-md text-headline-md text-primary mb-1">Flawless Diamond</h4>
+<p class="font-body-md text-body-md text-on-surface-variant mb-2">3.00 Carat • Round Brilliant</p>
+<p class="font-button text-button text-primary">$45,000</p>
+</div>
+</a>
+<!-- Product Card 5 (Placeholder for layout demonstration) -->
+<a class="group block image-scale" href="#">
+<div class="relative bg-surface-container-lowest aspect-square mb-6 overflow-hidden flex items-center justify-center p-4">
+<div class="bg-cover bg-center w-full h-full" data-alt="A macro studio shot of a 4-carat unheated yellow sapphire, emerald cut, showcasing exceptional clarity and vibrant canary yellow hue against a pure white background. High-key lighting, luxury aesthetic, sharp focus." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAvEThfrrdtCo0dGDAUlEmGwWkoGKRYqJp-GOXUVUO2aKnSuxd3j2wEI-mylLGR0RgdoSr4jre070aRXQ6NlCoB4icyM9b7vmT42WAuikO5EdKT0eQD8KERCAvHZOWgxVNsrBP7Gk8Il5ep3y-BnqzOMwKhDjfaI2bqvwRuFNoGX2GbzTbO1j3e94Sy0BBUvPjBhGtPw0p4lP8XX0hJVAWdoDFnTVzvf58zdIldzx25oCSZ6j7CGWhX')"></div>
+</div>
+<div class="text-center">
+<h4 class="font-headline-md text-headline-md text-primary mb-1">Yellow Sapphire</h4>
+<p class="font-body-md text-body-md text-on-surface-variant mb-2">4.10 Carat • Emerald Cut</p>
+<p class="font-button text-button text-primary">$15,400</p>
+</div>
+</a>
+<!-- Product Card 6 (Placeholder for layout demonstration) -->
+<a class="group block image-scale" href="#">
+<div class="relative bg-surface-container-lowest aspect-square mb-6 overflow-hidden flex items-center justify-center p-4">
+<img class="w-full h-full object-cover" data-alt="Close up photograph of a 2-carat pink diamond, radiant cut, exhibiting intense fancy pink color, resting on a smooth grey surface. Soft, diffused lighting highlighting the facets, elegant and minimalist composition." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCuUKktorrJNjm4BDWqfWXnBMB0D8klsZz5tlan6liORgFcrTLv0Mpip1hzfiI8Js2O-MQct56xb2-3nAMw2g6xrMt3-fyfFCItEpvcwKYeoqf7xpvWjRvY4gqqHGZ_abhzyPtoXguFVXBOvWcGRvdz8jRiYU1mF1yIHTQgJNCuOX7h4MUEDr9exc9w_RrAL6MWelMIBnjA4UVQCiaLHZVREjNIKuLs2-Cr8o0hKAeQi6ibld89SPHx"/>
+</div>
+<div class="text-center">
+<h4 class="font-headline-md text-headline-md text-primary mb-1">Fancy Pink Diamond</h4>
+<p class="font-body-md text-body-md text-on-surface-variant mb-2">2.05 Carat • Radiant Cut</p>
+<p class="font-button text-button text-primary">Price on Request</p>
+</div>
+</a>
+</div>
+<!-- Load More Button -->
+<div class="mt-16 text-center">
+<button class="bg-primary-container text-on-primary font-button text-button rounded lg px-8 py-4 hover:bg-primary-fixed-dim hover:text-primary-container transition-colors duration-300">
+                        View More Gemstones
+                    </button>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer (Shared Component) -->
+<footer class="bg-surface-container-low dark:bg-tertiary-container text-primary dark:text-on-primary-fixed font-body-md text-body-md w-full py-section-gap border-t border-outline-variant/30">
+<div class="max-w-container-max mx-auto px-margin-desktop grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<!-- Brand Section -->
+<div class="flex flex-col gap-4">
+<span class="font-headline-md text-headline-md text-primary flex items-center gap-2">
+<img alt="Aurelian Gems Logo" class="h-8 w-8 object-contain opacity-80" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYbkY9B7lk4zrbAM58pIV1-E_OlMUvQpcssZxROBT-Bfyj7pCtYT3E0KHCx_3uo94RHIZV-nxvxa_bOVKsefBC_ngrFA_pjHVtYkWJhrrVIM8KEhbxx8dvlfMWzGQm__KKtDd8ATMNpSQMfltLRTVUkFhV_iJ88ST1vLxTUtK46qw5kx9YKvue4qWAP_JEk9mnqqQl9FcbMPv1m3eKos6IEqcWT2Ab_gMjvS7S_9Xo-xdMyGqwMW0f"/>
+                    AURORA GEMS
+                </span>
+<p class="text-on-surface-variant max-w-sm">Curating the world's most exceptional gemstones for discerning collectors and creators.</p>
+</div>
+<!-- Links Section -->
+<div class="flex flex-col gap-4 md:col-start-2">
+<h4 class="font-label-caps text-label-caps tracking-widest mb-2">Explore</h4>
+<nav class="flex flex-col gap-3">
+<a class="text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">Sourcing</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">Warranty</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">Terms</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">Contact</a>
+</nav>
+</div>
+<!-- Newsletter / Copyright Section -->
+<div class="flex flex-col gap-4 md:col-start-3 md:items-end md:text-right">
+<h4 class="font-label-caps text-label-caps tracking-widest mb-2">Newsletter</h4>
+<div class="flex minimal-bottom-border w-full md:w-auto pb-1 mb-4">
+<input class="bg-transparent border-none p-0 focus:ring-0 text-body-md text-primary placeholder-on-surface-variant w-full md:w-48" placeholder="Email Address" type="email"/>
+<button class="text-primary font-button text-button hover:opacity-70 transition-opacity ml-2">Subscribe</button>
+</div>
+<p class="text-on-surface-variant text-sm mt-auto">© 2024 Aurora Gems. All rights reserved.</p>
+</div>
+</div>
+</footer>
+</body></html>
