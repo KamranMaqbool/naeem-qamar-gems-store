@@ -7,6 +7,7 @@ import Home from './pages/Home';
 import Shop from './pages/Shop';
 import ProductDetail from './pages/ProductDetail';
 import CartPage from './pages/Cart';
+import About from './pages/About';
 import { useCart } from './context/CartContext';
 
 function AppContent() {
@@ -22,7 +23,7 @@ function AppContent() {
           <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/education" element={<div className="py-section-gap px-5 md:px-20 max-w-[1440px] mx-auto text-center"><h1 className="font-display text-display-lg-mobile md:text-display-lg text-primary mb-4">Education</h1><p className="font-body text-body-lg text-on-surface-variant">Coming soon...</p></div>} />
-          <Route path="/about" element={<div className="py-section-gap px-5 md:px-20 max-w-[1440px] mx-auto text-center"><h1 className="font-display text-display-lg-mobile md:text-display-lg text-primary mb-4">About Us</h1><p className="font-body text-body-lg text-on-surface-variant">Coming soon...</p></div>} />
+          <Route path="/about" element={<About />} />
           <Route path="/bespoke" element={<div className="py-section-gap px-5 md:px-20 max-w-[1440px] mx-auto text-center"><h1 className="font-display text-display-lg-mobile md:text-display-lg text-primary mb-4">Bespoke Design</h1><p className="font-body text-body-lg text-on-surface-variant">Coming soon...</p></div>} />
           <Route path="/sourcing" element={<div className="py-section-gap px-5 md:px-20 max-w-[1440px] mx-auto text-center"><h1 className="font-display text-display-lg-mobile md:text-display-lg text-primary mb-4">Our Sourcing</h1><p className="font-body text-body-lg text-on-surface-variant">Coming soon...</p></div>} />
           <Route path="/warranty" element={<div className="py-section-gap px-5 md:px-20 max-w-[1440px] mx-auto text-center"><h1 className="font-display text-display-lg-mobile md:text-display-lg text-primary mb-4">Warranty</h1><p className="font-body text-body-lg text-on-surface-variant">Coming soon...</p></div>} />
