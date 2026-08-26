@@ -1,13 +1,13 @@
 export const brandConfig = {
-  name: 'NAEEM QAMAR GEMS',
+  name: "VIRTUOSO'S GEMS",
   logo: {
     src: '/logo.svg',
-    alt: 'Naeem Qamar Gems Logo',
+    alt: "Virtuoso's Gems Logo",
     width: 40,
     height: 40,
   },
   tagline: "Discover Earth's Rarest Treasures",
-  getCopyright: () => `© ${new Date().getFullYear()} Naeem Qamar Gems. All rights reserved.`,
+  getCopyright: () => `© ${new Date().getFullYear()} Virtuoso's Gems. All rights reserved.`,
   socialLinks: [
     { name: 'Instagram', icon: 'photo_camera', href: '#' },
     { name: 'Share', icon: 'share', href: '#' },
@@ -16,7 +16,6 @@ export const brandConfig = {
 
 export const navLinks = [
   { label: 'Shop', href: '/shop' },
-  { label: 'Education', href: '/education' },
   { label: 'About', href: '/about' },
 ];
 

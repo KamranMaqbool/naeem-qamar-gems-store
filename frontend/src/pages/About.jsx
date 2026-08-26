@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { brandConfig, footerLinks } from '../config/brand';
+import { brandConfig } from '../config/brand';
 
 export default function About() {
   return (
@@ -13,6 +13,7 @@ export default function About() {
             loop
             playsInline
             poster="/logo.svg"
+            style={{ objectFit: 'cover' }}
           >
             <source src="/about-video.mp4" type="video/mp4" />
           </video>
@@ -38,7 +39,7 @@ export default function About() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
               <div className="relative aspect-[4/3] bg-surface-container-low overflow-hidden">
                 <img
-                  alt="Naeem Qamar Gems workshop"
+                  alt="Virtuoso's Gems workshop"
                   className="w-full h-full object-cover"
                   src="https://lh3.googleusercontent.com/aida-public/AB6AXuABuk_j_HckpFbumdF99nS_4qIJCEoEqd9mY72_mOK7nxgxHyf9AX7lxFcOx3oxj8me6j_me4mKj83jHRA0Gubgymc3oOImEnNCISoewsUIVXUIUHLtOOT1043RSVCHOR1xO6AbYcmCQDFMM7yOmttiNw6DFB9rp7akqjnV6ajdaOBK1dEeHZfX5InOq-DMXtzhl5CFkH-DkerTmjwqLA_c4XoaJvNerxqrd8u5aodT4fr1-QBEez6C"
                 />
@@ -50,7 +51,7 @@ export default function About() {
                 </h2>
                 <div className="space-y-4 text-on-surface-variant font-body text-body-lg leading-relaxed">
                   <p>
-                    Founded in the heart of Jaipur's historic gem district, Naeem Qamar Gems began as a
+                    Founded in the heart of Jaipur's historic gem district, Virtuoso's Gems began as a
                     small family workshop where master artisans hand-cut and polished stones for local
                     jewelers. What started with three brothers and a single cutting wheel has grown into
                     a globally recognized name in ethically sourced, exceptional gemstones.
@@ -136,7 +137,7 @@ export default function About() {
                     complete transparency about each stone's identity and treatment history.
                   </p>
                   <p>
-                    This meticulous approach means that when you choose a Naeem Qamar gem,
+                    This meticulous approach means that when you choose a Virtuoso's gem,
                     you're not just buying a stone—you're inheriting a legacy of excellence
                     that spans decades.
                   </p>
@@ -195,7 +196,7 @@ export default function About() {
         <section className="py-section-gap px-5 md:px-20 bg-primary-container">
           <div className="max-w-[1440px] mx-auto text-center">
             <h2 className="font-headline text-headline-lg text-on-primary mb-6">
-              Experience the Naeem Qamar Difference
+              Experience the Virtuoso's Gems Difference
             </h2>
             <p className="font-body text-body-lg text-on-primary/80 mb-10 max-w-2xl mx-auto">
               Whether you're a collector seeking a rare investment stone or a designer crafting
@@ -218,30 +219,6 @@ export default function About() {
           </div>
         </section>
       </main>
-
-      <footer className="bg-surface-container-low border-t border-outline-variant/30 w-full py-section-gap mt-auto">
-        <div className="max-w-[1440px] mx-auto px-5 md:px-20 grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-24">
-          <div className="flex flex-col space-y-4">
-            <span className="font-headline text-headline-md text-primary">{brandConfig.name}</span>
-            <p className="font-body text-body-md text-on-surface-variant">{brandConfig.getCopyright()}</p>
-          </div>
-          <div className="flex flex-col space-y-2 font-body text-body-md">
-            {footerLinks.support.map((link) => (
-              <Link
-                key={link.href}
-                to={link.href}
-                className="text-on-surface-variant hover:text-secondary transition-colors duration-200 w-fit"
-              >
-                {link.label}
-              </Link>
-            ))}
-          </div>
-          <div className="flex flex-col space-y-2 font-body text-body-md">
-            <Link className="text-on-surface-variant hover:text-secondary transition-colors duration-200 w-fit" to="/terms">Terms</Link>
-            <Link className="text-on-surface-variant hover:text-secondary transition-colors duration-200 w-fit" to="/contact">Contact</Link>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
