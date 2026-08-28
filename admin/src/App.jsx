@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard/Dashboard';
 import Products from './pages/Products/Products';
 import AddProduct from './pages/Products/AddProduct';
 import Orders from './pages/Orders/Orders';
+import OrderDetail from './pages/Orders/OrderDetail';
 import Inventory from './pages/Inventory/Inventory';
 import Discounts from './pages/Discounts/Discounts';
 import Settings from './pages/Settings/Settings';
@@ -20,6 +21,7 @@ function AppContent() {
             <Route path="/products/add" element={<AddProduct />} />
             <Route path="/products/:id/edit" element={<AddProduct />} />
             <Route path="/orders" element={<Orders />} />
+            <Route path="/orders/:id" element={<OrderDetail />} />
             <Route path="/inventory" element={<Inventory />} />
             <Route path="/discounts" element={<Discounts />} />
             <Route path="/settings" element={<Settings />} />

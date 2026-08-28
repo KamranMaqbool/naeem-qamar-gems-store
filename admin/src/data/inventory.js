@@ -1,0 +1,101 @@
+export const inventoryItems = [
+  {
+    id: 'LUX-EM-001',
+    name: 'Emerald Cut Diamond',
+    category: 'Loose Gems',
+    sku: 'LUX-EM-001',
+    stock: 12,
+    threshold: 5,
+    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDxfiIsqhGBCzSQEWfZXG0utTczEq2VS43hVcsNioQ0MNLLtz_bd6VvkCi31jcblGgM41Cyws58IyVcPyhstcAn1n9opvr4dUXKAC2rJ5Rv8k5wG9kM9RL7SMRqieIkHvtb0izJHP4MBtTHbeLx4TOHBZd54qhBPNxpDsSlkXehaBAUJY571gOdbZPOWWDjpald96mTIb-gQ9Lehzbz2nmIOQnhRiV8EIAIV_9Qi3oIeSzjAFf-zY65_w',
+    status: 'in-stock',
+  },
+  {
+    id: 'LUX-SA-002',
+    name: 'Round Brilliant Sapphire',
+    category: 'Loose Gems',
+    sku: 'LUX-SA-002',
+    stock: 3,
+    threshold: 5,
+    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDbAeQdPjAykb3IzucteP_Bwp9_hNC3wZOYejrRBiKd_fwp90mvqKyuyh5UoxBD831urteeEoSb0BFtiS2DDtBqNl1rPlh7X53tKfk5JOG13-ayAY6ZDqEXgbdpdHN8xl5DkPomEQiY1bwf8iz4hc-j-5MGSSy_IhC02dBCXAV2orSmM8FtswofX3MalkMh0Ts3bz-CSbZ4kjKqIT3KRg4p8Q2i8AUD1CrUpceaaTCuhJGMCHjxYV73zQ',
+    status: 'low-stock',
+  },
+  {
+    id: 'LUX-RU-003',
+    name: 'Ruby Oval Cut',
+    category: 'Loose Gems',
+    sku: 'LUX-RU-003',
+    stock: 0,
+    threshold: 5,
+    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBe40Kl-RsqoelaaI27XwBqkwZLiacHmRtEVKrqIxVyIVfeaVZdr_8p6ZE9Pfp0Zhy_nRbYLxHztPvaIJ3n-EEQKo2vRoOhu_ymU-2TVpPr--1v9sXJ4sk4P_vM9Z9f1rQkAoDT183ja_4MGyLJNBSpv6mPqcMp2vupfZdjYQHfdoKW0nWekHkhfAFvlIdsUngyXj_cEL_jIu3RQnB_fpSYLwWgn-qkYbEudig_Fac6MnsVKSaaVlhZGA',
+    status: 'out-of-stock',
+  },
+  {
+    id: 'LUX-DM-004',
+    name: 'Princess Cut Diamond',
+    category: 'Loose Gems',
+    sku: 'LUX-DM-004',
+    stock: 8,
+    threshold: 5,
+    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCG5TuhG5OFNPwqpB0HF_pbKiOwfjXdRD4_aD-I822w3oCOHuomSUrZ_uHMwm-coTtuhGai3AQ4EooFOApZAduQ0GBOuir-V9gzcNE7hntl5agyqX3es-5bsIxJ2BY2V21tfPisImRs8-PhUwmB1XhAaw209s4BUK5XeK8j3J0anrYVAY5XgPMVo61rX8291whU5QuG6Vkat-hUOitSjczODbyzXfn2rVaiEzMtFuXzArewoSb4h3sH',
+    status: 'in-stock',
+  },
+  {
+    id: 'LUX-EM-005',
+    name: 'Colombian Emerald',
+    category: 'Loose Gems',
+    sku: 'LUX-EM-005',
+    stock: 2,
+    threshold: 5,
+    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuC6hfMj2z27VvR9Bj4Wn895Hmq1WB7fUCKd6P1QFk5CGPKVktiuZYmRkIZSHlmoeHO9sNkrDN-sffL1KVRNP5nBArFZoyCOpper6M_-IDKv00F9PB-cbAjMoXXH9zuQde_-WAc-rdbS_fVBhpCy1wcQdNabRvGvSRZkTm78zusNJyrTa6wbVw5WPtyIn44BhS0rJKVg5eyePr_V3TYJKd9rxYcE3YrN2IpkMTK3SYG6e4uVuqIMNjDk',
+    status: 'low-stock',
+  },
+  {
+    id: 'LUX-RU-006',
+    name: 'Burmese Ruby',
+    category: 'Loose Gems',
+    sku: 'LUX-RU-006',
+    stock: 15,
+    threshold: 5,
+    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAxKAmBIR0MAftZpjKdpmfC4XBHPlVgpZwtEH16Au4_n_ymh8wuT1ASNlF9C9q-sy3gjbzyTmhuXtlm-H7Fd8wUz8xiylzy1FVRN3E8RO5yibaG_Cu4Z6GaO73C0QTc7E6rZM0yoZVwxkMcfR26sIyVcyfl0LVZTpwpLoyPvYhZCGXcEt0Y0_n3hyRG-fnFZd7T3TVQWexn8pf_QgWsSg1uX6YLed46cXqaW304i2NhfrYwu6WaBvgO',
+    status: 'in-stock',
+  },
+  {
+    id: 'LUX-SA-007',
+    name: 'Padparadscha Sapphire',
+    category: 'Loose Gems',
+    sku: 'LUX-SA-007',
+    stock: 0,
+    threshold: 5,
+    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBuTEtgnV5kfFdIdsx-wAKkbdj4hcEI63rI-_PdtfsfaHXISu0URYyjZqAS_o6nsNRJx4eRvYmHUNOVhMF38D_O9vm2_OQ4Go7ifXlKZzryN_UGo74LJC2AxUBXCykZIx3t4er1NlqnfDHuR-ynxwjvFqAIooddLqrSrkGjbDi6Skd1dQ3SfDEZwWhjoHnKQ3qeogz9ZPfuGnitAt3sR5ZuD-3X1XYF8Ehc-6DdkEQzTRcwCr4ECzbz',
+    status: 'out-of-stock',
+  },
+  {
+    id: 'LUX-DM-008',
+    name: 'Asscher Cut Diamond',
+    category: 'Loose Gems',
+    sku: 'LUX-DM-008',
+    stock: 6,
+    threshold: 5,
+    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCG5TuhG5OFNPwqpB0HF_pbKiOwfjXdRD4_aD-I822w3oCOHuomSUrZ_uHMwm-coTtuhGai3AQ4EooFOApZAduQ0GBOuir-V9gzcNE7hntl5agyqX3es-5bsIxJ2BY2V21tfPisImRs8-PhUwmB1XhAaw209s4BUK5XeK8j3J0anrYVAY5XgPMVo61rX8291whU5QuG6Vkat-hUOitSjczODbyzXfn2rVaiEzMtFuXzArewoSb4h3sH',
+    status: 'in-stock',
+  },
+];
+
+export const inventoryStats = {
+  totalSKUs: 124,
+  lowStockAlerts: 7,
+  outOfStock: 2,
+};
+
+export const stockStatusOptions = [
+  { value: '', label: 'All Statuses' },
+  { value: 'in-stock', label: 'In Stock' },
+  { value: 'low-stock', label: 'Low Stock' },
+  { value: 'out-of-stock', label: 'Out of Stock' },
+];
+
+export const statusConfig = {
+  'in-stock': { label: 'In Stock', className: 'bg-success-bg text-success-text border border-success/20' },
+  'low-stock': { label: 'Low Stock', className: 'bg-warning-bg text-warning-text border border-warning/20' },
+  'out-of-stock': { label: 'Out of Stock', className: 'bg-error-bg text-error-text border border-error/20' },
+};
