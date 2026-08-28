@@ -1,0 +1,445 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/forms";
+@plugin "@tailwindcss/typography";
+@plugin "@tailwindcss/aspect-ratio";
+@plugin "@tailwindcss/container-queries";
+
+@theme {
+  --color-primary: #003527;
+  --color-primary-container: #064e3b;
+  --color-primary-fixed: #b0f0d6;
+  --color-primary-fixed-dim: #95d3ba;
+  --color-on-primary: #ffffff;
+  --color-on-primary-container: #80bea6;
+  --color-on-primary-fixed: #002117;
+  --color-on-primary-fixed-variant: #0b513d;
+  --color-inverse-primary: #95d3ba;
+  
+  --color-secondary: #006c49;
+  --color-secondary-container: #6cf8bb;
+  --color-secondary-fixed: #6ffbbe;
+  --color-secondary-fixed-dim: #4edea3;
+  --color-on-secondary: #ffffff;
+  --color-on-secondary-container: #00714d;
+  --color-on-secondary-fixed: #002113;
+  --color-on-secondary-fixed-variant: #005236;
+  
+  --color-tertiary: #242f41;
+  --color-tertiary-container: #3a4558;
+  --color-tertiary-fixed: #d8e3fb;
+  --color-tertiary-fixed-dim: #bcc7de.
+  --color-on-tertiary: #ffffff;
+  --color-on-tertiary-container: #a7b2c9.
+  --color-on-tertiary-fixed: #111c2d.
+  --color-on-tertiary-fixed-variant: #3c475a.
+  
+  --color-surface: #f7f9fb;
+  --color-surface-dim: #d8dadc;
+  --color-surface-bright: #f7f9fb;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f2f4f6;
+  --color-surface-container: #eceef0;
+  --color-surface-container-high: #e6e8ea;
+  --color-surface-container-highest: #e0e3e5;
+  --color-on-surface: #191c1e;
+  --color-on-surface-variant: #404944;
+  
+  --color-outline: #707974;
+  --color-outline-variant: #bfc9c3;
+  
+  --color-background: #f7f9fb;
+  --color-on-background: #191c1e.
+  --color-surface-variant: #e0e3e5.
+  
+  --color-success: #10B981;
+  --color-success-bg: #ECFDF5;
+  --color-success-text: #064E3B;
+  --color-warning: #F59E0B;
+  --color-warning-bg: #FFFBE6;
+  --color-warning-text: #B45309.
+  --color-error: #ba1a1a.
+  --color-error-bg: #FEF2F2.
+  --color-error-text: #991B1B.
+  --color-info: #3B82F6.
+  --color-info-bg: #EFF6FF.
+  --color-info-text: #1D4ED8.
+  
+  --radius-sm: 0.25rem.
+  --radius-md: 0.5rem.
+  --radius-lg: 1rem.
+  --radius-xl: 1.5rem.
+  --radius-2xl: 2rem.
+  --radius-full: 9999px.
+  
+  --spacing-base: 4px.
+  --spacing-xs: 4px.
+  --spacing-sm: 8px.
+  --spacing-md: 16px.
+  --spacing-lg: 24px.
+  --spacing-xl: 32px.
+  --spacing-gutter: 24px.
+  --spacing-margin: 24px.
+  --spacing-max-width: 1440px.
+  
+  --font-body: "Inter", sans-serif.
+  --font-headline: "Inter", sans-serif.
+  --font-display: "Inter", sans-serif.
+  --font-mono: "Inter", sans-serif.
+  --font-label: "Inter", sans-serif.
+  
+  --text-display-lg: 36px.
+  --text-display-lg--line-height: 44px.
+  --text-display-lg--letter-spacing: -0.02em.
+  --text-display-lg--font-weight: 700.
+  
+  --text-display-lg-mobile: 28px.
+  --text-display-lg-mobile--line-height: 34px.
+  --text-display-lg-mobile--letter-spacing: -0.01em.
+  --text-display-lg-mobile--font-weight: 700.
+  
+  --text-headline-md: 24px.
+  --text-headline-md--line-height: 32px.
+  --text-headline-md--letter-spacing: -0.01em.
+  --text-headline-md--font-weight: 600.
+  
+  --text-headline-sm: 20px.
+  --text-headline-sm--line-height: 28px.
+  --text-headline-sm--font-weight: 600.
+  
+  --text-body-lg: 16px.
+  --text-body-lg--line-height: 24px.
+  --text-body-lg--font-weight: 400.
+  
+  --text-body-md: 14px.
+  --text-body-md--line-height: 20px.
+  --text-body-md--font-weight: 400.
+  
+  --text-label-md: 12px.
+  --text-label-md--line-height: 16px.
+  --text-label-md--letter-spacing: 0.05em.
+  --text-label-md--font-weight: 600.
+  
+  --text-mono-label: 13px.
+  --text-mono-label--line-height: 18px.
+  --text-mono-label--font-weight: 500.
+  
+  --shadow-resting: 0px 1px 3px rgba(0, 0, 0, 0.05), 0px 1px 2px rgba(0, 0, 0, 0.03).
+  --shadow-floating: 0px 10px 15px -3px rgba(0, 0, 0, 0.08).
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+  
+  html {
+    font-family: var(--font-body);
+  }
+  
+  body {
+    background-color: #F8FAFC;
+    color: var(--color-on-surface);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    margin: 0;
+  }
+  
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+  
+  .material-symbols-outlined.fill {
+    font-variation-settings: 'FILL' 1;
+  }
+}
+
+@layer components {
+  .shadow-resting {
+    box-shadow: var(--shadow-resting);
+  }
+  
+  .shadow-floating {
+    box-shadow: var(--shadow-floating);
+  }
+  
+  .sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    color: rgba(255, 255, 255, 0.7);
+    border-left: 4px solid transparent;
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+  
+  .sidebar-link:hover {
+    color: white;
+    background-color: rgba(6, 78, 59, 0.5);
+  }
+  
+  .sidebar-link.active {
+    background-color: rgba(108, 248, 187, 0.1);
+    color: #6ffbbe;
+    border-left-color: #4edea3;
+  }
+  
+  .data-table th {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #404944;
+    background-color: #F1F5F9;
+    border-bottom: 1px solid #e6e8ea;
+  }
+  
+  .data-table td {
+    padding: 1rem 1.5rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    border-bottom: 1px solid #F1F5F9;
+  }
+  
+  .data-table tr {
+    transition: background-color 0.2s;
+  }
+  
+  .data-table tr:hover {
+    background-color: #f7f9fb;
+  }
+  
+  .data-table tr:hover td:last-child button {
+    opacity: 1;
+  }
+  
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.125rem 0.625rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  
+  .status-badge.pending {
+    background-color: #FFFBE6;
+    color: #B45309;
+  }
+  
+  .status-badge.shipped {
+    background-color: #EFF6FF;
+    color: #1D4ED8;
+  }
+  
+  .status-badge.delivered {
+    background-color: #ECFDF5;
+    color: #064E3B;
+  }
+  
+  .status-badge.cancelled {
+    background-color: #FEF2F2;
+    color: #991B1B;
+  }
+  
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: #064e3b;
+    color: white;
+    border-radius: 0.5rem;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    transition: background-color 0.2s;
+    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.05), 0px 1px 2px rgba(0, 0, 0, 0.03);
+  }
+  
+  .btn-primary:hover {
+    background-color: #003527;
+  }
+  
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid #bfc9c3;
+    border-radius: 0.5rem;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #191c1e;
+    background-color: white;
+    transition: background-color 0.2s;
+    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.03);
+  }
+  
+  .btn-secondary:hover {
+    background-color: #f2f4f6;
+  }
+  
+  .btn-tertiary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #404944;
+    transition: all 0.2s;
+  }
+  
+  .btn-tertiary:hover {
+    color: #064e3b;
+    background-color: #f2f4f6;
+  }
+  
+  .input-field {
+    width: 100%;
+    background-color: white;
+    border: 1px solid #bfc9c3;
+    border-radius: 0.75rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    color: #191c1e;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  
+  .input-field:focus {
+    border-color: #064e3b;
+    box-shadow: 0 0 0 1px rgba(6, 78, 59, 0.1);
+  }
+  
+  .input-field::placeholder {
+    color: #707974;
+  }
+  
+  .card {
+    background-color: white;
+    border-radius: 1.5rem;
+    border: 1px solid #e0e3e5;
+    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.05), 0px 1px 2px rgba(0, 0, 0, 0.03);
+  }
+  
+  .kpi-card {
+    background-color: white;
+    border-radius: 1.5rem;
+    border: 1px solid #e0e3e5;
+    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.05), 0px 1px 2px rgba(0, 0, 0, 0.03);
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: box-shadow 0.3s;
+  }
+  
+  .kpi-card:hover {
+    box-shadow: 0px 10px 15px -3px rgba(0, 0, 0, 0.08);
+  }
+  
+  .kpi-card:hover .watermark {
+    opacity: 0.1;
+  }
+  
+  .watermark {
+    position: absolute;
+    bottom: -1rem;
+    right: -1rem;
+    width: 6rem;
+    height: 6rem;
+    opacity: 0.05;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+}
+
+@layer utilities {
+  .font-display-lg {
+    font-size: 36px;
+    line-height: 44px;
+    letter-spacing: -0.02em;
+    font-weight: 700;
+  }
+  
+  .font-display-lg-mobile {
+    font-size: 28px;
+    line-height: 34px;
+    letter-spacing: -0.01em;
+    font-weight: 700;
+  }
+  
+  .font-headline-md {
+    font-size: 24px;
+    line-height: 32px;
+    letter-spacing: -0.01em;
+    font-weight: 600;
+  }
+  
+  .font-headline-sm {
+    font-size: 20px;
+    line-height: 28px;
+    font-weight: 600;
+  }
+  
+  .font-body-lg {
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 400;
+  }
+  
+  .font-body-md {
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 400;
+  }
+  
+  .font-label-md {
+    font-size: 12px;
+    line-height: 16px;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  
+  .font-mono-label {
+    font-size: 13px;
+    line-height: 18px;
+    font-weight: 500;
+  }
+  
+  .text-on-primary {
+    color: #ffffff;
+  }
+  
+  .text-on-primary\/70 {
+    color: rgba(255, 255, 255, 0.7);
+  }
+  
+  .bg-primary-container\/10 {
+    background-color: rgba(6, 78, 59, 0.1);
+  }
+  
+  .bg-secondary-container\/10 {
+    background-color: rgba(108, 248, 187, 0.1);
+  }
+  
+  .bg-primary-container\/50 {
+    background-color: rgba(6, 78, 59, 0.5);
+  }
+}

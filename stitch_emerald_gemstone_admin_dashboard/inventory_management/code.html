@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AURUM GEMS - Inventory &amp; Stock Control</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "background": "#f7f9fb",
+                        "primary-fixed": "#b0f0d6",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed-dim": "#bcc7de",
+                        "tertiary-fixed": "#d8e3fb",
+                        "surface-container-highest": "#e0e3e5",
+                        "surface-container": "#eceef0",
+                        "primary-container": "#064e3b",
+                        "on-primary-fixed": "#002117",
+                        "inverse-on-surface": "#eff1f3",
+                        "on-surface": "#191c1e",
+                        "on-primary-fixed-variant": "#0b513d",
+                        "error-container": "#ffdad6",
+                        "surface": "#f7f9fb",
+                        "surface-bright": "#f7f9fb",
+                        "outline-variant": "#bfc9c3",
+                        "on-tertiary-fixed-variant": "#3c475a",
+                        "on-surface-variant": "#404944",
+                        "surface-container-high": "#e6e8ea",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "inverse-primary": "#95d3ba",
+                        "surface-variant": "#e0e3e5",
+                        "secondary-container": "#6cf8bb",
+                        "on-background": "#191c1e",
+                        "secondary-fixed-dim": "#4edea3",
+                        "surface-container-low": "#f2f4f6",
+                        "outline": "#707974",
+                        "inverse-surface": "#2d3133",
+                        "tertiary-container": "#3a4558",
+                        "primary-fixed-dim": "#95d3ba",
+                        "on-secondary-fixed": "#002113",
+                        "secondary-fixed": "#6ffbbe",
+                        "on-tertiary": "#ffffff",
+                        "surface-tint": "#2b6954",
+                        "primary": "#003527",
+                        "tertiary": "#242f41",
+                        "error": "#ba1a1a",
+                        "on-primary-container": "#80bea6",
+                        "on-error-container": "#93000a",
+                        "on-secondary-fixed-variant": "#005236",
+                        "on-tertiary-fixed": "#111c2d",
+                        "surface-dim": "#d8dadc",
+                        "on-tertiary-container": "#a7b2c9",
+                        "on-secondary-container": "#00714d",
+                        "secondary": "#006c49",
+                        "on-error": "#ffffff"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "sm": "8px",
+                        "gutter": "24px",
+                        "max_width": "1440px",
+                        "base": "4px",
+                        "xs": "4px",
+                        "md": "16px",
+                        "xl": "32px",
+                        "margin": "24px",
+                        "lg": "24px"
+                    },
+                    fontFamily: {
+                        "display-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "display-lg-mobile": ["Inter"],
+                        "label-md": ["Inter"],
+                        "mono-label": ["Inter"],
+                        "headline-md": ["Inter"]
+                    },
+                    fontSize: {
+                        "display-lg": ["36px", { lineHeight: "44px", letterSpacing: "-0.02em", fontWeight: "700" }],
+                        "body-md": ["14px", { lineHeight: "20px", fontWeight: "400" }],
+                        "headline-sm": ["20px", { lineHeight: "28px", fontWeight: "600" }],
+                        "body-lg": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+                        "display-lg-mobile": ["28px", { lineHeight: "34px", letterSpacing: "-0.01em", fontWeight: "700" }],
+                        "label-md": ["12px", { lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "600" }],
+                        "mono-label": ["13px", { lineHeight: "18px", fontWeight: "500" }],
+                        "headline-md": ["24px", { lineHeight: "32px", letterSpacing: "-0.01em", fontWeight: "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .custom-shadow { box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.05), 0px 1px 2px rgba(0, 0, 0, 0.03); }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen">
+<!-- SideNavBar -->
+<aside class="bg-primary text-secondary-fixed h-screen w-64 fixed left-0 top-0 border-r border-outline-variant shadow-md z-50">
+<div class="flex flex-col h-full py-6">
+<div class="px-6 mb-8 flex items-center gap-4">
+<div class="w-10 h-10 bg-surface-container-lowest rounded-full flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary">diamond</span>
+</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm font-bold text-on-primary tracking-tight">AURUM GEMS</h1>
+<p class="text-[10px] uppercase tracking-widest text-on-primary/70">Luxury Admin</p>
+</div>
+</div>
+<nav class="flex-1 flex flex-col gap-1 px-2 font-body-md text-body-md">
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/70 hover:text-on-primary hover:bg-primary-container/50 transition-colors rounded cursor-pointer active:scale-95" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                    Dashboard
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/70 hover:text-on-primary hover:bg-primary-container/50 transition-colors rounded cursor-pointer active:scale-95" href="#">
+<span class="material-symbols-outlined">shopping_cart</span>
+                    Orders
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/70 hover:text-on-primary hover:bg-primary-container/50 transition-colors rounded cursor-pointer active:scale-95" href="#">
+<span class="material-symbols-outlined">save_as</span>
+                    Products
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container/10 text-secondary-fixed border-l-4 border-secondary-fixed cursor-pointer active:scale-95" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+                    Inventory
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/70 hover:text-on-primary hover:bg-primary-container/50 transition-colors rounded cursor-pointer active:scale-95" href="#">
+<span class="material-symbols-outlined">sell</span>
+                    Discounts
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/70 hover:text-on-primary hover:bg-primary-container/50 transition-colors rounded cursor-pointer active:scale-95" href="#">
+<span class="material-symbols-outlined">settings</span>
+                    Settings
+                </a>
+</nav>
+</div>
+</aside>
+<!-- TopNavBar -->
+<header class="bg-surface-container-lowest fixed top-0 right-0 left-64 h-16 border-b border-surface-container-highest shadow-sm z-40">
+<div class="flex justify-between items-center px-6 h-full font-label-md text-label-md">
+<div class="flex items-center gap-4 w-1/3">
+<div class="relative w-full max-w-md">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full pl-10 pr-4 py-2 border border-outline-variant rounded-md bg-surface-bright focus:border-primary-container focus:ring-4 focus:ring-primary-container/10 transition-all duration-200 text-on-surface" placeholder="Search..." type="text"/>
+</div>
+</div>
+<div class="font-headline-md text-headline-md text-on-surface absolute left-1/2 -translate-x-1/2">
+                Admin Dashboard
+            </div>
+<div class="flex items-center gap-4 text-primary">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-low transition-all duration-200">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-low transition-all duration-200">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-64 pt-16 p-8 min-h-screen">
+<div class="max-w-[1440px] mx-auto">
+<!-- Page Header -->
+<div class="flex justify-between items-end mb-8">
+<div>
+<h2 class="font-display-lg text-display-lg text-on-surface">Inventory Management</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant mt-2">Monitor and control your luxury gemstone stock.</p>
+</div>
+<div class="flex gap-4">
+<button class="px-6 py-2.5 bg-surface-container-lowest border border-tertiary-container text-tertiary-container rounded-md font-label-md text-label-md font-bold uppercase tracking-wider hover:bg-surface-container-low transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">download</span>
+                        Export CSV
+                    </button>
+<button class="px-6 py-2.5 bg-primary-container text-on-primary rounded-md font-label-md text-label-md font-bold uppercase tracking-wider hover:bg-primary transition-colors flex items-center gap-2 shadow-sm">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                        Receive Stock
+                    </button>
+</div>
+</div>
+<!-- Summary Cards (Bento-style Grid) -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+<div class="bg-surface-container-lowest p-6 rounded-xl border border-surface-container-highest custom-shadow relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-[64px] text-primary-container">inventory_2</span>
+</div>
+<p class="font-label-md text-label-md text-on-surface-variant uppercase mb-2">Total SKUs</p>
+<p class="font-display-lg text-display-lg text-on-surface">124</p>
+<p class="font-body-md text-body-md text-on-surface-variant mt-2">Active products in catalog</p>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-xl border border-surface-container-highest custom-shadow relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-[64px] text-yellow-600">warning</span>
+</div>
+<p class="font-label-md text-label-md text-on-surface-variant uppercase mb-2">Low Stock Alerts</p>
+<p class="font-display-lg text-display-lg text-yellow-600">7</p>
+<p class="font-body-md text-body-md text-on-surface-variant mt-2">Items below threshold (5)</p>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-xl border border-surface-container-highest custom-shadow relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-[64px] text-error">error</span>
+</div>
+<p class="font-label-md text-label-md text-on-surface-variant uppercase mb-2">Out of Stock</p>
+<p class="font-display-lg text-display-lg text-error">2</p>
+<p class="font-body-md text-body-md text-on-surface-variant mt-2">Requires immediate reorder</p>
+</div>
+</div>
+<!-- Table Controls -->
+<div class="flex justify-between items-center mb-4 bg-surface-container-lowest p-4 rounded-t-xl border border-surface-container-highest border-b-0">
+<div class="relative w-72">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full pl-10 pr-4 py-2 border border-outline-variant rounded-md bg-surface-bright focus:border-primary-container focus:ring-4 focus:ring-primary-container/10 transition-all duration-200 text-body-md font-body-md text-on-surface" placeholder="Search by name or SKU..." type="text"/>
+</div>
+<div class="flex items-center gap-3">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase">Filter by Status:</span>
+<select class="border border-outline-variant rounded-md px-4 py-2 bg-surface-bright text-body-md font-body-md focus:border-primary-container focus:ring-4 focus:ring-primary-container/10">
+<option>All Statuses</option>
+<option>In Stock</option>
+<option>Low Stock</option>
+<option>Out of Stock</option>
+</select>
+</div>
+</div>
+<!-- Enterprise Data Table -->
+<div class="bg-surface-container-lowest border border-surface-container-highest rounded-b-xl custom-shadow overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead class="bg-[#F1F5F9] border-b border-[#E2E8F0]">
+<tr>
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider w-1/3">Product</th>
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">SKU</th>
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Category</th>
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider w-32">Current Stock</th>
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-right">Status</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-[#F1F5F9]">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded bg-surface-dim overflow-hidden shrink-0 border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A macro studio photograph of a flawless emerald cut diamond resting on a crisp white surface. The lighting is bright and high-key, creating intense, precise reflections and refractions within the gem. The aesthetic is extremely high-end, clean, and modern luxury." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDxfiIsqhGBCzSQEWfZXG0utTczEq2VS43hVcsNioQ0MNLLtz_bd6VvkCi31jcblGgM41Cyws58IyVcPyhstcAn1n9opvr4dUXKAC2rJ5Rv8k5wG9kM9RL7SMRqieIkHvtb0izJHP4MBtTHbeLx4TOHBZd54qhBPNxpDsSlkXehaBAUJY571gOdbZPOWWDjpald96mTIb-gQ9Lehzbz2nmIOQnhRiV8EIAIV_9Qi3oIeSzjAFf-zY65_w"/>
+</div>
+<span class="font-headline-sm text-body-lg font-semibold text-on-surface">Emerald Cut Diamond</span>
+</div>
+</td>
+<td class="px-6 py-4 font-mono-label text-mono-label text-on-surface-variant">LUX-EM-001</td>
+<td class="px-6 py-4 font-body-md text-body-md text-on-surface-variant">Loose Gems</td>
+<td class="px-6 py-4">
+<input class="w-20 px-2 py-1 border border-outline-variant rounded text-center font-mono-label text-mono-label focus:border-primary-container focus:ring-4 focus:ring-primary-container/10 transition-all" type="number" value="12"/>
+</td>
+<td class="px-6 py-4 text-right">
+<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-[#10B981]/10 text-[#064E3B] border border-[#10B981]/20">
+                                    In Stock
+                                </span>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded bg-surface-dim overflow-hidden shrink-0 border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A pristine round brilliant cut sapphire viewed from above. The deep ocean-blue gemstone sits perfectly centered on a pure white background. Studio lighting highlights the precise symmetrical facets, conveying immense value and corporate luxury." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDbAeQdPjAykb3IzucteP_Bwp9_hNC3wZOYejrRBiKd_fwp90mvqKyuyh5UoxBD831urteeEoSb0BFtiS2DDtBqNl1rPlh7X53tKfk5JOG13-ayAY6ZDqEXgbdpdHN8xl5DkPomEQiY1bwf8iz4hc-j-5MGSSy_IhC02dBCXAV2orSmM8FtswofX3MalkMh0Ts3bz-CSbZ4kjKqIT3KRg4p8Q2i8AUD1CrUpceaaTCuhJGMCHjxYV73zQ"/>
+</div>
+<span class="font-headline-sm text-body-lg font-semibold text-on-surface">Round Brilliant Sapphire</span>
+</div>
+</td>
+<td class="px-6 py-4 font-mono-label text-mono-label text-on-surface-variant">LUX-SA-002</td>
+<td class="px-6 py-4 font-body-md text-body-md text-on-surface-variant">Loose Gems</td>
+<td class="px-6 py-4">
+<input class="w-20 px-2 py-1 border border-outline-variant rounded text-center font-mono-label text-mono-label focus:border-primary-container focus:ring-4 focus:ring-primary-container/10 transition-all border-yellow-400" type="number" value="3"/>
+</td>
+<td class="px-6 py-4 text-right">
+<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-yellow-400/10 text-yellow-800 border border-yellow-400/20">
+                                    Low Stock
+                                </span>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded bg-surface-dim overflow-hidden shrink-0 border border-outline-variant opacity-50 grayscale">
+<img class="w-full h-full object-cover" data-alt="A highly detailed close-up of a vibrant oval cut ruby isolated against a minimalist stark white background. The gem is softly illuminated to show deep, rich reds and sharp faceting. The overall mood is luxurious, austere, and gallery-like." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBe40Kl-RsqoelaaI27XwBqkwZLiacHmRtEVKrqIxVyIVfeaVZdr_8p6ZE9Pfp0Zhy_nRbYLxHztPvaIJ3n-EEQKo2vRoOhu_ymU-2TVpPr--1v9sXJ4sk4P_vM9Z9f1rQkAoDT183ja_4MGyLJNBSpv6mPqcMp2vupfZdjYQHfdoKW0nWekHkhfAFvlIdsUngyXj_cEL_jIu3RQnB_fpSYLwWgn-qkYbEudig_Fac6MnsVKSaaVlhZGA"/>
+</div>
+<span class="font-headline-sm text-body-lg font-semibold text-on-surface opacity-60">Ruby Oval Cut</span>
+</div>
+</td>
+<td class="px-6 py-4 font-mono-label text-mono-label text-on-surface-variant opacity-60">LUX-RU-003</td>
+<td class="px-6 py-4 font-body-md text-body-md text-on-surface-variant opacity-60">Loose Gems</td>
+<td class="px-6 py-4">
+<input class="w-20 px-2 py-1 border border-error/50 rounded text-center font-mono-label text-mono-label focus:border-error focus:ring-4 focus:ring-error/10 transition-all bg-error/5 text-error" type="number" value="0"/>
+</td>
+<td class="px-6 py-4 text-right">
+<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-error/10 text-error border border-error/20">
+                                    Out of Stock
+                                </span>
+</td>
+</tr>
+</tbody>
+</table>
+<!-- Pagination Footer -->
+<div class="border-t border-surface-container-highest p-4 flex justify-between items-center bg-[#F8FAFC]">
+<span class="font-body-md text-body-md text-on-surface-variant">Showing 1 to 3 of 124 entries</span>
+<div class="flex items-center gap-1">
+<button class="w-8 h-8 flex items-center justify-center rounded border border-outline-variant bg-surface-container-lowest text-on-surface-variant disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined text-[18px]">chevron_left</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded border border-primary-container bg-primary-container text-on-primary font-label-md">1</button>
+<button class="w-8 h-8 flex items-center justify-center rounded border border-outline-variant bg-surface-container-lowest text-on-surface hover:bg-surface-container-low font-label-md">2</button>
+<button class="w-8 h-8 flex items-center justify-center rounded border border-outline-variant bg-surface-container-lowest text-on-surface hover:bg-surface-container-low font-label-md">3</button>
+<span class="px-2 text-on-surface-variant">...</span>
+<button class="w-8 h-8 flex items-center justify-center rounded border border-outline-variant bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container-low">
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

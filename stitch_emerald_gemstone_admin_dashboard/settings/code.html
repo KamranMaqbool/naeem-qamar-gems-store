@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Store Settings - Luxe Facet Admin</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config from Brand Anchors -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-fixed": "#d8e3fb",
+                    "on-secondary-container": "#00714d",
+                    "surface-tint": "#2b6954",
+                    "on-tertiary-fixed-variant": "#3c475a",
+                    "secondary-container": "#6cf8bb",
+                    "on-secondary-fixed": "#002113",
+                    "inverse-surface": "#2d3133",
+                    "on-primary-container": "#80bea6",
+                    "error-container": "#ffdad6",
+                    "on-tertiary": "#ffffff",
+                    "tertiary": "#242f41",
+                    "surface-container-high": "#e6e8ea",
+                    "surface-container-low": "#f2f4f6",
+                    "tertiary-fixed-dim": "#bcc7de",
+                    "surface-dim": "#d8dadc",
+                    "on-primary": "#ffffff",
+                    "on-primary-fixed": "#002117",
+                    "on-surface": "#191c1e",
+                    "primary-fixed": "#b0f0d6",
+                    "on-surface-variant": "#404944",
+                    "primary": "#003527",
+                    "surface-container": "#eceef0",
+                    "on-secondary": "#ffffff",
+                    "surface-container-lowest": "#ffffff",
+                    "primary-fixed-dim": "#95d3ba",
+                    "secondary-fixed-dim": "#4edea3",
+                    "outline-variant": "#bfc9c3",
+                    "on-background": "#191c1e",
+                    "inverse-on-surface": "#eff1f3",
+                    "secondary-fixed": "#6ffbbe",
+                    "primary-container": "#064e3b",
+                    "surface-bright": "#f7f9fb",
+                    "on-secondary-fixed-variant": "#005236",
+                    "on-tertiary-container": "#a7b2c9",
+                    "surface": "#f7f9fb",
+                    "surface-container-highest": "#e0e3e5",
+                    "background": "#f7f9fb",
+                    "outline": "#707974",
+                    "tertiary-container": "#3a4558",
+                    "on-error": "#ffffff",
+                    "on-primary-fixed-variant": "#0b513d",
+                    "error": "#ba1a1a",
+                    "surface-variant": "#e0e3e5",
+                    "inverse-primary": "#95d3ba",
+                    "on-tertiary-fixed": "#111c2d",
+                    "secondary": "#006c49",
+                    "on-error-container": "#93000a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "16px",
+                    "max_width": "1440px",
+                    "xs": "4px",
+                    "sm": "8px",
+                    "margin": "24px",
+                    "lg": "24px",
+                    "gutter": "24px",
+                    "base": "4px",
+                    "xl": "32px"
+            },
+            "fontFamily": {
+                    "mono-label": ["Inter"],
+                    "body-md": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "headline-sm": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "label-md": ["Inter"],
+                    "display-lg-mobile": ["Inter"]
+            },
+            "fontSize": {
+                    "mono-label": ["13px", {"lineHeight": "18px", "fontWeight": "500"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "display-lg": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "display-lg-mobile": ["28px", {"lineHeight": "34px", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        body {
+            background-color: #F8FAFC;
+        }
+        .form-input:focus {
+            border-color: #064E3B;
+            box-shadow: 0 0 0 4px rgba(6, 78, 59, 0.1);
+            outline: none;
+        }
+    </style>
+</head>
+<body class="font-body-md text-on-surface antialiased bg-background">
+<!-- JSON Component: SideNavBar -->
+<nav class="bg-primary dark:bg-primary font-body-md text-body-md h-screen w-64 fixed left-0 top-0 border-r border-outline-variant shadow-md flex flex-col py-6 z-50 md:flex hidden">
+<!-- Brand Header -->
+<div class="px-6 mb-8 flex items-center gap-4">
+<div class="w-10 h-10 rounded bg-on-primary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary font-bold" data-icon="diamond" data-weight="fill" style="font-variation-settings: 'FILL' 1;">diamond</span>
+</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm font-bold text-on-primary tracking-tight">LUXE FACET</h1>
+<p class="font-label-md text-label-md text-on-primary/70 uppercase">Luxury Admin</p>
+</div>
+</div>
+<!-- Navigation Links -->
+<ul class="flex-1 overflow-y-auto space-y-1">
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/70 hover:text-on-primary hover:bg-primary-container/50 transition-colors cursor-pointer active:scale-95" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span>Dashboard</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/70 hover:text-on-primary hover:bg-primary-container/50 transition-colors cursor-pointer active:scale-95" href="#">
+<span class="material-symbols-outlined" data-icon="shopping_cart">shopping_cart</span>
+<span>Orders</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/70 hover:text-on-primary hover:bg-primary-container/50 transition-colors cursor-pointer active:scale-95" href="#">
+<span class="material-symbols-outlined" data-icon="gem">save_as</span>
+<span>Products</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/70 hover:text-on-primary hover:bg-primary-container/50 transition-colors cursor-pointer active:scale-95" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span>Inventory</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/70 hover:text-on-primary hover:bg-primary-container/50 transition-colors cursor-pointer active:scale-95" href="#">
+<span class="material-symbols-outlined" data-icon="sell">sell</span>
+<span>Discounts</span>
+</a>
+</li>
+<!-- ACTIVE STATE -->
+<li>
+<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container/10 text-secondary-fixed border-l-4 border-secondary-fixed hover:bg-primary-container/50 transition-colors cursor-pointer active:scale-95" href="#">
+<span class="material-symbols-outlined" data-icon="settings" data-weight="fill" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span>Settings</span>
+</a>
+</li>
+</ul>
+</nav>
+<!-- Main Content Wrapper -->
+<div class="md:ml-64 flex flex-col min-h-screen">
+<!-- JSON Component: TopNavBar -->
+<header class="bg-surface-container-lowest dark:bg-surface-container-lowest font-label-md text-label-md fixed top-0 right-0 left-0 md:left-64 h-16 border-b border-surface-container-highest shadow-sm flex justify-between items-center px-6 z-40">
+<!-- Mobile Menu Toggle (Visible only on mobile) -->
+<button class="md:hidden text-on-surface p-2 rounded hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+<!-- Product Name / Search Area -->
+<div class="flex items-center gap-4 flex-1">
+<h2 class="font-headline-md text-headline-md text-on-surface hidden md:block">Admin Dashboard</h2>
+<div class="relative max-w-md w-full md:ml-8">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant/70 text-sm" data-icon="search">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-container-low border border-transparent rounded-md text-body-md focus:bg-surface-container-lowest focus:border-outline-variant focus:ring-0 transition-all duration-200" placeholder="Search orders, products..." type="text"/>
+</div>
+</div>
+<!-- Trailing Actions -->
+<div class="flex items-center gap-2">
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition-all duration-200 relative">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition-all duration-200 ml-2">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</header>
+<!-- Page Content Canvas -->
+<main class="flex-1 pt-16 p-4 md:p-8 lg:p-margin mx-auto w-full max-w-max_width">
+<div class="mb-8">
+<h2 class="font-display-lg text-display-lg text-on-surface">Store Settings</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-2">Manage your core store configuration and formatting.</p>
+</div>
+<!-- Bento Grid Layout for Settings Area -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-gutter items-start pb-24">
+<!-- Inner Sidebar (Secondary Navigation) -->
+<aside class="lg:col-span-3 bg-surface-container-lowest rounded-xl shadow-[0px_1px_3px_rgba(0,0,0,0.05),0px_1px_2px_rgba(0,0,0,0.03)] border border-[#E2E8F0] overflow-hidden sticky top-24">
+<nav class="flex flex-col py-2">
+<a class="flex items-center justify-between px-4 py-3 bg-primary/5 border-l-4 border-primary text-primary font-medium transition-colors" href="#">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="storefront">storefront</span>
+<span>General</span>
+</div>
+</a>
+<a class="flex items-center justify-between px-4 py-3 text-on-surface-variant hover:bg-surface-container-low transition-colors border-l-4 border-transparent" href="#">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+<span>Payments</span>
+</div>
+</a>
+<a class="flex items-center justify-between px-4 py-3 text-on-surface-variant hover:bg-surface-container-low transition-colors border-l-4 border-transparent" href="#">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined" data-icon="local_shipping">local_shipping</span>
+<span>Shipping</span>
+</div>
+</a>
+<a class="flex items-center justify-between px-4 py-3 text-on-surface-variant hover:bg-surface-container-low transition-colors border-l-4 border-transparent" href="#">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined" data-icon="account_balance">account_balance</span>
+<span>Taxes</span>
+</div>
+</a>
+<a class="flex items-center justify-between px-4 py-3 text-on-surface-variant hover:bg-surface-container-low transition-colors border-l-4 border-transparent" href="#">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined" data-icon="campaign">campaign</span>
+<span>Notifications</span>
+</div>
+</a>
+</nav>
+</aside>
+<!-- Main Form Area -->
+<div class="lg:col-span-9 space-y-6">
+<!-- Section 1: Store Details -->
+<section class="bg-surface-container-lowest rounded-xl shadow-[0px_1px_3px_rgba(0,0,0,0.05),0px_1px_2px_rgba(0,0,0,0.03)] border border-[#E2E8F0] overflow-hidden p-6 lg:p-8">
+<div class="mb-6 border-b border-surface-variant pb-4">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Store Details</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Basic information used on your storefront and invoices.</p>
+</div>
+<div class="space-y-6">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="col-span-1 md:col-span-2">
+<label class="block font-label-md text-label-md text-on-surface-variant uppercase mb-2" for="storeName">Store Name</label>
+<input class="form-input w-full bg-surface-bright border-[#E2E8F0] rounded-md px-4 py-2.5 text-body-md text-on-surface transition-colors" id="storeName" placeholder="e.g. Luxe Facet" type="text" value="Luxe Facet"/>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant uppercase mb-2" for="contactEmail">Contact Email</label>
+<input class="form-input w-full bg-surface-bright border-[#E2E8F0] rounded-md px-4 py-2.5 text-body-md text-on-surface transition-colors" id="contactEmail" type="email" value="admin@luxefacet.com"/>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant uppercase mb-2" for="phoneNumber">Phone Number</label>
+<input class="form-input w-full bg-surface-bright border-[#E2E8F0] rounded-md px-4 py-2.5 text-body-md text-on-surface transition-colors" id="phoneNumber" placeholder="+1 (555) 000-0000" type="tel"/>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 2: Currency & Region -->
+<section class="bg-surface-container-lowest rounded-xl shadow-[0px_1px_3px_rgba(0,0,0,0.05),0px_1px_2px_rgba(0,0,0,0.03)] border border-[#E2E8F0] overflow-hidden p-6 lg:p-8">
+<div class="mb-6 border-b border-surface-variant pb-4">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Currency &amp; Region</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Configure your primary operating currency and timezone.</p>
+</div>
+<div class="space-y-6">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant uppercase mb-2" for="defaultCurrency">Default Currency</label>
+<div class="relative">
+<select class="form-input appearance-none w-full bg-surface-bright border-[#E2E8F0] rounded-md pl-4 pr-10 py-2.5 text-body-md text-on-surface transition-colors cursor-pointer" id="defaultCurrency">
+<option value="PKR">PKR - Pakistani Rupee</option>
+<option selected="" value="USD">USD - US Dollar</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant uppercase mb-2" for="timezone">Timezone</label>
+<div class="relative">
+<select class="form-input appearance-none w-full bg-surface-bright border-[#E2E8F0] rounded-md pl-4 pr-10 py-2.5 text-body-md text-on-surface transition-colors cursor-pointer" id="timezone">
+<option selected="" value="EST">(GMT-05:00) Eastern Time (US &amp; Canada)</option>
+<option value="PST">(GMT-08:00) Pacific Time (US &amp; Canada)</option>
+<option value="GMT">(GMT+00:00) Greenwich Mean Time</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 3: Order Formatting -->
+<section class="bg-surface-container-lowest rounded-xl shadow-[0px_1px_3px_rgba(0,0,0,0.05),0px_1px_2px_rgba(0,0,0,0.03)] border border-[#E2E8F0] overflow-hidden p-6 lg:p-8">
+<div class="mb-6 border-b border-surface-variant pb-4">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Order Formatting</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Customize how order numbers appear in your system.</p>
+</div>
+<div class="space-y-6">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant uppercase mb-2" for="orderPrefix">Order ID Prefix</label>
+<input class="form-input w-full bg-surface-bright border-[#E2E8F0] rounded-md px-4 py-2.5 text-body-md text-on-surface transition-colors" id="orderPrefix" placeholder="#GEM-" type="text"/>
+<p class="font-body-md text-body-md text-on-surface-variant mt-2 text-sm">Example: #GEM-1001</p>
+</div>
+</div>
+</div>
+</section>
+</div>
+</div>
+</main>
+<!-- Action Bar (Sticky Footer) -->
+<div class="fixed bottom-0 right-0 left-0 md:left-64 bg-surface-container-lowest border-t border-surface-container-highest p-4 md:px-8 z-30 shadow-[0px_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+<div class="max-w-max_width mx-auto flex items-center justify-between md:justify-end gap-6">
+<button class="text-on-surface-variant hover:text-on-surface font-body-md font-medium transition-colors" type="button">
+                    Discard Changes
+                </button>
+<button class="bg-primary-container hover:bg-primary-container/90 text-on-primary px-6 py-2.5 rounded-md font-label-md text-label-md uppercase tracking-wider transition-all shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.1)] active:scale-95 flex items-center gap-2" type="button">
+<span class="material-symbols-outlined text-sm" data-icon="save">save</span>
+                    Save Settings
+                </button>
+</div>
+</div>
+</div>
+</body></html>
