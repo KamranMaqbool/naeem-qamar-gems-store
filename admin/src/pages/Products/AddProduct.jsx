@@ -1,4 +1,5 @@
-import { useState, useNavigate } from 'react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const categories = [
   { value: '', label: 'Select a category' },
@@ -323,64 +324,3 @@ export default function AddProduct() {
     </div>
   );
 }
-
-function handleChange(e) {
-  const { name, value, type } = e.target;
-  setFormData((prev) => ({
-    ...prev,
-    [name]: type === 'number' ? (value === '' ? 0 : Number(value)) : value,
-  }));
-}
-
-function handleDrag(e) {
-  e.preventDefault();
-  e.stopPropagation();
-  if (e.type === 'dragenter' || e.type === 'dragover') {
-    setDragActive(true);
-  } else if (e.type === 'dragleave') {
-    setDragActive(false);
-  }
-}
-
-function handleDrop(e) {
-  e.preventDefault();
-  e.stopPropagation();
-  setDragActive(false);
-  if (e.dataTransfer.files) {
-    const files = Array.from(e.dataTransfer.files).filter((f) => f.type.startsWith('image/'));
-    const newImages = files.map((file) => URL.createObjectURL(file));
-    setImages((prev) => [...prev, ...newImages].slice(0, 5));
-  }
-}
-
-function handleFileSelect(e) {
-  if (e.target.files) {
-    const files = Array.from(e.target.files).filter((f) => f.type.startsWith('image/'));
-    const newImages = files.map((file) => URL.createObjectURL(file));
-    setImages((prev) => [...prev, ...newImages].slice(0, 5));
-  }
-}
-
-function removeImage(index) {
-  setImages((prev) => prev.filter((_, i) => i !== index));
-}
-
-function handleSubmit(e) {
-  e.preventDefault();
-  console.log('Saving product:', { ...formData, images });
-  alert('Product saved successfully!');
-  navigate('/products');
-}
-
-const [formData, setFormData] = useState({
-  title: '',
-  description: '',
-  category: '',
-  regularPrice: '',
-  salePrice: '',
-  sku: '',
-  quantity: 0,
-});
-const [images, setImages] = useState([]);
-const [dragActive, setDragActive] = useState(false);
-const navigate = useNavigate();

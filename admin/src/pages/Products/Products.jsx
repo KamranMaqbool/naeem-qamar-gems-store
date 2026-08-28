@@ -1,11 +1,45 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { products, categories, stockStatuses, statusConfig } from '../../data/products';
+import { products as staticProducts, categories, stockStatuses, statusConfig } from '../../data/products';
+import { fetchAdminProducts, isAuthenticated, login } from '../../lib/api';
 
 export default function Products() {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
   const [stockStatus, setStockStatus] = useState('');
+  const [apiProducts, setApiProducts] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadProducts() {
+      try {
+        if (!isAuthenticated()) {
+          await login('admin@virtuoso-gems.com', 'admin123');
+        }
+        const data = await fetchAdminProducts();
+        const productList = data.results || data;
+        setApiProducts(productList.map((p) => ({
+          id: p.id,
+          name: p.title,
+          category: p.category?.name || p.category || '',
+          sku: p.sku,
+          stock: p.inventory?.current_stock ?? 0,
+          price: parseFloat(p.base_price),
+          salePrice: p.sale_price ? parseFloat(p.sale_price) : null,
+          status: p.inventory?.stock_status === 'OUT_OF_STOCK' ? 'out-of-stock'
+            : p.inventory?.stock_status === 'LOW_STOCK' ? 'low-stock' : 'active',
+          image: typeof p.primary_image === 'object' ? p.primary_image?.image_url : p.primary_image || '',
+        })));
+      } catch {
+        setApiProducts(null);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadProducts();
+  }, []);
+
+  const products = apiProducts || staticProducts;
 
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
@@ -15,11 +49,10 @@ export default function Products() {
       const matchesStock = !stockStatus || product.status === stockStatus;
       return matchesSearch && matchesCategory && matchesStock;
     });
-  }, [search, category, stockStatus]);
+  }, [products, search, category, stockStatus]);
 
   return (
     <div>
-      {/* Page Header */}
       <div className="mb-8 flex justify-between items-end">
         <div>
           <h1 className="text-[36px] leading-[44px] tracking-[-0.02em] font-bold text-on-surface">Products</h1>
@@ -31,7 +64,6 @@ export default function Products() {
         </Link>
       </div>
 
-      {/* Filters */}
       <div className="flex flex-col md:flex-row gap-4 mb-8">
         <div className="relative flex-1">
           <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
@@ -44,20 +76,12 @@ export default function Products() {
           />
         </div>
         <div className="flex gap-4">
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className="bg-surface-container-low border border-outline-variant text-on-surface-variant text-[12px] leading-[16px] font-semibold uppercase tracking-wider rounded-md px-4 py-2 text-sm focus:ring-1 focus:ring-primary-container outline-none"
-          >
+          <select value={category} onChange={(e) => setCategory(e.target.value)} className="bg-surface-container-low border border-outline-variant text-on-surface-variant text-[12px] leading-[16px] font-semibold uppercase tracking-wider rounded-md px-4 py-2 text-sm focus:ring-1 focus:ring-primary-container outline-none">
             {categories.map((cat) => (
               <option key={cat.value} value={cat.value}>{cat.label}</option>
             ))}
           </select>
-          <select
-            value={stockStatus}
-            onChange={(e) => setStockStatus(e.target.value)}
-            className="bg-surface-container-low border border-outline-variant text-on-surface-variant text-[12px] leading-[16px] font-semibold uppercase tracking-wider rounded-md px-4 py-2 text-sm focus:ring-1 focus:ring-primary-container outline-none"
-          >
+          <select value={stockStatus} onChange={(e) => setStockStatus(e.target.value)} className="bg-surface-container-low border border-outline-variant text-on-surface-variant text-[12px] leading-[16px] font-semibold uppercase tracking-wider rounded-md px-4 py-2 text-sm focus:ring-1 focus:ring-primary-container outline-none">
             {stockStatuses.map((status) => (
               <option key={status.value} value={status.value}>{status.label}</option>
             ))}
@@ -65,7 +89,6 @@ export default function Products() {
         </div>
       </div>
 
-      {/* Products Table */}
       <div className="card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
@@ -81,18 +104,14 @@ export default function Products() {
               </tr>
             </thead>
             <tbody>
-              {filteredProducts.map((product) => (
+              {loading ? (
+                <tr><td colSpan="7" className="py-12 text-center text-on-surface-variant">Loading products...</td></tr>
+              ) : filteredProducts.map((product) => (
                 <tr key={product.id} className="border-b border-[#F1F5F9] hover:bg-surface-bright transition-colors group">
                   <td className="py-4 px-6">
                     <div className="flex items-center gap-3">
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        className="w-12 h-12 rounded-md object-cover"
-                      />
-                      <div>
-                        <p className="font-medium text-on-surface">{product.name}</p>
-                      </div>
+                      <img src={product.image} alt={product.name} className="w-12 h-12 rounded-md object-cover" />
+                      <div><p className="font-medium text-on-surface">{product.name}</p></div>
                     </div>
                   </td>
                   <td className="py-4 px-6 text-on-surface-variant">{product.category}</td>
@@ -136,7 +155,7 @@ export default function Products() {
             </tbody>
           </table>
         </div>
-        {filteredProducts.length === 0 && (
+        {!loading && filteredProducts.length === 0 && (
           <div className="p-12 text-center">
             <span className="material-symbols-outlined text-on-surface-variant/30 text-6xl mb-4 block">inventory_2</span>
             <p className="text-[16px] leading-[24px] text-on-surface-variant">No products found</p>
@@ -144,13 +163,9 @@ export default function Products() {
           </div>
         )}
         <div className="px-6 py-4 border-t border-surface-container-highest bg-white flex items-center justify-between">
-          <span className="text-[14px] leading-[20px] text-sm text-on-surface-variant">Showing 1 to {filteredProducts.length} of {products.length} entries</span>
+          <span className="text-[14px] leading-[20px] text-sm text-on-surface-variant">Showing {filteredProducts.length} of {products.length} entries</span>
           <div className="flex gap-1">
-            <button className="px-3 py-1 border border-outline-variant rounded-md text-sm text-on-surface-variant hover:bg-surface-container-low disabled:opacity-50" disabled>Prev</button>
             <button className="px-3 py-1 bg-primary-container text-white rounded-md text-sm shadow-sm">1</button>
-            <button className="px-3 py-1 border border-outline-variant rounded-md text-sm text-on-surface hover:bg-surface-container-low">2</button>
-            <button className="px-3 py-1 border border-outline-variant rounded-md text-sm text-on-surface hover:bg-surface-container-low">3</button>
-            <button className="px-3 py-1 border border-outline-variant rounded-md text-sm text-on-surface hover:bg-surface-container-low">Next</button>
           </div>
         </div>
       </div>

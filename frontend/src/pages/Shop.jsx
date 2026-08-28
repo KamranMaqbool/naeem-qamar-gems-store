@@ -1,9 +1,12 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import ProductCard from '../components/product/ProductCard';
 import FilterSidebar from '../components/product/FilterSidebar';
-import { products } from '../data/products';
+import { products as staticProducts } from '../data/products';
+import { fetchProducts } from '../lib/api';
 
 export default function Shop() {
+  const [apiProducts, setApiProducts] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
     types: [],
     carats: [],
@@ -11,6 +14,32 @@ export default function Shop() {
     priceRange: { min: 1000, max: 50000 },
     sortBy: 'Featured',
   });
+
+  useEffect(() => {
+    setLoading(true);
+    fetchProducts()
+      .then((products) => {
+        const mapped = products.map((p) => ({
+          id: p.id,
+          name: p.title,
+          slug: p.slug,
+          carat: p.gemstone_attributes?.carat_weight || '',
+          cut: p.gemstone_attributes?.cut_shape || '',
+          price: parseFloat(p.sale_price || p.base_price),
+          image: typeof p.primary_image === 'object' ? p.primary_image?.image_url : p.primary_image,
+          alt: p.title,
+          tags: (p.tags || '').split(',').map((t) => t.trim()).filter(Boolean),
+          type: p.category?.name || p.category || '',
+          category: 'loose',
+          priceOnRequest: parseFloat(p.base_price) === 0,
+        }));
+        setApiProducts(mapped);
+      })
+      .catch(() => setApiProducts(null))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const products = apiProducts || staticProducts;
 
   const handleFilterChange = (newFilters) => {
     setFilters((prev) => ({ ...prev, ...newFilters }));
@@ -67,7 +96,7 @@ export default function Shop() {
         <div className="flex-grow">
           <div className="flex justify-between items-center mb-8 pb-4 border-b border-outline-variant/30">
             <p className="font-body text-body-md text-on-surface-variant">
-              Showing {sortedProducts.length} exceptional stones
+              {loading ? 'Loading...' : `Showing ${sortedProducts.length} exceptional stones`}
             </p>
             <div className="flex items-center gap-2">
               <span className="font-label text-label-caps text-on-surface-variant">SORT BY:</span>
@@ -85,13 +114,25 @@ export default function Shop() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
-            {sortedProducts.map((product) => (
-              <ProductCard key={product.id} product={product} variant="grid" />
-            ))}
-          </div>
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="animate-pulse">
+                  <div className="bg-surface-container-low h-64 rounded-lg mb-4" />
+                  <div className="bg-surface-container-low h-4 rounded w-3/4 mb-2" />
+                  <div className="bg-surface-container-low h-4 rounded w-1/2" />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
+              {sortedProducts.map((product) => (
+                <ProductCard key={product.id} product={product} variant="grid" />
+              ))}
+            </div>
+          )}
 
-          {sortedProducts.length === 0 && (
+          {!loading && sortedProducts.length === 0 && (
             <div className="text-center py-16">
               <p className="font-body text-body-lg text-on-surface-variant">No gemstones match your filters.</p>
               <p className="font-body text-body-md text-on-surface-variant/70 mt-2">Try adjusting your search criteria.</p>

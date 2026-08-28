@@ -11,7 +11,7 @@ const navItems = [
 ];
 
 export default function Sidebar() {
-  const { sidebarOpen, closeSidebar, currentPage } = useAdmin();
+  const { sidebarOpen, closeSidebar, currentPage, user } = useAdmin();
   const location = useLocation();
 
   return (
