@@ -7,7 +7,8 @@ const navItems = [
   { path: '/products', label: 'Products', icon: 'save_as', fill: false },
   { path: '/inventory', label: 'Inventory', icon: 'inventory_2', fill: false },
   { path: '/discounts', label: 'Discounts', icon: 'sell', fill: false },
-  { path: '/settings', label: 'Settings', icon: 'settings', fill: false },
+  { path: '/customers', label: 'Customers', icon: 'group', fill: false },
+  { path: '/profile', label: 'Profile', icon: 'settings', fill: true },
 ];
 
 export default function Sidebar() {

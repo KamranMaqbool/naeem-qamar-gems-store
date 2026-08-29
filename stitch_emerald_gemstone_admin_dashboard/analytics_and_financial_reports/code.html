@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Analytics &amp; Sales Intelligence - AURUM GEMS</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error": "#ba1a1a",
+                        "inverse-primary": "#95d3ba",
+                        "on-tertiary-fixed-variant": "#3c475a",
+                        "on-secondary": "#ffffff",
+                        "secondary": "#006c49",
+                        "on-surface-variant": "#404944",
+                        "on-error": "#ffffff",
+                        "secondary-container": "#6cf8bb",
+                        "error-container": "#ffdad6",
+                        "primary-fixed-dim": "#95d3ba",
+                        "on-surface": "#191c1e",
+                        "surface-container": "#eceef0",
+                        "on-secondary-fixed": "#002113",
+                        "on-primary-fixed-variant": "#0b513d",
+                        "on-primary-container": "#80bea6",
+                        "on-background": "#191c1e",
+                        "on-tertiary-container": "#a7b2c9",
+                        "tertiary": "#242f41",
+                        "on-secondary-container": "#00714d",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed": "#d8e3fb",
+                        "on-tertiary-fixed": "#111c2d",
+                        "surface-bright": "#f7f9fb",
+                        "surface-tint": "#2b6954",
+                        "outline": "#707974",
+                        "surface-container-low": "#f2f4f6",
+                        "on-tertiary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "outline-variant": "#bfc9c3",
+                        "surface-container-high": "#e6e8ea",
+                        "secondary-fixed-dim": "#4edea3",
+                        "primary-container": "#064e3b",
+                        "background": "#f7f9fb",
+                        "primary-fixed": "#b0f0d6",
+                        "surface-variant": "#e0e3e5",
+                        "secondary-fixed": "#6ffbbe",
+                        "on-secondary-fixed-variant": "#005236",
+                        "surface": "#f7f9fb",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed": "#002117",
+                        "surface-container-highest": "#e0e3e5",
+                        "tertiary-fixed-dim": "#bcc7de",
+                        "inverse-on-surface": "#eff1f3",
+                        "tertiary-container": "#3a4558",
+                        "inverse-surface": "#2d3133",
+                        "surface-dim": "#d8dadc",
+                        "primary": "#003527"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xs": "4px",
+                        "max_width": "1440px",
+                        "base": "4px",
+                        "margin": "24px",
+                        "sm": "8px",
+                        "gutter": "24px",
+                        "lg": "24px",
+                        "md": "16px",
+                        "xl": "32px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Inter"],
+                        "label-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "display-lg-mobile": ["Inter"],
+                        "mono-label": ["Inter"],
+                        "headline-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "display-lg": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "display-lg-mobile": ["28px", { "lineHeight": "34px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "mono-label": ["13px", { "lineHeight": "18px", "fontWeight": "500" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #F8FAFC; }
+        .chart-grid {
+            background-image: linear-gradient(to right, #E2E8F0 1px, transparent 1px),
+                              linear-gradient(to bottom, #E2E8F0 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen">
+<!-- SideNavBar -->
+<aside class="h-screen w-64 fixed left-0 top-0 bg-primary border-r border-outline-variant shadow-md flex flex-col py-6 z-20">
+<div class="px-6 mb-8 flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-on-secondary-container text-[18px]">diamond</span>
+</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm font-bold text-on-primary tracking-tight">AURUM GEMS</h1>
+<p class="text-[10px] uppercase tracking-wider text-on-primary/70">Luxury Admin</p>
+</div>
+</div>
+<nav class="flex-1 space-y-1 mt-4">
+<!-- Active Tab (Dashboard mapping for Analytics) -->
+<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container/10 text-secondary-fixed border-l-4 border-secondary-fixed font-body-md text-body-md hover:bg-primary-container/50 transition-colors cursor-pointer active:scale-95" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/70 hover:text-on-primary font-body-md text-body-md hover:bg-primary-container/50 transition-colors cursor-pointer active:scale-95" href="#">
+<span class="material-symbols-outlined">shopping_cart</span>
+<span>Orders</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/70 hover:text-on-primary font-body-md text-body-md hover:bg-primary-container/50 transition-colors cursor-pointer active:scale-95" href="#">
+<span class="material-symbols-outlined">save_as</span>
+<span>Products</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/70 hover:text-on-primary font-body-md text-body-md hover:bg-primary-container/50 transition-colors cursor-pointer active:scale-95" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span>Inventory</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/70 hover:text-on-primary font-body-md text-body-md hover:bg-primary-container/50 transition-colors cursor-pointer active:scale-95" href="#">
+<span class="material-symbols-outlined">sell</span>
+<span>Discounts</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/70 hover:text-on-primary font-body-md text-body-md hover:bg-primary-container/50 transition-colors cursor-pointer active:scale-95 mt-auto" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span>Settings</span>
+</a>
+</nav>
+</aside>
+<!-- TopNavBar -->
+<header class="fixed top-0 right-0 left-64 h-16 bg-surface-container-lowest border-b border-surface-container-highest shadow-sm z-10">
+<div class="flex justify-between items-center px-6 h-full">
+<div class="flex items-center gap-4">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px]">search</span>
+<input class="pl-9 pr-4 py-2 bg-surface-container-low border-none rounded-full font-body-md text-body-md text-on-surface focus:ring-1 focus:ring-primary focus:bg-surface-container-lowest transition-colors w-64" placeholder="Search..." type="text"/>
+</div>
+</div>
+<div class="font-headline-md text-headline-md text-on-surface">Admin Dashboard</div>
+<div class="flex items-center gap-4 text-primary font-label-md text-label-md">
+<button class="w-10 h-10 rounded-full hover:bg-surface-container-low flex items-center justify-center transition-all duration-200">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="w-10 h-10 rounded-full hover:bg-surface-container-low flex items-center justify-center transition-all duration-200">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="ml-64 pt-16 min-h-screen">
+<div class="max-w-[1440px] mx-auto px-6 py-8">
+<!-- Page Header -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+<div>
+<h2 class="font-display-lg text-display-lg text-on-surface">Analytics &amp; Financial Reports</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Monitor high-value inventory performance and sales intelligence.</p>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center bg-surface-container-lowest border border-outline-variant rounded-md px-3 py-2 shadow-sm text-sm">
+<span class="material-symbols-outlined text-[18px] text-outline mr-2">calendar_today</span>
+<span class="font-body-md text-on-surface font-medium">Last 30 Days</span>
+<span class="material-symbols-outlined text-[18px] text-outline ml-2">expand_more</span>
+</div>
+<button class="bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md py-2 px-4 rounded-md shadow-md transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">download</span>
+                        Download Full PDF Report
+                    </button>
+</div>
+</div>
+<!-- Bento Grid Layout for Charts -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
+<!-- Left Card: Area Line Chart (60%) -->
+<div class="lg:col-span-8 bg-surface-container-lowest rounded-lg border border-surface-container-highest shadow-sm overflow-hidden flex flex-col">
+<div class="px-6 py-5 border-b border-surface-container-highest flex justify-between items-center bg-white">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Total Revenue vs. Net Profit</h3>
+<div class="flex gap-4 font-label-md text-label-md text-on-surface-variant">
+<div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-[#064E3B]"></div>Revenue</div>
+<div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-[#9CA3AF]"></div>Net Profit</div>
+</div>
+</div>
+<div class="p-6 flex-1 bg-white relative">
+<!-- Simulated Chart -->
+<div class="w-full h-64 chart-grid relative">
+<!-- Y-Axis Labels -->
+<div class="absolute left-0 top-0 bottom-0 w-12 flex flex-col justify-between text-xs text-outline pt-2 pb-6">
+<span>$150k</span><span>$100k</span><span>$50k</span><span>$0</span>
+</div>
+<!-- Mock Area Paths using SVG for visual structure -->
+<svg class="absolute inset-0 w-full h-full ml-12 pb-6" preserveaspectratio="none" viewbox="0 0 100 100">
+<!-- Profit (Grey) Area -->
+<path d="M0,100 L0,70 L20,65 L40,80 L60,50 L80,60 L100,40 L100,100 Z" fill="#9CA3AF" fill-opacity="0.2"></path>
+<path d="M0,70 L20,65 L40,80 L60,50 L80,60 L100,40" fill="none" stroke="#9CA3AF" stroke-width="2"></path>
+<!-- Revenue (Emerald) Area -->
+<path d="M0,100 L0,50 L20,30 L40,45 L60,15 L80,25 L100,5 L100,100 Z" fill="#064E3B" fill-opacity="0.1"></path>
+<path d="M0,50 L20,30 L40,45 L60,15 L80,25 L100,5" fill="none" stroke="#064E3B" stroke-width="2"></path>
+</svg>
+<!-- X-Axis Labels -->
+<div class="absolute bottom-0 left-12 right-0 flex justify-between text-xs text-outline pt-2">
+<span>Week 1</span><span>Week 2</span><span>Week 3</span><span>Week 4</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Card: Donut Chart (40%) -->
+<div class="lg:col-span-4 bg-surface-container-lowest rounded-lg border border-surface-container-highest shadow-sm overflow-hidden flex flex-col">
+<div class="px-6 py-5 border-b border-surface-container-highest bg-white">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Sales by Gemstone Type</h3>
+</div>
+<div class="p-6 flex-1 bg-white flex flex-col justify-center items-center">
+<!-- Simulated Donut Chart using SVG -->
+<div class="relative w-48 h-48 mb-6">
+<svg class="transform -rotate-90 w-full h-full" viewbox="0 0 100 100">
+<!-- Others 10% -->
+<circle cx="50" cy="50" fill="transparent" r="40" stroke="#E2E8F0" stroke-dasharray="25.12 251.2" stroke-dashoffset="0" stroke-width="20"></circle>
+<!-- Rubies 15% -->
+<circle cx="50" cy="50" fill="transparent" r="40" stroke="#991B1B" stroke-dasharray="37.68 251.2" stroke-dashoffset="-25.12" stroke-width="20"></circle>
+<!-- Emeralds 30% -->
+<circle cx="50" cy="50" fill="transparent" r="40" stroke="#064E3B" stroke-dasharray="75.36 251.2" stroke-dashoffset="-62.8" stroke-width="20"></circle>
+<!-- Sapphires 45% -->
+<circle cx="50" cy="50" fill="transparent" r="40" stroke="#1E3A8A" stroke-dasharray="113.04 251.2" stroke-dashoffset="-138.16" stroke-width="20"></circle>
+</svg>
+<div class="absolute inset-0 flex items-center justify-center flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface">1,240</span>
+<span class="text-xs text-outline">Total Units</span>
+</div>
+</div>
+<!-- Legend -->
+<div class="w-full space-y-3 font-body-md text-sm">
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-2"><div class="w-3 h-3 rounded-sm bg-[#1E3A8A]"></div><span class="text-on-surface-variant">Sapphires</span></div>
+<span class="font-semibold">45%</span>
+</div>
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-2"><div class="w-3 h-3 rounded-sm bg-[#064E3B]"></div><span class="text-on-surface-variant">Emeralds</span></div>
+<span class="font-semibold">30%</span>
+</div>
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-2"><div class="w-3 h-3 rounded-sm bg-[#991B1B]"></div><span class="text-on-surface-variant">Rubies</span></div>
+<span class="font-semibold">15%</span>
+</div>
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-2"><div class="w-3 h-3 rounded-sm bg-[#E2E8F0]"></div><span class="text-on-surface-variant">Others</span></div>
+<span class="font-semibold">10%</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Section: Performance Metrics Tables -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+<!-- Table 1: Top Performing Products -->
+<div class="bg-surface-container-lowest rounded-lg border border-surface-container-highest shadow-sm overflow-hidden">
+<div class="px-6 py-5 border-b border-surface-container-highest bg-white flex justify-between items-center">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Top Performing Products</h3>
+<button class="text-primary text-sm font-medium hover:underline">View All</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse bg-white">
+<thead>
+<tr class="bg-[#F1F5F9] font-label-md text-label-md text-on-surface-variant uppercase border-b border-surface-container-highest">
+<th class="py-3 px-6 font-medium">Gemstone/Item</th>
+<th class="py-3 px-6 font-medium">SKU</th>
+<th class="py-3 px-6 font-medium text-right">Revenue</th>
+</tr>
+</thead>
+<tbody class="font-body-md text-on-surface divide-y divide-[#F1F5F9]">
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="py-4 px-6 font-medium">2ct Emerald Cut Diamond</td>
+<td class="py-4 px-6 text-on-surface-variant text-sm">DIA-EC-002</td>
+<td class="py-4 px-6 text-right font-semibold">$45,000</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="py-4 px-6 font-medium">Royal Blue Sapphire (3ct)</td>
+<td class="py-4 px-6 text-on-surface-variant text-sm">SAP-RB-003</td>
+<td class="py-4 px-6 text-right font-semibold">$32,500</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="py-4 px-6 font-medium">Pigeon Blood Ruby (1.5ct)</td>
+<td class="py-4 px-6 text-on-surface-variant text-sm">RUB-PB-015</td>
+<td class="py-4 px-6 text-right font-semibold">$28,000</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="py-4 px-6 font-medium">Columbian Emerald (4ct)</td>
+<td class="py-4 px-6 text-on-surface-variant text-sm">EME-CO-004</td>
+<td class="py-4 px-6 text-right font-semibold">$24,200</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="py-4 px-6 font-medium">Fancy Yellow Diamond (1ct)</td>
+<td class="py-4 px-6 text-on-surface-variant text-sm">DIA-FY-001</td>
+<td class="py-4 px-6 text-right font-semibold">$18,900</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Table 2: Sales Channel Breakdown -->
+<div class="bg-surface-container-lowest rounded-lg border border-surface-container-highest shadow-sm overflow-hidden">
+<div class="px-6 py-5 border-b border-surface-container-highest bg-white">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Sales Channel Breakdown</h3>
+</div>
+<div class="p-6 bg-white space-y-6">
+<!-- Direct Website Sales -->
+<div>
+<div class="flex justify-between items-end mb-2">
+<div>
+<h4 class="font-semibold text-on-surface">Direct Website Sales</h4>
+<p class="text-xs text-on-surface-variant mt-1">Standard inventory purchases</p>
+</div>
+<div class="text-right">
+<div class="font-headline-sm text-headline-sm">$84,500</div>
+<div class="text-xs text-secondary font-medium flex items-center justify-end gap-1"><span class="material-symbols-outlined text-[14px]">trending_up</span> +12%</div>
+</div>
+</div>
+<!-- Progress Bar -->
+<div class="w-full bg-surface-container-highest h-2 rounded-full overflow-hidden">
+<div class="bg-primary h-full" style="width: 65%;"></div>
+</div>
+</div>
+<hr class="border-surface-container-highest"/>
+<!-- Bespoke Custom Orders -->
+<div>
+<div class="flex justify-between items-end mb-2">
+<div>
+<h4 class="font-semibold text-on-surface">Bespoke Custom Orders</h4>
+<p class="text-xs text-on-surface-variant mt-1">High-touch consultation sales</p>
+</div>
+<div class="text-right">
+<div class="font-headline-sm text-headline-sm">$64,100</div>
+<div class="text-xs text-secondary font-medium flex items-center justify-end gap-1"><span class="material-symbols-outlined text-[14px]">trending_up</span> +8%</div>
+</div>
+</div>
+<!-- Progress Bar -->
+<div class="w-full bg-surface-container-highest h-2 rounded-full overflow-hidden">
+<div class="bg-[#1E3A8A] h-full" style="width: 35%;"></div>
+</div>
+</div>
+<!-- Summary Stats underneath -->
+<div class="grid grid-cols-2 gap-4 pt-4">
+<div class="bg-surface p-4 rounded-md border border-surface-container-highest">
+<div class="text-xs text-on-surface-variant uppercase tracking-wider mb-1">Avg. Order Value (Web)</div>
+<div class="font-headline-sm font-semibold">$3,250</div>
+</div>
+<div class="bg-surface p-4 rounded-md border border-surface-container-highest">
+<div class="text-xs text-on-surface-variant uppercase tracking-wider mb-1">Avg. Order Value (Custom)</div>
+<div class="font-headline-sm font-semibold text-primary">$12,820</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

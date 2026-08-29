@@ -9,6 +9,8 @@ import OrderDetail from './pages/Orders/OrderDetail';
 import Inventory from './pages/Inventory/Inventory';
 import Discounts from './pages/Discounts/Discounts';
 import Settings from './pages/Settings/Settings';
+import Profile from './pages/Profile/Profile';
+import Customers from './pages/Customers/Customers';
 
 function AppContent() {
   return (
@@ -25,6 +27,8 @@ function AppContent() {
             <Route path="/inventory" element={<Inventory />} />
             <Route path="/discounts" element={<Discounts />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/customers" element={<Customers />} />
           </Route>
         </Routes>
       </AdminProvider>
