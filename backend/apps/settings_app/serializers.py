@@ -25,6 +25,7 @@ class AdminStoreSettingsSerializer(serializers.ModelSerializer):
             'id', 'store_name', 'contact_email', 'contact_phone',
             'default_currency', 'tax_rate_percentage',
             'free_shipping_threshold', 'order_prefix', 'logo_url',
+            'payment_settings', 'shipping_settings', 'notification_settings',
             'created_at', 'updated_at',
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']

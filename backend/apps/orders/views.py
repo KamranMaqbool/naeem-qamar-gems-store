@@ -189,6 +189,10 @@ class AdminOrderListView(generics.ListAPIView):
         order_status = self.request.query_params.get('status')
         if order_status:
             qs = qs.filter(order_status=order_status)
+        search = self.request.query_params.get('search')
+        if search:
+            from django.db.models import Q
+            qs = qs.filter(Q(order_number__icontains=search) | Q(guest_email__icontains=search) | Q(user__email__icontains=search) | Q(user__username__icontains=search))
         return qs
 
 

@@ -1,11 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { kpiCards as staticKpiCards, recentActivity, recentOrders as staticRecentOrders, statusConfig } from '../../data/dashboard';
-import { fetchDashboardKPIs, fetchAdminOrders, isAuthenticated, login } from '../../lib/api';
+import { fetchDashboardKPIs, fetchAdminOrders, fetchRevenueChart, isAuthenticated, login } from '../../lib/api';
 
 export default function Dashboard() {
   const [chartPeriod, setChartPeriod] = useState('Last 30 Days');
   const [kpiCards, setKpiCards] = useState(staticKpiCards);
   const [recentOrders, setRecentOrders] = useState(staticRecentOrders);
+  const [chartData, setChartData] = useState([]);
   const chartRef = useRef(null);
 
   useEffect(() => {
@@ -15,11 +17,12 @@ export default function Dashboard() {
           await login('admin@virtuoso-gems.com', 'admin123');
         }
         const kpis = await fetchDashboardKPIs();
+        const revenue = Number(kpis.total_revenue || 0);
         setKpiCards([
-          { ...staticKpiCards[0], value: `$${(kpis.total_revenue || 0).toLocaleString()}` },
+          { ...staticKpiCards[0], value: `$${revenue.toLocaleString()}` },
           { ...staticKpiCards[1], value: String(kpis.active_orders_count || 0) },
           { ...staticKpiCards[2], value: String(kpis.low_stock_count || 0) },
-          { ...staticKpiCards[3], value: `$${Math.round((kpis.total_revenue || 0) / Math.max(kpis.total_orders || 1, 1)).toLocaleString()}` },
+          { ...staticKpiCards[3], value: `$${Math.round(revenue / Math.max(Number(kpis.total_orders) || 1, 1)).toLocaleString()}` },
         ]);
 
         const ordersData = await fetchAdminOrders();
@@ -44,10 +47,26 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
+    const period = chartPeriod === 'Last 30 Days' ? 'daily' : 'monthly';
+    (async () => {
+      try {
+        if (!isAuthenticated()) await login('admin@virtuoso-gems.com', 'admin123');
+        const data = await fetchRevenueChart(period);
+        const mapped = (data || []).map((entry) => ({
+          week: new Date(entry.period).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+          revenue: Number(entry.revenue || 0),
+          profit: Number(entry.revenue || 0) * 0.3,
+        })).slice(-6);
+        if (mapped.length > 1) setChartData(mapped);
+      } catch { setChartData([]); }
+    })();
+  }, [chartPeriod]);
+
+  useEffect(() => {
     if (chartRef.current) {
       drawChart(chartRef.current);
     }
-  }, [chartPeriod]);
+  }, [chartPeriod, chartData]);
 
   const drawChart = (canvas) => {
     const ctx = canvas.getContext('2d');
@@ -60,15 +79,30 @@ export default function Dashboard() {
 
     ctx.clearRect(0, 0, cssWidth, cssHeight);
 
-    const data = {
-      'Last 30 Days': [12000, 19000, 15000, 25000, 22000, 30000, 28000, 35000, 32000, 40000, 38000, 45000, 42000, 48000, 50000, 52000, 55000, 58000, 60000, 62000, 65000, 63000, 68000, 70000, 72000, 75000, 78000, 80000, 82000, 85000],
-      'This Quarter': [45000, 52000, 48000, 65000, 58000, 72000, 68000, 85000, 78000, 92000, 88000, 105000, 98000, 112000, 108000, 125000, 118000, 135000, 128000, 142000, 135000, 150000, 142000, 160000, 152000, 168000, 160000, 175000, 168000, 185000],
-      'This Year': [120000, 145000, 135000, 180000, 165000, 210000, 195000, 240000, 220000, 270000, 250000, 300000, 280000, 330000, 310000, 360000, 340000, 395000, 370000, 420000, 400000, 450000, 430000, 485000, 460000, 510000, 490000, 540000, 520000, 570000],
+    const fallbackData = {
+      'Last 30 Days': [
+        { week: 'Week 1', revenue: 12000, profit: 4500 },
+        { week: 'Week 2', revenue: 19000, profit: 6000 },
+        { week: 'Week 3', revenue: 15000, profit: 4000 },
+        { week: 'Week 4', revenue: 25000, profit: 7500 },
+      ],
+      'This Quarter': [
+        { week: 'Week 1', revenue: 45000, profit: 15000 },
+        { week: 'Week 2', revenue: 52000, profit: 18000 },
+        { week: 'Week 3', revenue: 48000, profit: 14000 },
+        { week: 'Week 4', revenue: 65000, profit: 20000 },
+      ],
+      'This Year': [
+        { week: 'Month 1', revenue: 120000, profit: 35000 },
+        { week: 'Month 2', revenue: 145000, profit: 42000 },
+        { week: 'Month 3', revenue: 135000, profit: 38000 },
+        { week: 'Month 4', revenue: 180000, profit: 55000 },
+      ],
     };
 
-    const values = data[chartPeriod] || data['Last 30 Days'];
-    const maxVal = Math.max(...values);
-    const minVal = Math.min(...values);
+    const values = chartData.length > 1 ? chartData : (fallbackData[chartPeriod] || fallbackData['Last 30 Days']);
+    const maxVal = Math.max(...values.flatMap(v => [v.revenue, v.profit]));
+    const minVal = 0;
     const range = maxVal - minVal || 1;
     const padding = { top: 20, right: 10, bottom: 40, left: 60 };
     const graphWidth = cssWidth - padding.left - padding.right;
@@ -78,6 +112,7 @@ export default function Dashboard() {
     const getY = (val) => padding.top + graphHeight - ((val - minVal) / range) * graphHeight;
     const getX = (i) => padding.left + i * xStep;
 
+    // Grid lines
     ctx.strokeStyle = '#E2E8F0';
     ctx.lineWidth = 1;
     for (let i = 0; i <= 4; i++) {
@@ -88,6 +123,7 @@ export default function Dashboard() {
       ctx.stroke();
     }
 
+    // Y-axis labels
     ctx.fillStyle = '#707974';
     ctx.font = '11px Inter';
     ctx.textAlign = 'right';
@@ -98,6 +134,49 @@ export default function Dashboard() {
       ctx.fillText('$' + (val / 1000).toFixed(0) + 'K', padding.left - 10, y);
     }
 
+    // Profit area (grey)
+    const profitGradient = ctx.createLinearGradient(0, padding.top, 0, cssHeight - padding.bottom);
+    profitGradient.addColorStop(0, 'rgba(156, 163, 175, 0.15)');
+    profitGradient.addColorStop(1, 'rgba(156, 163, 175, 0)');
+    ctx.fillStyle = profitGradient;
+    ctx.beginPath();
+    ctx.moveTo(getX(0), cssHeight - padding.bottom);
+    values.forEach((val, i) => {
+      ctx.lineTo(getX(i), getY(val.profit));
+    });
+    ctx.lineTo(cssWidth - padding.right, cssHeight - padding.bottom);
+    ctx.closePath();
+    ctx.fill();
+
+    // Revenue area (emerald)
+    const revenueGradient = ctx.createLinearGradient(0, padding.top, 0, cssHeight - padding.bottom);
+    revenueGradient.addColorStop(0, 'rgba(6, 78, 59, 0.15)');
+    revenueGradient.addColorStop(1, 'rgba(6, 78, 59, 0)');
+    ctx.fillStyle = revenueGradient;
+    ctx.beginPath();
+    ctx.moveTo(getX(0), cssHeight - padding.bottom);
+    values.forEach((val, i) => {
+      ctx.lineTo(getX(i), getY(val.revenue));
+    });
+    ctx.lineTo(cssWidth - padding.right, cssHeight - padding.bottom);
+    ctx.closePath();
+    ctx.fill();
+
+    // Profit line
+    ctx.strokeStyle = '#9CA3AF';
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    values.forEach((val, i) => {
+      const x = getX(i);
+      const y = getY(val.profit);
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+
+    // Revenue line
     ctx.strokeStyle = '#064E3B';
     ctx.lineWidth = 2;
     ctx.lineCap = 'round';
@@ -105,40 +184,64 @@ export default function Dashboard() {
     ctx.beginPath();
     values.forEach((val, i) => {
       const x = getX(i);
-      const y = getY(val);
+      const y = getY(val.revenue);
       if (i === 0) ctx.moveTo(x, y);
       else ctx.lineTo(x, y);
     });
     ctx.stroke();
 
-    const gradient = ctx.createLinearGradient(0, padding.top, 0, cssHeight - padding.bottom);
-    gradient.addColorStop(0, 'rgba(6, 78, 59, 0.15)');
-    gradient.addColorStop(1, 'rgba(6, 78, 59, 0)');
-    ctx.fillStyle = gradient;
-    ctx.lineTo(cssWidth - padding.right, cssHeight - padding.bottom);
-    ctx.lineTo(padding.left, cssHeight - padding.bottom);
-    ctx.closePath();
-    ctx.fill();
-
+    // Revenue points
     ctx.fillStyle = '#064E3B';
     values.forEach((val, i) => {
       const x = getX(i);
-      const y = getY(val);
+      const y = getY(val.revenue);
       ctx.beginPath();
       ctx.arc(x, y, 4, 0, Math.PI * 2);
       ctx.fill();
     });
 
+    // Profit points
+    ctx.fillStyle = '#9CA3AF';
+    values.forEach((val, i) => {
+      const x = getX(i);
+      const y = getY(val.profit);
+      ctx.beginPath();
+      ctx.arc(x, y, 4, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // X-axis labels
     ctx.fillStyle = '#707974';
     ctx.font = '11px Inter';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
-    const labelCount = 6;
-    for (let i = 0; i < labelCount; i++) {
-      const idx = Math.round(i * (values.length - 1) / (labelCount - 1));
-      const x = getX(idx);
-      ctx.fillText(`${idx + 1}`, x, cssHeight - padding.bottom + 8);
-    }
+    values.forEach((val, i) => {
+      const x = getX(i);
+      ctx.fillText(val.week, x, cssHeight - padding.bottom + 8);
+    });
+
+    // Legend
+    const legendY = padding.top - 8;
+    const legendX = padding.left;
+    // Revenue legend
+    ctx.fillStyle = '#064E3B';
+    ctx.beginPath();
+    ctx.arc(legendX + 6, legendY + 6, 4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#191c1e';
+    ctx.font = '12px Inter';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('Revenue', legendX + 14, legendY + 6);
+
+    // Net Profit legend
+    ctx.fillStyle = '#9CA3AF';
+    ctx.beginPath();
+    ctx.arc(legendX + 100, legendY + 6, 4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#191c1e';
+    ctx.textAlign = 'left';
+    ctx.fillText('Net Profit', legendX + 108, legendY + 6);
   };
 
   return (
@@ -150,10 +253,10 @@ export default function Dashboard() {
         </div>
         <div className="hidden sm:flex gap-3">
           <button className="px-4 py-2 border border-outline-variant rounded-md text-[12px] leading-[16px] font-semibold uppercase tracking-wider text-on-surface hover:bg-surface-container-low transition-colors shadow-sm">Export Data</button>
-          <button className="px-4 py-2 bg-primary-container text-white rounded-md text-[12px] leading-[16px] font-semibold uppercase tracking-wider hover:bg-primary transition-colors shadow-resting flex items-center gap-2">
+          <Link to="/orders/new" className="px-4 py-2 bg-primary-container text-white rounded-md text-[12px] leading-[16px] font-semibold uppercase tracking-wider hover:bg-primary transition-colors shadow-resting flex items-center gap-2">
             <span className="material-symbols-outlined text-sm">add</span>
             New Order
-          </button>
+          </Link>
         </div>
       </div>
 

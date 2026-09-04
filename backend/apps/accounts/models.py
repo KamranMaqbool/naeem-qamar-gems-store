@@ -12,7 +12,7 @@ class User(AbstractUser):
 
     email = models.EmailField(unique=True)
     phone_number = models.CharField(max_length=20, blank=True)
-    avatar = models.URLField(blank=True)
+    avatar = models.URLField(max_length=500, blank=True)
     role = models.CharField(
         max_length=20,
         choices=Role.choices,

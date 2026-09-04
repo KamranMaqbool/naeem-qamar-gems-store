@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import { inventoryItems as staticItems, inventoryStats as staticStats, stockStatusOptions, statusConfig } from '../../data/inventory';
-import { fetchInventory, isAuthenticated, login } from '../../lib/api';
+import { fetchInventory, isAuthenticated, login, updateInventory } from '../../lib/api';
 
 export default function Inventory() {
   const [search, setSearch] = useState('');
@@ -8,6 +9,11 @@ export default function Inventory() {
   const [apiItems, setApiItems] = useState(null);
   const [inventoryStats, setInventoryStats] = useState(staticStats);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const [savingId, setSavingId] = useState(null);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     async function loadInventory() {
@@ -15,7 +21,7 @@ export default function Inventory() {
         if (!isAuthenticated()) {
           await login('admin@virtuoso-gems.com', 'admin123');
         }
-        const data = await fetchInventory();
+        const data = await fetchInventory({ search, status, page });
         const items = data.results || data;
         const mapped = items.map((inv) => ({
           id: inv.id,
@@ -34,14 +40,18 @@ export default function Inventory() {
           lowStockAlerts: mapped.filter((i) => i.status === 'low-stock').length,
           outOfStock: mapped.filter((i) => i.status === 'out-of-stock').length,
         });
+        setTotalItems(data.count ?? mapped.length);
+        setTotalPages(data.count ? Math.max(1, Math.ceil(data.count / 20)) : 1);
       } catch {
         setApiItems(null);
+        setTotalItems(staticItems.length);
+        setTotalPages(1);
       } finally {
         setLoading(false);
       }
     }
     loadInventory();
-  }, []);
+  }, [search, status, page]);
 
   const inventoryItems = apiItems || staticItems;
 
@@ -53,6 +63,19 @@ export default function Inventory() {
       return matchesSearch && matchesStatus;
     });
   }, [inventoryItems, search, status]);
+
+  const updateSearch = (value) => { setSearch(value); setPage(1); };
+  const updateStatus = (value) => { setStatus(value); setPage(1); };
+  const saveStock = async (item, value) => {
+    const stock = Math.max(0, Number(value));
+    if (!Number.isFinite(stock) || stock === item.stock) return;
+    setSavingId(item.id); setError('');
+    try {
+      await updateInventory(item.id, { current_stock: stock, low_stock_threshold: item.threshold });
+      setApiItems((current) => current?.map((entry) => entry.id === item.id ? { ...entry, stock } : entry) || current);
+    } catch (err) { setError(err.message || 'Unable to update stock.'); }
+    finally { setSavingId(null); }
+  };
 
   return (
     <div>
@@ -66,12 +89,13 @@ export default function Inventory() {
             <span className="material-symbols-outlined text-[18px]">download</span>
             Export CSV
           </button>
-          <button className="px-6 py-2.5 bg-primary-container text-on-primary rounded-md text-[12px] leading-[16px] font-bold uppercase tracking-wider hover:bg-primary transition-colors flex items-center gap-2 shadow-sm">
+          <Link to="/inventory/receive" className="px-6 py-2.5 bg-primary-container text-on-primary rounded-md text-[12px] leading-[16px] font-bold uppercase tracking-wider hover:bg-primary transition-colors flex items-center gap-2 shadow-sm">
             <span className="material-symbols-outlined text-[18px]">add</span>
             Receive Stock
-          </button>
+          </Link>
         </div>
       </div>
+      {error && <div className="mb-6 rounded-lg border border-error/30 bg-error-bg px-4 py-3 text-sm text-error-text">{error}</div>}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="card p-6 relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300">
@@ -103,11 +127,11 @@ export default function Inventory() {
       <div className="flex justify-between items-center mb-4 bg-surface-container-lowest p-4 rounded-t-xl border border-surface-container-highest border-b-0">
         <div className="relative w-72">
           <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
-          <input type="text" placeholder="Search by name or SKU..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full pl-10 pr-4 py-2 border border-outline-variant rounded-md bg-surface-bright focus:border-primary-container focus:ring-4 focus:ring-primary-container/10 transition-all duration-200 text-on-surface" />
+          <input type="text" placeholder="Search by name or SKU..." value={search} onChange={(e) => updateSearch(e.target.value)} className="w-full pl-10 pr-4 py-2 border border-outline-variant rounded-md bg-surface-bright focus:border-primary-container focus:ring-4 focus:ring-primary-container/10 transition-all duration-200 text-on-surface" />
         </div>
         <div className="flex items-center gap-3">
           <span className="text-[12px] leading-[16px] font-semibold uppercase tracking-wider text-on-surface-variant">Filter by Status:</span>
-          <select value={status} onChange={(e) => setStatus(e.target.value)} className="border border-outline-variant rounded-md px-4 py-2 bg-surface-bright focus:border-primary-container focus:ring-4 focus:ring-primary-container/10">
+          <select value={status} onChange={(e) => updateStatus(e.target.value)} className="border border-outline-variant rounded-md px-4 py-2 bg-surface-bright focus:border-primary-container focus:ring-4 focus:ring-primary-container/10">
             {stockStatusOptions.map((opt) => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>
             ))}
@@ -142,7 +166,7 @@ export default function Inventory() {
                 <td className="px-6 py-4 text-[13px] leading-[18px] font-medium text-on-surface-variant">{item.sku}</td>
                 <td className="px-6 py-4 text-[14px] leading-[20px] text-on-surface-variant">{item.category}</td>
                 <td className="px-6 py-4">
-                  <input type="number" defaultValue={item.stock} min="0" className={`w-20 px-2 py-1 border rounded text-center text-[13px] leading-[18px] font-medium focus:border-primary-container focus:ring-4 focus:ring-primary-container/10 transition-all ${
+                  <input type="number" defaultValue={item.stock} min="0" disabled={savingId === item.id} onBlur={(e) => saveStock(item, e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.currentTarget.blur(); } }} className={`w-20 px-2 py-1 border rounded text-center text-[13px] leading-[18px] font-medium focus:border-primary-container focus:ring-4 focus:ring-primary-container/10 transition-all ${
                     item.status === 'out-of-stock' ? 'border-error/50 bg-error/5 text-error' :
                     item.status === 'low-stock' ? 'border-yellow-400' : 'border-outline-variant'
                   }`} />
@@ -157,9 +181,8 @@ export default function Inventory() {
           </tbody>
         </table>
         <div className="border-t border-surface-container-highest p-4 flex justify-between items-center bg-[#F8FAFC] rounded-b-xl">
-          <span className="text-[14px] leading-[20px] text-on-surface-variant">Showing {filteredItems.length} of {inventoryItems.length} entries</span>
-          <div className="flex items-center gap-1">
-            <button className="w-8 h-8 flex items-center justify-center rounded border border-primary-container bg-primary-container text-on-primary text-[12px] leading-[16px] font-semibold">1</button>
+          <span className="text-[14px] leading-[20px] text-on-surface-variant">Showing {filteredItems.length} of {totalItems} entries</span>
+          <div className="flex items-center gap-2"><button type="button" disabled={page === 1 || loading} onClick={() => setPage((current) => current - 1)} className="rounded-md border border-outline-variant px-3 py-1 text-sm disabled:opacity-40">Previous</button><span className="text-sm text-on-surface-variant">Page {page} of {totalPages}</span><button type="button" disabled={page >= totalPages || loading} onClick={() => setPage((current) => current + 1)} className="rounded-md border border-outline-variant px-3 py-1 text-sm disabled:opacity-40">Next</button>
           </div>
         </div>
       </div>
