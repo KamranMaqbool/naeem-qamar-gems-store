@@ -10,6 +10,7 @@ from apps.orders.models import Cart, CartItem, Order, OrderItem
 from apps.orders.serializers import (
     AddToCartSerializer,
     AdminOrderSerializer,
+    AdminOrderCreateSerializer,
     CartSerializer,
     CheckoutSerializer,
     OrderDetailSerializer,
@@ -194,6 +195,38 @@ class AdminOrderListView(generics.ListAPIView):
             from django.db.models import Q
             qs = qs.filter(Q(order_number__icontains=search) | Q(guest_email__icontains=search) | Q(user__email__icontains=search) | Q(user__username__icontains=search))
         return qs
+
+    def post(self, request, *args, **kwargs):
+        serializer = AdminOrderCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        try:
+            product = Product.objects.select_related('gemstone_attributes').get(
+                pk=data['product_id'], status=Product.Status.PUBLISHED,
+            )
+        except Product.DoesNotExist:
+            return Response({'message': 'Published product not found.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        price = product.sale_price or product.base_price
+        subtotal = price * data['quantity']
+        address = {
+            'recipient_name': data['customer_name'],
+            'address1': data['address'], 'city': data['city'],
+            'postal_code': data.get('postal_code', ''), 'country': data['country'],
+        }
+        order = Order.objects.create(
+            guest_email=data['customer_email'], guest_phone=data.get('customer_phone', ''),
+            shipping_address=address,
+            subtotal=subtotal, total_amount=subtotal,
+            # Keep admin notes in the JSON address until a dedicated notes field is added.
+            billing_address={**address, 'notes': data.get('notes', '')},
+        )
+        snapshot = None
+        if hasattr(product, 'gemstone_attributes'):
+            attrs = product.gemstone_attributes
+            snapshot = {'cut_shape': attrs.cut_shape, 'color_grade': attrs.color_grade, 'carat_weight': str(attrs.carat_weight) if attrs.carat_weight else None}
+        OrderItem.objects.create(order=order, product=product, unit_price_at_purchase=price, quantity=data['quantity'], gemstone_snapshot=snapshot)
+        return Response(OrderDetailSerializer(order).data, status=status.HTTP_201_CREATED)
 
 
 class AdminOrderDetailView(generics.RetrieveUpdateAPIView):

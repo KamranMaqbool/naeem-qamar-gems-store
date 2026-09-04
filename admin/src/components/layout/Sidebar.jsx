@@ -6,6 +6,7 @@ const navItems = [
   { path: '/analytics', label: 'Analytics', icon: 'analytics', fill: true },
   { path: '/orders', label: 'Orders', icon: 'shopping_cart', fill: false },
   { path: '/products', label: 'Products', icon: 'save_as', fill: false },
+  { path: '/categories', label: 'Categories', icon: 'category', fill: false },
   { path: '/inventory', label: 'Inventory', icon: 'inventory_2', fill: false },
   { path: '/discounts', label: 'Discounts', icon: 'sell', fill: false },
   { path: '/customers', label: 'Customers', icon: 'group', fill: false },

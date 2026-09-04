@@ -6,13 +6,15 @@ import {
   topProductsData,
   channelData,
 } from '../../data/analytics';
-import { fetchDashboardKPIs, fetchRevenueChart, fetchSalesByGemstone, isAuthenticated, login } from '../../lib/api';
+import { fetchDashboardKPIs, fetchRevenueChart, fetchSalesByGemstone, fetchTopProducts, isAuthenticated, login } from '../../lib/api';
 
 export default function Analytics() {
   const [dateRange, setDateRange] = useState('Last 30 Days');
   const [cards, setCards] = useState(kpiCards);
   const [revenueValues, setRevenueValues] = useState(revenueChartData);
   const [gemstoneData, setGemstoneData] = useState(gemstoneDistribution);
+  const [products, setProducts] = useState(topProductsData);
+  const [totalUnits, setTotalUnits] = useState(0);
   const chartRef = useRef(null);
 
   useEffect(() => {
@@ -25,10 +27,11 @@ export default function Analytics() {
     (async () => {
       try {
         if (!isAuthenticated()) await login('admin@virtuoso-gems.com', 'admin123');
-        const [kpis, chart, gemstoneSales] = await Promise.all([
+        const [kpis, chart, gemstoneSales, topProducts] = await Promise.all([
           fetchDashboardKPIs(),
           fetchRevenueChart(dateRange === 'Last 30 Days' ? 'daily' : 'monthly'),
           fetchSalesByGemstone(),
+          fetchTopProducts(),
         ]);
         const revenue = Number(kpis.total_revenue || 0);
         const orders = Number(kpis.total_orders || 0);
@@ -46,12 +49,14 @@ export default function Analytics() {
         if (mapped.length > 1) setRevenueValues(mapped);
         if (gemstoneSales?.length) {
           const total = gemstoneSales.reduce((sum, item) => sum + Number(item.total_quantity || 0), 0) || 1;
+          setTotalUnits(total);
           setGemstoneData(gemstoneSales.slice(0, 4).map((item, index) => ({
             type: item.cut_shape || 'Unknown',
             percentage: Math.round(Number(item.total_quantity || 0) / total * 100),
             color: gemstoneDistribution[index % gemstoneDistribution.length].color,
           })));
         }
+        if (topProducts?.length) setProducts(topProducts.map((item) => ({ ...item, revenue: Number(item.revenue || 0) })));
       } catch { /* retain the designed fallback values */ }
     })();
   }, [dateRange]);
@@ -277,7 +282,7 @@ export default function Analytics() {
                     <circle cx="50" cy="50" fill="transparent" r="40" stroke="#1E3A8A" strokeDasharray="113.04 251.2" strokeDashoffset="-138.16" strokeWidth="20" />
                   </svg>
                   <div className="absolute inset-0 flex items-center justify-center flex-col">
-                    <span className="text-[20px] leading-[28px] font-semibold text-on-surface">1,240</span>
+                    <span className="text-[20px] leading-[28px] font-semibold text-on-surface">{(totalUnits || 1240).toLocaleString()}</span>
                     <span className="text-xs text-outline">Total Units</span>
                   </div>
                 </div>
@@ -315,7 +320,7 @@ export default function Analytics() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#F1F5F9]">
-                    {topProductsData.map((product) => (
+                    {products.map((product) => (
                       <tr key={product.id} className="hover:bg-surface-container-low transition-colors">
                         <td className="py-4 px-6 font-medium">{product.name}</td>
                         <td className="py-4 px-6 text-on-surface-variant text-sm">{product.sku}</td>

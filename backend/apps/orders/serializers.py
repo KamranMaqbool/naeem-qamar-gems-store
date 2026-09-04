@@ -117,3 +117,18 @@ class AdminOrderSerializer(serializers.ModelSerializer):
 
     def get_customer_email(self, obj):
         return obj.user.email if obj.user else obj.guest_email
+
+
+class AdminOrderCreateSerializer(serializers.Serializer):
+    """Validate the compact order form used by the admin console."""
+
+    customer_name = serializers.CharField(max_length=255)
+    customer_email = serializers.EmailField()
+    customer_phone = serializers.CharField(required=False, allow_blank=True)
+    product_id = serializers.IntegerField()
+    quantity = serializers.IntegerField(min_value=1)
+    address = serializers.CharField()
+    city = serializers.CharField()
+    postal_code = serializers.CharField(required=False, allow_blank=True)
+    country = serializers.CharField()
+    notes = serializers.CharField(required=False, allow_blank=True)

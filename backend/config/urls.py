@@ -20,6 +20,7 @@ urlpatterns = [
     # Catalog
     path('api/v1/products/', include('apps.catalog.urls.public_urls')),
     path('api/v1/admin/products/', include('apps.catalog.urls.admin_urls')),
+    path('api/v1/admin/categories/', include('apps.catalog.urls.category_admin_urls')),
 
     # Inventory
     path('api/v1/admin/inventory/', include('apps.inventory.urls')),

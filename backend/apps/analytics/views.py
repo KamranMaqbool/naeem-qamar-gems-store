@@ -1,4 +1,4 @@
-from django.db.models import Count, Sum
+from django.db.models import Count, F, Sum
 from django.db.models.functions import TruncDay, TruncMonth
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
@@ -94,3 +94,27 @@ class SalesByGemstoneView(APIView):
             entry['total_revenue'] = f"{entry['total_revenue']:.2f}"
 
         return Response(result)
+
+
+class TopProductsView(APIView):
+    """GET: best-selling products by completed-order revenue."""
+
+    permission_classes = [IsAdminUser]
+
+    def get(self, request):
+        rows = (
+            OrderItem.objects.filter(order__order_status=Order.Status.COMPLETED)
+            .values('product_id', 'product__title', 'product__sku')
+            .annotate(quantity=Sum('quantity'), revenue=Sum(F('unit_price_at_purchase') * F('quantity')))
+            .order_by('-revenue')[:10]
+        )
+        return Response([
+            {
+                'id': row['product_id'],
+                'name': row['product__title'] or 'Deleted product',
+                'sku': row['product__sku'] or '-',
+                'quantity': row['quantity'] or 0,
+                'revenue': str(row['revenue'] or 0),
+            }
+            for row in rows
+        ])

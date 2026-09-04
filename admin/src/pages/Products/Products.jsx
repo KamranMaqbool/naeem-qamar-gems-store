@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { products as staticProducts, categories, stockStatuses, statusConfig } from '../../data/products';
-import { fetchAdminProducts, isAuthenticated, login } from '../../lib/api';
+import { deleteProduct, fetchAdminProducts, isAuthenticated, login } from '../../lib/api';
 
 export default function Products() {
   const [search, setSearch] = useState('');
@@ -12,6 +12,7 @@ export default function Products() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalProducts, setTotalProducts] = useState(0);
+  const [deleting, setDeleting] = useState(null);
 
   useEffect(() => {
     async function loadProducts() {
@@ -19,7 +20,7 @@ export default function Products() {
         if (!isAuthenticated()) {
           await login('admin@virtuoso-gems.com', 'admin123');
         }
-        const data = await fetchAdminProducts({ search, category, page });
+        const data = await fetchAdminProducts({ search, category, stockStatus, page });
         const productList = data.results || data;
         setApiProducts(productList.map((p) => ({
           id: p.id,
@@ -44,7 +45,7 @@ export default function Products() {
       }
     }
     loadProducts();
-  }, [search, category, page]);
+  }, [search, category, stockStatus, page]);
 
   const products = apiProducts || staticProducts;
 
@@ -55,6 +56,18 @@ export default function Products() {
   }), [products, apiProducts, search, category, stockStatus]);
   const updateSearch = (value) => { setSearch(value); setPage(1); };
   const updateCategory = (value) => { setCategory(value); setPage(1); };
+  const updateStockStatus = (value) => { setStockStatus(value); setPage(1); };
+  const handleDelete = async (product) => {
+    if (!window.confirm(`Delete “${product.name}”? This cannot be undone.`)) return;
+    setDeleting(product.id);
+    try {
+      await deleteProduct(product.id);
+      setApiProducts((current) => current ? current.filter((item) => item.id !== product.id) : current);
+      setTotalProducts((count) => Math.max(0, count - 1));
+    } catch (deleteError) {
+      window.alert(deleteError.message || 'Unable to delete product.');
+    } finally { setDeleting(null); }
+  };
 
   return (
     <div>
@@ -63,10 +76,10 @@ export default function Products() {
           <h1 className="text-[36px] leading-[44px] tracking-[-0.02em] font-bold text-on-surface">Products</h1>
           <p className="text-[16px] leading-[24px] text-on-surface-variant mt-1">Manage your luxury inventory and product listings.</p>
         </div>
-        <Link to="/products/add" className="px-4 py-2 bg-primary-container text-white rounded-md text-[12px] leading-[16px] font-semibold uppercase tracking-wider hover:bg-primary transition-colors shadow-resting flex items-center gap-2">
+        <div className="flex gap-3"><Link to="/categories" className="px-4 py-2 border border-outline-variant rounded-md text-[12px] font-semibold uppercase tracking-wider">Categories</Link><Link to="/products/add" className="px-4 py-2 bg-primary-container text-white rounded-md text-[12px] leading-[16px] font-semibold uppercase tracking-wider hover:bg-primary transition-colors shadow-resting flex items-center gap-2">
           <span className="material-symbols-outlined text-sm">add</span>
           Add New Product
-        </Link>
+        </Link></div>
       </div>
 
       <div className="flex flex-col md:flex-row gap-4 mb-8">
@@ -86,7 +99,7 @@ export default function Products() {
               <option key={cat.value} value={cat.value}>{cat.label}</option>
             ))}
           </select>
-          <select value={stockStatus} onChange={(e) => setStockStatus(e.target.value)} className="bg-surface-container-low border border-outline-variant text-on-surface-variant text-[12px] leading-[16px] font-semibold uppercase tracking-wider rounded-md px-4 py-2 text-sm focus:ring-1 focus:ring-primary-container outline-none">
+          <select value={stockStatus} onChange={(e) => updateStockStatus(e.target.value)} className="bg-surface-container-low border border-outline-variant text-on-surface-variant text-[12px] leading-[16px] font-semibold uppercase tracking-wider rounded-md px-4 py-2 text-sm focus:ring-1 focus:ring-primary-container outline-none">
             {stockStatuses.map((status) => (
               <option key={status.value} value={status.value}>{status.label}</option>
             ))}
@@ -150,7 +163,7 @@ export default function Products() {
                       <Link to={`/products/${product.id}/edit`} className="px-4 py-2 text-on-surface-variant hover:text-primary transition-colors hover:bg-surface-container-low rounded-md" aria-label="Edit product">
                         <span className="material-symbols-outlined">edit</span>
                       </Link>
-                      <button className="px-4 py-2 text-on-surface-variant hover:text-error transition-colors hover:bg-surface-container-low rounded-md" aria-label="Delete product">
+                      <button onClick={() => handleDelete(product)} disabled={deleting === product.id} className="px-4 py-2 text-on-surface-variant hover:text-error transition-colors hover:bg-surface-container-low rounded-md disabled:opacity-50" aria-label="Delete product">
                         <span className="material-symbols-outlined">delete</span>
                       </button>
                     </div>

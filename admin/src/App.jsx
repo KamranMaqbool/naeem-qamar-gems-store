@@ -16,6 +16,7 @@ import Customers from './pages/Customers/Customers';
 import Analytics from './pages/Analytics/Analytics';
 import SignIn from './pages/Auth/SignIn';
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import Categories from './pages/Categories/Categories';
 
 function AppContent() {
   return (
@@ -30,6 +31,7 @@ function AppContent() {
               <Route path="/products" element={<Products />} />
               <Route path="/products/add" element={<AddProduct />} />
               <Route path="/products/:id/edit" element={<AddProduct />} />
+              <Route path="/categories" element={<Categories />} />
               <Route path="/orders" element={<Orders />} />
               <Route path="/orders/new" element={<AddOrder />} />
               <Route path="/orders/:id" element={<OrderDetail />} />

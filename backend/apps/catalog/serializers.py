@@ -9,6 +9,11 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'slug', 'description', 'parent', 'image', 'created_at']
 
 
+class AdminCategorySerializer(CategorySerializer):
+    class Meta(CategorySerializer.Meta):
+        read_only_fields = ['id', 'created_at']
+
+
 class GemstoneAttributesSerializer(serializers.ModelSerializer):
     class Meta:
         model = GemstoneAttributes

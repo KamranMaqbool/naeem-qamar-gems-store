@@ -61,6 +61,7 @@ async function authFetch(url, options = {}) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.message || `API error: ${res.status}`);
   }
+  if (res.status === 204) return null;
   return res.json();
 }
 
@@ -81,16 +82,41 @@ export async function fetchAdminProducts(params = {}) {
   if (params.search) query.set('search', params.search);
   if (params.category) query.set('category', params.category);
   if (params.status) query.set('status', params.status);
+  if (params.stockStatus) {
+    const stockStatus = { active: 'IN_STOCK', 'low-stock': 'LOW_STOCK', 'out-of-stock': 'OUT_OF_STOCK' }[params.stockStatus] || params.stockStatus;
+    query.set('stock_status', stockStatus);
+  }
   const qs = query.toString();
   return authFetch(`/admin/products/${qs ? '?' + qs : ''}`);
 }
 
 export async function fetchCategories() {
-  return authFetch('/catalog/categories/');
+  return authFetch('/products/categories/');
+}
+
+export async function fetchAdminCategories(params = {}) {
+  const query = params.search ? `?search=${encodeURIComponent(params.search)}` : '';
+  return authFetch(`/admin/categories/${query}`);
+}
+
+export async function createCategory(data) {
+  return authFetch('/admin/categories/', { method: 'POST', body: JSON.stringify(data) });
+}
+
+export async function updateCategory(id, data) {
+  return authFetch(`/admin/categories/${id}/`, { method: 'PATCH', body: JSON.stringify(data) });
+}
+
+export async function deleteCategory(id) {
+  return authFetch(`/admin/categories/${id}/`, { method: 'DELETE' });
 }
 
 export async function createProduct(data) {
   return authFetch('/admin/products/', { method: 'POST', body: JSON.stringify(data) });
+}
+
+export async function fetchAdminProduct(id) {
+  return authFetch(`/admin/products/${id}/`);
 }
 
 export async function updateProduct(id, data) {
@@ -108,6 +134,10 @@ export async function fetchAdminOrders(params = {}) {
   if (params.page) query.set('page', params.page);
   const qs = query.toString();
   return authFetch(`/admin/orders/${qs ? '?' + qs : ''}`);
+}
+
+export async function createAdminOrder(data) {
+  return authFetch('/admin/orders/', { method: 'POST', body: JSON.stringify(data) });
 }
 
 export async function updateOrder(id, data) {
@@ -149,6 +179,10 @@ export async function fetchRevenueChart(period = 'daily') {
 
 export async function fetchSalesByGemstone() {
   return authFetch('/admin/analytics/sales-by-gemstone/');
+}
+
+export async function fetchTopProducts() {
+  return authFetch('/admin/analytics/top-products/');
 }
 
 export async function fetchAdminDiscounts() {

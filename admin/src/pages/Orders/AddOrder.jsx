@@ -1,5 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { createAdminOrder, fetchAdminProducts, isAuthenticated, login } from '../../lib/api';
 
 const fieldClass = 'w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2.5 text-sm text-on-surface placeholder:text-on-surface-variant/60 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10';
 
@@ -7,12 +8,29 @@ export default function AddOrder() {
   const navigate = useNavigate();
   const [submitted, setSubmitted] = useState(false);
   const [toast, setToast] = useState(false);
+  const [products, setProducts] = useState([]);
+  const [error, setError] = useState('');
+  const [saving, setSaving] = useState(false);
 
-  const handleSubmit = (event) => {
+  useEffect(() => {
+    fetchAdminProducts().then((data) => setProducts(data.results || data || [])).catch(() => {});
+  }, []);
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    setSubmitted(true);
-    setToast(true);
-    window.setTimeout(() => setToast(false), 4200);
+    setSaving(true); setError('');
+    const form = new FormData(event.currentTarget);
+    try {
+      if (!isAuthenticated()) await login('admin@virtuoso-gems.com', 'admin123');
+      await createAdminOrder({
+        customer_name: form.get('name'), customer_email: form.get('email'), customer_phone: form.get('phone'),
+        product_id: Number(form.get('product')), quantity: Number(form.get('quantity')),
+        address: form.get('address'), city: form.get('city'), postal_code: form.get('postalCode'), country: form.get('country'), notes: form.get('notes'),
+      });
+      setSubmitted(true); setToast(true); event.currentTarget.reset();
+      window.setTimeout(() => setToast(false), 4200);
+    } catch (submitError) { setError(submitError.message || 'Unable to create order.'); }
+    finally { setSaving(false); }
   };
 
   return (
@@ -29,6 +47,7 @@ export default function AddOrder() {
       </div>
 
       {submitted && <div className="mb-6 rounded-lg border border-success/30 bg-success-bg px-4 py-3 text-sm text-success-text">Order draft created successfully.</div>}
+      {error && <div className="mb-6 rounded-lg border border-error/30 bg-error-bg px-4 py-3 text-sm text-error-text" role="alert">{error}</div>}
 
       <form onSubmit={handleSubmit} className="grid gap-6 lg:grid-cols-[1fr_320px]">
         <div className="space-y-6">
@@ -46,7 +65,7 @@ export default function AddOrder() {
             <h2 className="mb-1 text-xl font-semibold text-on-surface">Order details</h2>
             <p className="mb-5 text-sm text-on-surface-variant">Select the product and quantity for this order.</p>
             <div className="grid gap-4 sm:grid-cols-[1fr_120px]">
-              <label className="text-sm font-medium text-on-surface">Product<select className={`${fieldClass} mt-2`} name="product" required defaultValue=""><option value="" disabled>Select a product</option><option>1.5ct Emerald Cut Diamond</option><option>Round Brilliant Sapphire</option><option>Custom Gemstone Setting</option></select></label>
+              <label className="text-sm font-medium text-on-surface">Product<select className={`${fieldClass} mt-2`} name="product" required defaultValue=""><option value="" disabled>Select a product</option>{products.map((product) => <option key={product.id} value={product.id}>{product.title} ({product.sku})</option>)}</select></label>
               <label className="text-sm font-medium text-on-surface">Quantity<input className={`${fieldClass} mt-2`} name="quantity" type="number" min="1" defaultValue="1" required /></label>
             </div>
             <label className="mt-4 block text-sm font-medium text-on-surface">Order notes<textarea className={`${fieldClass} mt-2 min-h-24 resize-y`} name="notes" placeholder="Special requests or internal notes" /></label>
@@ -68,7 +87,7 @@ export default function AddOrder() {
           <h2 className="mb-5 text-xl font-semibold text-on-surface">Order summary</h2>
           <div className="space-y-3 border-b border-surface-container-highest pb-5 text-sm"><div className="flex justify-between"><span className="text-on-surface-variant">Subtotal</span><span>$0.00</span></div><div className="flex justify-between"><span className="text-on-surface-variant">Shipping</span><span>Calculated later</span></div></div>
           <div className="flex justify-between py-5 text-base font-semibold"><span>Total</span><span>$0.00</span></div>
-          <button type="submit" className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-on-primary shadow-resting transition hover:bg-primary-container"><span className="material-symbols-outlined text-lg">check</span>Create order</button>
+          <button type="submit" disabled={saving} className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-on-primary shadow-resting transition hover:bg-primary-container disabled:opacity-60"><span className="material-symbols-outlined text-lg">check</span>{saving ? 'Creating…' : 'Create order'}</button>
           <button type="button" onClick={() => navigate('/orders')} className="mt-3 w-full rounded-lg px-4 py-2.5 text-sm font-medium text-on-surface-variant hover:bg-surface-container-low">Cancel</button>
         </aside>
       </form>

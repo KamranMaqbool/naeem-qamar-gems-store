@@ -36,6 +36,9 @@ class ProductFilter(django_filters.FilterSet):
     is_featured = django_filters.BooleanFilter(
         field_name='is_featured',
     )
+    stock_status = django_filters.CharFilter(
+        field_name='inventory__stock_status', lookup_expr='exact',
+    )
     search = django_filters.CharFilter(method='filter_search')
 
     class Meta:
@@ -43,7 +46,7 @@ class ProductFilter(django_filters.FilterSet):
         fields = [
             'category', 'min_price', 'max_price',
             'carat_min', 'carat_max', 'cut_shape',
-            'status', 'is_featured', 'search',
+            'status', 'is_featured', 'search', 'stock_status',
         ]
 
     def filter_search(self, queryset, name, value):

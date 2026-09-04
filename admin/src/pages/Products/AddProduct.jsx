@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { createProduct, fetchCategories, isAuthenticated, login, receiveStock } from '../../lib/api';
+import { useNavigate, useParams } from 'react-router-dom';
+import { createProduct, fetchAdminProduct, fetchCategories, isAuthenticated, login, receiveStock, updateProduct } from '../../lib/api';
 
 const categories = [
   { value: '', label: 'Select a category' },
@@ -12,6 +12,7 @@ const categories = [
 
 export default function AddProduct() {
   const navigate = useNavigate();
+  const { id } = useParams();
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -38,6 +39,14 @@ export default function AddProduct() {
       }
     })();
   }, []);
+
+  useEffect(() => {
+    if (!id) return;
+    fetchAdminProduct(id).then((product) => setFormData({
+      title: product.title || '', description: product.description || '', category: product.category?.id || '',
+      regularPrice: product.base_price || '', salePrice: product.sale_price || '', sku: product.sku || '', quantity: product.inventory_stock || 0,
+    })).catch((loadError) => setError(loadError.message || 'Unable to load product.'));
+  }, [id]);
 
   const handleChange = (e) => {
     const { name, value, type } = e.target;
@@ -87,7 +96,7 @@ export default function AddProduct() {
     try {
       if (!isAuthenticated()) await login('admin@virtuoso-gems.com', 'admin123');
       const slug = formData.title.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-      const createdProduct = await createProduct({
+      const payload = {
         title: formData.title,
         slug,
         sku: formData.sku,
@@ -95,11 +104,12 @@ export default function AddProduct() {
         base_price: formData.regularPrice,
         sale_price: formData.salePrice || null,
         category: formData.category && Number.isFinite(Number(formData.category)) ? Number(formData.category) : null,
-        status: 'DRAFT',
+        ...(id ? {} : { status: 'DRAFT' }),
         is_featured: false,
-      });
-      if (formData.quantity > 0 && createdProduct?.id) {
-        await receiveStock({ product_id: createdProduct.id, quantity: formData.quantity, reason: 'RECEIVE_STOCK', notes: 'Opening stock received with product creation.' });
+      };
+      const savedProduct = id ? await updateProduct(id, payload) : await createProduct(payload);
+      if (!id && formData.quantity > 0 && savedProduct?.id) {
+        await receiveStock({ product_id: savedProduct.id, quantity: formData.quantity, reason: 'RECEIVE_STOCK', notes: 'Opening stock received with product creation.' });
       }
       navigate('/products');
     } catch (submitError) {
