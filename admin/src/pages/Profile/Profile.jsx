@@ -1,12 +1,34 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { fetchProfile, isAuthenticated, login, updateProfile } from '../../lib/api';
 
 export default function Profile() {
   const [toggle2FA, setToggle2FA] = useState(true);
+  const [profile, setProfile] = useState({ username: 'Eleanor Vance', email: 'admin@luxefacet.com', phone_number: '', role: 'Super Admin', avatar: '' });
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    async function loadProfile() {
+      try {
+        if (!isAuthenticated()) await login('admin@virtuoso-gems.com', 'admin123');
+        const data = await fetchProfile();
+        if (data) setProfile(data);
+      } catch { /* Keep the local profile preview when unavailable. */ }
+    }
+    loadProfile();
+  }, []);
+
+  const saveProfile = async () => {
+    setSaving(true); setMessage('');
+    try { setProfile((await updateProfile({ username: profile.username, phone_number: profile.phone_number })) || profile); setMessage('Profile updated successfully.'); }
+    catch (error) { setMessage(error.message || 'Unable to update profile.'); }
+    finally { setSaving(false); }
+  };
 
   return (
-    <div className="min-h-screen bg-background text-on-surface antialiased flex">
+    <div className="w-full">
       {/* Side Navigation */}
-      <aside className="bg-primary h-screen w-64 fixed inset-y-0 left-0 border-r border-outline-variant shadow-md flex flex-col py-6 z-20 overflow-y-auto">
+      <aside className="hidden bg-primary h-screen w-64 fixed inset-y-0 left-0 border-r border-outline-variant shadow-md py-6 z-20 overflow-y-auto">
         {/* Header */}
         <div className="px-6 mb-8 flex flex-col gap-4">
           <div className="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center shrink-0">
@@ -63,9 +85,9 @@ export default function Profile() {
       </aside>
 
       {/* Main Content Area */}
-      <div className="flex-1 ml-64 flex flex-col min-h-screen">
+      <div className="flex-1 ml-0 flex flex-col min-h-screen">
         {/* Top Navigation */}
-        <header className="bg-surface-container-lowest fixed top-0 right-0 left-64 h-16 border-b border-surface-container-highest shadow-sm flex justify-between items-center px-6 sticky top-0 z-10 w-full">
+        <header className="hidden bg-surface-container-lowest fixed top-0 right-0 left-64 h-16 border-b border-surface-container-highest shadow-sm justify-between items-center px-6 sticky top-0 z-10 w-full">
           <div className="text-[24px] leading-[32px] tracking-[-0.01em] font-semibold text-on-surface">Admin Dashboard</div>
           <div className="flex items-center gap-4">
             <div className="relative hidden md:block">
@@ -82,7 +104,7 @@ export default function Profile() {
         </header>
 
         {/* Main Content Wrapper */}
-        <main className="flex-1 w-full max-w-[1440px] mx-auto p-8 lg:px-24">
+        <main className="flex-1 w-full">
           <div className="flex flex-col gap-8 w-full">
             {/* Page Title */}
             <div>
@@ -90,7 +112,8 @@ export default function Profile() {
                 Admin Profile & Security
                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-primary/10 text-primary font-semibold text-[12px] leading-[16px] uppercase tracking-wider border border-primary/20">Active Account</span>
               </h2>
-              <p className="text-[16px] leading-[24px] text-on-surface-variant mt-1">Manage your administrative account settings and security preferences.</p>
+            <p className="text-[16px] leading-[24px] text-on-surface-variant mt-1">Manage your administrative account settings and security preferences.</p>
+            {message && <p className="mt-3 rounded-lg border border-primary/20 bg-primary/5 px-3 py-2 text-sm text-primary">{message}</p>}
             </div>
 
             {/* Profile Header */}
@@ -103,10 +126,10 @@ export default function Profile() {
               </div>
               <div className="flex flex-col items-center md:items-start flex-1 w-full">
                 <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mb-1">
-                  <h3 className="text-[24px] leading-[32px] tracking-[-0.01em] font-semibold text-on-surface">Eleanor Vance</h3>
+                <h3 className="text-[24px] leading-[32px] tracking-[-0.01em] font-semibold text-on-surface">{profile.username}</h3>
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-primary text-white font-semibold text-[12px] leading-[16px] uppercase tracking-wider">Super Admin</span>
                 </div>
-                <p className="text-[14px] leading-[20px] text-on-surface-variant mb-4">admin@luxefacet.com</p>
+                <p className="text-[14px] leading-[20px] text-on-surface-variant mb-4">{profile.email}</p>
                 <div className="flex gap-3">
                   <button className="bg-surface-container-lowest border border-outline font-semibold text-[12px] leading-[16px] uppercase tracking-wider text-on-surface px-4 py-2 rounded hover:bg-surface-container-low transition-colors shadow-sm">
                     Upload New Photo
@@ -126,19 +149,19 @@ export default function Profile() {
                 <form className="flex flex-col gap-5 flex-1">
                   <div>
                     <label className="block text-[12px] leading-[16px] font-semibold uppercase tracking-wider text-on-surface-variant mb-1">Full Name</label>
-                    <input className="w-full h-10 px-4 bg-surface-container-lowest border border-outline-variant rounded focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all text-on-surface" type="text" value="Eleanor Vance" />
+                    <input className="w-full h-10 px-4 bg-surface-container-lowest border border-outline-variant rounded focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all text-on-surface" type="text" value={profile.username} onChange={(e) => setProfile((prev) => ({ ...prev, username: e.target.value }))} />
                   </div>
                   <div>
                     <label className="block text-[12px] leading-[16px] font-semibold uppercase tracking-wider text-on-surface-variant mb-1">Email Address</label>
-                    <input className="w-full h-10 px-4 bg-surface-container-lowest border border-outline-variant rounded focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all text-on-surface" type="email" value="admin@luxefacet.com" />
+                    <input className="w-full h-10 px-4 bg-surface-container-lowest border border-outline-variant rounded focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all text-on-surface" type="email" value={profile.email} readOnly />
                   </div>
                   <div>
                     <label className="block text-[12px] leading-[16px] font-semibold uppercase tracking-wider text-on-surface-variant mb-1">Role</label>
                     <input className="w-full h-10 px-4 bg-surface-container-low border border-outline-variant rounded text-on-surface-variant cursor-not-allowed" disabled type="text" value="Super Admin" />
                   </div>
                   <div className="mt-auto pt-6">
-                    <button className="w-full bg-primary text-white font-semibold text-[12px] leading-[16px] uppercase tracking-wider py-3 rounded hover:bg-primary/90 transition-colors shadow-sm" type="button">
-                      Edit Profile
+                    <button onClick={saveProfile} disabled={saving} className="w-full bg-primary text-white font-semibold text-[12px] leading-[16px] uppercase tracking-wider py-3 rounded hover:bg-primary/90 transition-colors shadow-sm disabled:opacity-60" type="button">
+                      {saving ? 'Saving...' : 'Save Profile'}
                     </button>
                   </div>
                 </form>
@@ -172,14 +195,14 @@ export default function Profile() {
                       </div>
                       <div className="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in cursor-pointer shrink-0">
                         <input
-                          checked
+                          checked={toggle2FA}
                           onChange={(e) => setToggle2FA(e.target.checked)}
                           className="toggle-checkbox absolute block w-6 h-6 rounded-full bg-surface-container-lowest border-4 border-primary appearance-none cursor-pointer right-0 z-10 transition-transform duration-200"
                           id="toggle"
                           name="toggle"
                           type="checkbox"
                         />
-                        <label className="toggle-label block overflow-hidden h-6 rounded-full bg-primary cursor-pointer" for="toggle"></label>
+                        <label className="toggle-label block overflow-hidden h-6 rounded-full bg-primary cursor-pointer" htmlFor="toggle"></label>
                       </div>
                     </div>
                   </div>

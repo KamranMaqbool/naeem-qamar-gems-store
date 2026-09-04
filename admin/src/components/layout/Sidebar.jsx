@@ -3,12 +3,14 @@ import { useAdmin } from '../../context/AdminContext';
 
 const navItems = [
   { path: '/', label: 'Dashboard', icon: 'dashboard', fill: true },
+  { path: '/analytics', label: 'Analytics', icon: 'analytics', fill: true },
   { path: '/orders', label: 'Orders', icon: 'shopping_cart', fill: false },
   { path: '/products', label: 'Products', icon: 'save_as', fill: false },
   { path: '/inventory', label: 'Inventory', icon: 'inventory_2', fill: false },
   { path: '/discounts', label: 'Discounts', icon: 'sell', fill: false },
   { path: '/customers', label: 'Customers', icon: 'group', fill: false },
-  { path: '/profile', label: 'Profile', icon: 'settings', fill: true },
+  { path: '/settings', label: 'Settings', icon: 'settings', fill: false },
+  { path: '/profile', label: 'Profile', icon: 'settings', fill: false },
 ];
 
 export default function Sidebar() {

@@ -14,7 +14,7 @@
   --color-on-primary-fixed: #002117;
   --color-on-primary-fixed-variant: #0b513d;
   --color-inverse-primary: #95d3ba;
-  
+
   --color-secondary: #006c49;
   --color-secondary-container: #6cf8bb;
   --color-secondary-fixed: #6ffbbe;
@@ -23,16 +23,16 @@
   --color-on-secondary-container: #00714d;
   --color-on-secondary-fixed: #002113;
   --color-on-secondary-fixed-variant: #005236;
-  
+
   --color-tertiary: #242f41;
   --color-tertiary-container: #3a4558;
   --color-tertiary-fixed: #d8e3fb;
-  --color-tertiary-fixed-dim: #bcc7de.
+  --color-tertiary-fixed-dim: #bcc7de;
   --color-on-tertiary: #ffffff;
-  --color-on-tertiary-container: #a7b2c9.
-  --color-on-tertiary-fixed: #111c2d.
-  --color-on-tertiary-fixed-variant: #3c475a.
-  
+  --color-on-tertiary-container: #a7b2c9;
+  --color-on-tertiary-fixed: #111c2d;
+  --color-on-tertiary-fixed-variant: #3c475a;
+
   --color-surface: #f7f9fb;
   --color-surface-dim: #d8dadc;
   --color-surface-bright: #f7f9fb;
@@ -43,88 +43,88 @@
   --color-surface-container-highest: #e0e3e5;
   --color-on-surface: #191c1e;
   --color-on-surface-variant: #404944;
-  
+
   --color-outline: #707974;
   --color-outline-variant: #bfc9c3;
-  
+
   --color-background: #f7f9fb;
-  --color-on-background: #191c1e.
-  --color-surface-variant: #e0e3e5.
-  
+  --color-on-background: #191c1e;
+  --color-surface-variant: #e0e3e5;
+
   --color-success: #10B981;
   --color-success-bg: #ECFDF5;
   --color-success-text: #064E3B;
   --color-warning: #F59E0B;
   --color-warning-bg: #FFFBE6;
-  --color-warning-text: #B45309.
-  --color-error: #ba1a1a.
-  --color-error-bg: #FEF2F2.
-  --color-error-text: #991B1B.
-  --color-info: #3B82F6.
-  --color-info-bg: #EFF6FF.
-  --color-info-text: #1D4ED8.
+  --color-warning-text: #B45309;
+  --color-error: #ba1a1a;
+  --color-error-bg: #FEF2F2;
+  --color-error-text: #991B1B;
+  --color-info: #3B82F6;
+  --color-info-bg: #EFF6FF;
+  --color-info-text: #1D4ED8;
+
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-2xl: 2rem;
+  --radius-full: 9999px;
+
+  --spacing-base: 4px;
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-gutter: 24px;
+  --spacing-margin: 24px;
+  --spacing-max-width: 1440px;
+
+  --font-body: "Inter", sans-serif;
+  --font-headline: "Inter", sans-serif;
+  --font-display: "Inter", sans-serif;
+  --font-mono: "Inter", sans-serif;
+  --font-label: "Inter", sans-serif;
+
+  --text-display-lg: 36px;
+  --text-display-lg--line-height: 44px;
+  --text-display-lg--letter-spacing: -0.02em;
+  --text-display-lg--font-weight: 700;
+
+  --text-display-lg-mobile: 28px;
+  --text-display-lg-mobile--line-height: 34px;
+  --text-display-lg-mobile--letter-spacing: -0.01em;
+  --text-display-lg-mobile--font-weight: 700;
+
+  --text-headline-md: 24px;
+  --text-headline-md--line-height: 32px;
+  --text-headline-md--letter-spacing: -0.01em;
+  --text-headline-md--font-weight: 600;
   
-  --radius-sm: 0.25rem.
-  --radius-md: 0.5rem.
-  --radius-lg: 1rem.
-  --radius-xl: 1.5rem.
-  --radius-2xl: 2rem.
-  --radius-full: 9999px.
+  --text-headline-sm: 20px;
+  --text-headline-sm--line-height: 28px;
+  --text-headline-sm--font-weight: 600;
   
-  --spacing-base: 4px.
-  --spacing-xs: 4px.
-  --spacing-sm: 8px.
-  --spacing-md: 16px.
-  --spacing-lg: 24px.
-  --spacing-xl: 32px.
-  --spacing-gutter: 24px.
-  --spacing-margin: 24px.
-  --spacing-max-width: 1440px.
+  --text-body-lg: 16px;
+  --text-body-lg--line-height: 24px;
+  --text-body-lg--font-weight: 400;
   
-  --font-body: "Inter", sans-serif.
-  --font-headline: "Inter", sans-serif.
-  --font-display: "Inter", sans-serif.
-  --font-mono: "Inter", sans-serif.
-  --font-label: "Inter", sans-serif.
+  --text-body-md: 14px;
+  --text-body-md--line-height: 20px;
+  --text-body-md--font-weight: 400;
   
-  --text-display-lg: 36px.
-  --text-display-lg--line-height: 44px.
-  --text-display-lg--letter-spacing: -0.02em.
-  --text-display-lg--font-weight: 700.
+  --text-label-md: 12px;
+  --text-label-md--line-height: 16px;
+  --text-label-md--letter-spacing: 0.05em;
+  --text-label-md--font-weight: 600;
   
-  --text-display-lg-mobile: 28px.
-  --text-display-lg-mobile--line-height: 34px.
-  --text-display-lg-mobile--letter-spacing: -0.01em.
-  --text-display-lg-mobile--font-weight: 700.
+  --text-mono-label: 13px;
+  --text-mono-label--line-height: 18px;
+  --text-mono-label--font-weight: 500;
   
-  --text-headline-md: 24px.
-  --text-headline-md--line-height: 32px.
-  --text-headline-md--letter-spacing: -0.01em.
-  --text-headline-md--font-weight: 600.
-  
-  --text-headline-sm: 20px.
-  --text-headline-sm--line-height: 28px.
-  --text-headline-sm--font-weight: 600.
-  
-  --text-body-lg: 16px.
-  --text-body-lg--line-height: 24px.
-  --text-body-lg--font-weight: 400.
-  
-  --text-body-md: 14px.
-  --text-body-md--line-height: 20px.
-  --text-body-md--font-weight: 400.
-  
-  --text-label-md: 12px.
-  --text-label-md--line-height: 16px.
-  --text-label-md--letter-spacing: 0.05em.
-  --text-label-md--font-weight: 600.
-  
-  --text-mono-label: 13px.
-  --text-mono-label--line-height: 18px.
-  --text-mono-label--font-weight: 500.
-  
-  --shadow-resting: 0px 1px 3px rgba(0, 0, 0, 0.05), 0px 1px 2px rgba(0, 0, 0, 0.03).
-  --shadow-floating: 0px 10px 15px -3px rgba(0, 0, 0, 0.08).
+  --shadow-resting: 0px 1px 3px rgba(0, 0, 0, 0.05), 0px 1px 2px rgba(0, 0, 0, 0.03);
+  --shadow-floating: 0px 10px 15px -3px rgba(0, 0, 0, 0.08);
 }
 
 @layer base {
@@ -154,6 +154,73 @@
 }
 
 @layer components {
+  .signin-shell {
+    min-height: 100vh;
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    background: #f7f9fb;
+    padding: 48px;
+    gap: 0;
+  }
+
+  .signin-brand {
+    width: min(430px, 38vw);
+    min-height: 620px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 56px;
+    color: #fff;
+    background: linear-gradient(145deg, #003527 0%, #064e3b 100%);
+    border-radius: 20px 0 0 20px;
+  }
+
+  .signin-brand-mark, .signin-mobile-mark {
+    width: 56px;
+    height: 56px;
+    display: grid;
+    place-items: center;
+    border-radius: 16px;
+    background: #6ffbbe;
+    color: #003527;
+  }
+
+  .signin-brand-name { margin: 28px 0 4px; font-size: 28px; font-weight: 700; letter-spacing: -0.02em; }
+  .signin-brand-tagline { margin: 0; color: #b0f0d6; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; }
+  .signin-brand-copy { max-width: 280px; margin-top: 72px; color: rgba(255,255,255,.78); font-size: 15px; line-height: 1.7; }
+
+  .signin-card {
+    width: min(480px, 100%);
+    min-height: 620px;
+    padding: 72px 64px 48px;
+    background: #fff;
+    border: 1px solid #dfe5e2;
+    border-radius: 0 20px 20px 0;
+    box-shadow: 0 18px 45px rgba(0, 53, 39, .09);
+  }
+
+  .signin-card-header h1 { margin: 8px 0 8px; color: #191c1e; font-size: 32px; line-height: 1.2; letter-spacing: -.03em; }
+  .signin-card-header p { margin: 0; color: #66716c; font-size: 14px; }
+  .signin-eyebrow { color: #006c49 !important; font-size: 11px !important; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+  .signin-mobile-mark { display: none; }
+  .signin-form { display: grid; gap: 22px; margin-top: 38px; }
+  .signin-form label { display: grid; gap: 8px; color: #34413b; font-size: 13px; font-weight: 600; }
+  .signin-form input { width: 100%; height: 48px; padding: 0 14px; color: #191c1e; background: #fff; border: 1px solid #bfc9c3; border-radius: 8px; font: inherit; font-weight: 400; outline: none; }
+  .signin-form input:focus { border-color: #006c49; box-shadow: 0 0 0 3px rgba(0,108,73,.12); }
+  .signin-form button { width: 100%; height: 48px; margin-top: 6px; border: 0; border-radius: 8px; color: #fff; background: #003527; font-size: 14px; font-weight: 700; cursor: pointer; transition: background .2s ease; }
+  .signin-form button:hover { background: #064e3b; }
+  .signin-form button:disabled { opacity: .6; cursor: wait; }
+  .signin-error { margin-top: 22px; padding: 12px 14px; color: #991b1b; background: #fef2f2; border: 1px solid rgba(186,26,26,.25); border-radius: 8px; font-size: 13px; }
+  .signin-footer { margin: 42px 0 0; color: #8a938e; font-size: 12px; text-align: center; }
+
+  @media (max-width: 720px) {
+    .signin-shell { padding: 20px; align-items: center; }
+    .signin-brand { display: none; }
+    .signin-card { min-height: 0; padding: 36px 26px 30px; border-radius: 16px; }
+    .signin-mobile-mark { display: grid; margin-bottom: 24px; }
+  }
+
   .shadow-resting {
     box-shadow: var(--shadow-resting);
   }

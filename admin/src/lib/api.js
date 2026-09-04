@@ -85,6 +85,10 @@ export async function fetchAdminProducts(params = {}) {
   return authFetch(`/admin/products/${qs ? '?' + qs : ''}`);
 }
 
+export async function fetchCategories() {
+  return authFetch('/catalog/categories/');
+}
+
 export async function createProduct(data) {
   return authFetch('/admin/products/', { method: 'POST', body: JSON.stringify(data) });
 }
@@ -100,7 +104,8 @@ export async function deleteProduct(id) {
 export async function fetchAdminOrders(params = {}) {
   const query = new URLSearchParams();
   if (params.search) query.set('search', params.search);
-  if (params.status) query.set('order_status', params.status);
+  if (params.status) query.set('status', params.status);
+  if (params.page) query.set('page', params.page);
   const qs = query.toString();
   return authFetch(`/admin/orders/${qs ? '?' + qs : ''}`);
 }
@@ -109,11 +114,25 @@ export async function updateOrder(id, data) {
   return authFetch(`/admin/orders/${id}/`, { method: 'PATCH', body: JSON.stringify(data) });
 }
 
+export async function fetchAdminOrder(id) {
+  return authFetch(`/admin/orders/${id}/`);
+}
+
+export async function deleteOrder(id) {
+  return authFetch(`/admin/orders/${id}/`, { method: 'DELETE' });
+}
+
 export async function fetchInventory(params = {}) {
   const query = new URLSearchParams();
   if (params.status) query.set('stock_status', params.status);
+  if (params.search) query.set('search', params.search);
+  if (params.page) query.set('page', params.page);
   const qs = query.toString();
   return authFetch(`/admin/inventory/${qs ? '?' + qs : ''}`);
+}
+
+export async function updateInventory(id, data) {
+  return authFetch(`/admin/inventory/${id}/`, { method: 'PATCH', body: JSON.stringify(data) });
 }
 
 export async function receiveStock(data) {
@@ -128,6 +147,10 @@ export async function fetchRevenueChart(period = 'daily') {
   return authFetch(`/admin/analytics/revenue-chart/?period=${period}`);
 }
 
+export async function fetchSalesByGemstone() {
+  return authFetch('/admin/analytics/sales-by-gemstone/');
+}
+
 export async function fetchAdminDiscounts() {
   return authFetch('/admin/discounts/');
 }
@@ -136,8 +159,37 @@ export async function createDiscount(data) {
   return authFetch('/admin/discounts/', { method: 'POST', body: JSON.stringify(data) });
 }
 
+export async function updateDiscount(id, data) {
+  return authFetch(`/admin/discounts/${id}/`, { method: 'PATCH', body: JSON.stringify(data) });
+}
+
+export async function deleteDiscount(id) {
+  return authFetch(`/admin/discounts/${id}/`, { method: 'DELETE' });
+}
+
 export async function fetchAdminSettings() {
   return authFetch('/settings/');
+}
+
+export async function fetchAdminCustomers(params = {}) {
+  const query = new URLSearchParams();
+  if (params.search) query.set('search', params.search);
+  if (params.isVip !== '') query.set('is_vip', params.isVip);
+  if (params.page) query.set('page', params.page);
+  const qs = query.toString();
+  return authFetch(`/admin/customers/${qs ? '?' + qs : ''}`);
+}
+
+export async function fetchAdminCustomer(id) {
+  return authFetch(`/admin/customers/${id}/`);
+}
+
+export async function fetchProfile() {
+  return authFetch('/users/me/');
+}
+
+export async function updateProfile(data) {
+  return authFetch('/users/me/', { method: 'PATCH', body: JSON.stringify(data) });
 }
 
 export async function updateAdminSettings(data) {

@@ -1,12 +1,38 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { orderDetail, statusOptions, statusConfig } from '../../data/orders';
+import { fetchAdminOrder, isAuthenticated, login, updateOrder } from '../../lib/api';
 
 export default function OrderDetail() {
   const { id } = useParams();
   const [status, setStatus] = useState(orderDetail.status);
+  const [order, setOrder] = useState(orderDetail);
+  const [saving, setSaving] = useState(false);
 
-  const order = orderDetail;
+  useEffect(() => {
+    async function loadOrder() {
+      try {
+        if (!isAuthenticated()) await login('admin@virtuoso-gems.com', 'admin123');
+        const data = await fetchAdminOrder(id);
+        const address = data.shipping_address || {};
+        const mapped = {
+          ...orderDetail,
+          id: `#${data.order_number}`,
+          status: data.order_status?.toLowerCase() || 'pending',
+          date: new Date(data.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+          customer: { name: data.user?.username || data.guest_email || 'Guest', email: data.user?.email || data.guest_email || '', phone: data.guest_phone || '' },
+          shipping: { name: data.user?.username || data.guest_email || 'Guest', address1: address.address1 || address.street || '', address2: address.address2 || '', city: address.city || '', state: address.state || '', zip: address.zip || address.postal_code || '', country: address.country || '' },
+          items: (data.items || []).map((item) => ({ id: item.id, name: item.product_title, category: '', unitPrice: Number(item.unit_price_at_purchase), quantity: item.quantity, total: Number(item.unit_price_at_purchase) * item.quantity })),
+          summary: { subtotal: Number(data.subtotal || 0), shipping: Number(data.shipping_cost || 0), tax: Number(data.tax_amount || 0), total: Number(data.total_amount || 0) },
+        };
+        setOrder(mapped);
+        setStatus(mapped.status);
+      } catch {
+        // Keep the static preview if the API is unavailable.
+      }
+    }
+    loadOrder();
+  }, [id]);
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat('en-US', {
@@ -20,70 +46,19 @@ export default function OrderDetail() {
     setStatus(e.target.value);
   };
 
-  const handleUpdateOrder = () => {
-    // In a real app, this would call an API
-    alert(`Order status updated to: ${status}`);
+  const handleUpdateOrder = async () => {
+    setSaving(true);
+    try {
+      if (!isAuthenticated()) await login('admin@virtuoso-gems.com', 'admin123');
+      await updateOrder(id, { order_status: status.toUpperCase() });
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
     <div className="min-h-screen bg-surface text-on-surface">
-      {/* SideNavBar */}
-      <aside className="bg-primary text-on-primary/70 h-screen w-64 fixed left-0 top-0 border-r border-outline-variant shadow-md flex flex-col h-full py-6 z-20">
-        <div className="px-6 mb-8">
-          <h1 className="text-[20px] leading-[28px] font-bold tracking-tight">VIRTUOSO'S GEMS</h1>
-          <p className="text-on-primary/70 text-[12px] leading-[16px] font-semibold uppercase tracking-wider mt-1">Luxury Admin</p>
-        </div>
-        <nav className="flex-1 flex flex-col gap-1">
-          <a className="flex items-center gap-3 px-4 py-3 text-on-primary/70 hover:text-on-primary hover:bg-primary-container/50 transition-colors cursor-pointer active:scale-95" href="/">
-            <span className="material-symbols-outlined" data-icon="dashboard">dashboard</span>
-            Dashboard
-          </a>
-          <a className="flex items-center gap-3 px-4 py-3 bg-secondary-container/10 text-secondary-fixed border-l-4 border-secondary-fixed cursor-pointer active:scale-95" href="/orders">
-            <span className="material-symbols-outlined" data-icon="shopping_cart">shopping_cart</span>
-            Orders
-          </a>
-          <a className="flex items-center gap-3 px-4 py-3 text-on-primary/70 hover:text-on-primary hover:bg-primary-container/50 transition-colors cursor-pointer active:scale-95" href="/products">
-            <span className="material-symbols-outlined" data-icon="save_as">save_as</span>
-            Products
-          </a>
-          <a className="flex items-center gap-3 px-4 py-3 text-on-primary/70 hover:text-on-primary hover:bg-primary-container/50 transition-colors cursor-pointer active:scale-95" href="/inventory">
-            <span className="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
-            Inventory
-          </a>
-          <a className="flex items-center gap-3 px-4 py-3 text-on-primary/70 hover:text-on-primary hover:bg-primary-container/50 transition-colors cursor-pointer active:scale-95" href="/discounts">
-            <span className="material-symbols-outlined" data-icon="sell">sell</span>
-            Discounts
-          </a>
-          <a className="flex items-center gap-3 px-4 py-3 text-on-primary/70 hover:text-on-primary hover:bg-primary-container/50 transition-colors cursor-pointer active:scale-95" href="/settings">
-            <span className="material-symbols-outlined" data-icon="settings">settings</span>
-            Settings
-          </a>
-        </nav>
-      </aside>
-
-      {/* TopNavBar */}
-      <header className="bg-surface-container-lowest text-primary fixed top-0 right-0 left-64 h-16 border-b border-surface-container-highest shadow-sm flex justify-between items-center px-6 z-10 transition-all duration-200">
-        <div className="flex items-center gap-4 w-1/3">
-          <div className="relative w-full max-w-md">
-            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
-            <input className="w-full pl-10 pr-4 py-2 bg-surface rounded-full border border-surface-container-highest focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-on-surface" placeholder="Search orders, customers..." type="text" />
-          </div>
-        </div>
-        <div className="text-[24px] leading-[32px] tracking-[-0.01em] font-semibold text-on-surface absolute left-1/2 -translate-x-1/2">
-          Admin Dashboard
-        </div>
-        <div className="flex items-center gap-4">
-          <button className="p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors duration-200" aria-label="Notifications">
-            <span className="material-symbols-outlined" data-icon="notifications">notifications</span>
-          </button>
-          <button className="p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors duration-200" aria-label="Account">
-            <span className="material-symbols-outlined" data-icon="account_circle">account_circle</span>
-          </button>
-        </div>
-      </header>
-
-      {/* Main Content Canvas */}
-      <main className="ml-64 pt-16 min-h-screen">
+      <main>
         <div className="max-w-[1440px] mx-auto p-6 md:p-8">
           {/* Page Header */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
@@ -111,14 +86,14 @@ export default function OrderDetail() {
           {/* Asymmetric Grid Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Left Column: Items & Total (Col Span 2) */}
-            <div className="lg:col-span-2 space-y-6">
+            <div className="lg:col-span-2 min-w-0 space-y-6">
               {/* Items Card */}
-              <div className="card overflow-hidden">
+              <div className="card min-w-0 overflow-hidden">
                 <div className="px-6 py-4 border-b border-surface-variant">
                   <h3 className="text-[20px] leading-[28px] font-semibold text-on-surface">Order Items</h3>
                 </div>
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse">
+                  <table className="w-full min-w-[720px] text-left border-collapse">
                     <thead className="bg-surface-container-low text-[12px] leading-[16px] font-semibold uppercase tracking-wider text-on-surface-variant border-b border-surface-variant">
                       <tr>
                         <th className="px-6 py-4 font-semibold">Product</th>
@@ -154,15 +129,15 @@ export default function OrderDetail() {
                 <div className="px-6 py-6 bg-surface-bright border-t border-surface-variant">
                   <div className="flex justify-end">
                     <div className="w-full max-w-sm space-y-3">
-                      <div className="flex justify-between text-on-surface-variant">
+                      <div className="flex items-center justify-between gap-6 text-on-surface-variant">
                         <span>Subtotal</span>
                         <span className="text-on-surface">{formatPrice(order.summary.subtotal)}</span>
                       </div>
-                      <div className="flex justify-between text-on-surface-variant">
+                      <div className="flex items-center justify-between gap-6 text-on-surface-variant">
                         <span>Shipping (Insured Overnight)</span>
                         <span className="text-on-surface">{formatPrice(order.summary.shipping)}</span>
                       </div>
-                      <div className="flex justify-between text-on-surface-variant">
+                      <div className="flex items-center justify-between gap-6 text-on-surface-variant">
                         <span>Tax (8.5%)</span>
                         <span className="text-on-surface">{formatPrice(order.summary.tax)}</span>
                       </div>
@@ -229,10 +204,11 @@ export default function OrderDetail() {
                   </div>
                   <button
                     onClick={handleUpdateOrder}
+                    disabled={saving}
                     className="w-full px-4 py-3 bg-primary text-on-primary text-[12px] leading-[16px] font-semibold uppercase tracking-wider rounded hover:bg-primary-container transition-colors shadow-sm flex justify-center items-center gap-2"
                   >
                     <span className="material-symbols-outlined text-[18px]">save</span>
-                    Update Order
+                    {saving ? 'Saving...' : 'Update Order'}
                   </button>
                 </div>
               </div>
@@ -242,12 +218,4 @@ export default function OrderDetail() {
       </main>
     </div>
   );
-}
-
-function formatPrice(price) {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 2,
-  }).format(price);
 }

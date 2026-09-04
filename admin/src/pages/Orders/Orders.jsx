@@ -1,13 +1,17 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { orders as staticOrders, statusConfig } from '../../data/orders';
-import { fetchAdminOrders, isAuthenticated, login } from '../../lib/api';
+import { deleteOrder, fetchAdminOrders, isAuthenticated, login } from '../../lib/api';
 
 export default function Orders() {
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState('');
   const [apiOrders, setApiOrders] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalOrders, setTotalOrders] = useState(0);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     async function loadOrders() {
@@ -15,29 +19,33 @@ export default function Orders() {
         if (!isAuthenticated()) {
           await login('admin@virtuoso-gems.com', 'admin123');
         }
-        const data = await fetchAdminOrders();
+        const data = await fetchAdminOrders({ search, status, page });
         const orderList = data.results || data;
         setApiOrders(orderList.map((o) => ({
           id: `#${o.order_number || o.id}`,
           rawId: o.id,
           customer: {
-            name: o.user?.username || o.guest_email || 'Guest',
-            initials: (o.user?.username || o.guest_email || 'G').substring(0, 2).toUpperCase(),
-            email: o.user?.email || o.guest_email || '',
+            name: o.customer_name || o.user?.username || o.guest_email || 'Guest',
+            initials: (o.customer_name || o.guest_email || 'G').substring(0, 2).toUpperCase(),
+            email: o.customer_email || o.user?.email || o.guest_email || '',
           },
           date: new Date(o.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
           amount: `$${parseFloat(o.total_amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
           status: o.order_status?.toLowerCase() || 'pending',
-          items: o.items?.length || 0,
+          items: o.items_count ?? o.items?.length ?? 0,
         })));
+        setTotalOrders(data.count ?? orderList.length);
+        setTotalPages(data.count ? Math.max(1, Math.ceil(data.count / 20)) : 1);
       } catch {
         setApiOrders(null);
+        setTotalOrders(staticOrders.length);
+        setTotalPages(1);
       } finally {
         setLoading(false);
       }
     }
     loadOrders();
-  }, []);
+  }, [search, status, page]);
 
   const orders = apiOrders || staticOrders;
 
@@ -50,6 +58,16 @@ export default function Orders() {
       return matchesSearch && matchesStatus;
     });
   }, [orders, search, status]);
+
+  const setSearchAndReset = (value) => { setSearch(value); setPage(1); };
+  const setStatusAndReset = (value) => { setStatus(value); setPage(1); };
+  const handleDelete = async (order) => {
+    if (!window.confirm(`Delete order ${order.id}?`)) return;
+    try {
+      await deleteOrder(order.rawId || order.id.replace('#', ''));
+      setApiOrders((current) => current?.filter((item) => item.id !== order.id) || current);
+    } catch (err) { setError(err.message || 'Unable to delete order.'); }
+  };
 
   const statusOptions = [
     { value: '', label: 'All Statuses' },
@@ -67,19 +85,21 @@ export default function Orders() {
           <h1 className="text-[36px] leading-[44px] tracking-[-0.02em] font-bold text-on-surface">Orders</h1>
           <p className="text-[16px] leading-[24px] text-on-surface-variant mt-1">Manage and track customer orders.</p>
         </div>
-        <button className="px-4 py-2 bg-primary-container text-white rounded-md text-[12px] leading-[16px] font-semibold uppercase tracking-wider hover:bg-primary transition-colors shadow-resting flex items-center gap-2">
+        <Link to="/orders/new" className="px-4 py-2 bg-primary-container text-white rounded-md text-[12px] leading-[16px] font-semibold uppercase tracking-wider hover:bg-primary transition-colors shadow-resting flex items-center gap-2">
           <span className="material-symbols-outlined text-sm">add</span>
           New Order
-        </button>
+        </Link>
       </div>
+
+      {error && <div className="mb-6 rounded-lg border border-error/30 bg-error-bg px-4 py-3 text-sm text-error-text">{error}</div>}
 
       <div className="flex flex-col md:flex-row gap-4 mb-8">
         <div className="relative flex-1">
           <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
-          <input type="text" placeholder="Search orders..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full pl-10 pr-4 py-2 bg-surface-container-low border border-outline-variant rounded-md text-[14px] leading-[20px] focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container/10" />
+          <input type="text" placeholder="Search orders..." value={search} onChange={(e) => setSearchAndReset(e.target.value)} className="w-full pl-10 pr-4 py-2 bg-surface-container-low border border-outline-variant rounded-md text-[14px] leading-[20px] focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container/10" />
         </div>
         <div className="flex gap-4">
-          <select value={status} onChange={(e) => setStatus(e.target.value)} className="bg-surface-container-low border border-outline-variant text-on-surface-variant text-[12px] leading-[16px] font-semibold uppercase tracking-wider rounded-md px-4 py-2 text-sm focus:ring-1 focus:ring-primary-container outline-none">
+        <select value={status} onChange={(e) => setStatusAndReset(e.target.value)} className="bg-surface-container-low border border-outline-variant text-on-surface-variant text-[12px] leading-[16px] font-semibold uppercase tracking-wider rounded-md px-4 py-2 text-sm focus:ring-1 focus:ring-primary-container outline-none">
             {statusOptions.map((opt) => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>
             ))}
@@ -107,7 +127,7 @@ export default function Orders() {
               ) : filteredOrders.map((order) => (
                 <tr key={order.id} className="border-b border-[#F1F5F9] hover:bg-surface-bright transition-colors group">
                   <td className="py-4 px-6 font-mono text-[13px] leading-[18px] font-medium text-primary-container">
-                    <Link to={`/orders/${order.id}`} className="hover:text-primary transition-colors">{order.id}</Link>
+                    <Link to={`/orders/${order.rawId || order.id.replace('#', '')}`} className="hover:text-primary transition-colors">{order.id}</Link>
                   </td>
                   <td className="py-4 px-6">
                     <div className="flex items-center gap-3">
@@ -127,9 +147,12 @@ export default function Orders() {
                     </span>
                   </td>
                   <td className="py-4 px-6 text-right">
-                    <Link to={`/orders/${order.id}`} className="text-on-surface-variant hover:text-primary transition-colors opacity-0 group-hover:opacity-100">
+                    <Link to={`/orders/${order.rawId || order.id.replace('#', '')}`} className="text-on-surface-variant hover:text-primary transition-colors opacity-0 group-hover:opacity-100">
                       <span className="material-symbols-outlined text-sm">edit</span>
                     </Link>
+                    <button type="button" onClick={() => handleDelete(order)} className="ml-3 text-on-surface-variant hover:text-error transition-colors opacity-0 group-hover:opacity-100" aria-label="Delete order">
+                      <span className="material-symbols-outlined text-sm">delete</span>
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -143,9 +166,11 @@ export default function Orders() {
           </div>
         )}
         <div className="px-6 py-4 border-t border-surface-container-highest bg-white flex items-center justify-between">
-          <span className="text-[14px] leading-[20px] text-sm text-on-surface-variant">Showing {filteredOrders.length} of {orders.length} entries</span>
-          <div className="flex gap-1">
-            <button className="px-3 py-1 bg-primary-container text-white rounded-md text-sm shadow-sm">1</button>
+          <span className="text-[14px] leading-[20px] text-sm text-on-surface-variant">Showing {filteredOrders.length} of {totalOrders} entries</span>
+          <div className="flex items-center gap-2">
+            <button type="button" disabled={page === 1 || loading} onClick={() => setPage((current) => current - 1)} className="rounded-md border border-outline-variant px-3 py-1 text-sm disabled:cursor-not-allowed disabled:opacity-40">Previous</button>
+            <span className="px-2 text-sm text-on-surface-variant">Page {page} of {totalPages}</span>
+            <button type="button" disabled={page >= totalPages || loading} onClick={() => setPage((current) => current + 1)} className="rounded-md border border-outline-variant px-3 py-1 text-sm disabled:cursor-not-allowed disabled:opacity-40">Next</button>
           </div>
         </div>
       </div>

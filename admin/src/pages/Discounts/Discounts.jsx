@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { discounts, discountTypes } from '../../data/discounts';
+import { useEffect, useState } from 'react';
+import { discounts as staticDiscounts, discountTypes } from '../../data/discounts';
+import { createDiscount, deleteDiscount, fetchAdminDiscounts, isAuthenticated, login } from '../../lib/api';
 
 export default function Discounts() {
   const [activeTab, setActiveTab] = useState('active');
@@ -12,6 +13,21 @@ export default function Discounts() {
     endDate: '',
     usageLimit: '',
   });
+  const [discountList, setDiscountList] = useState(staticDiscounts);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    async function loadDiscounts() {
+      try {
+        if (!isAuthenticated()) await login('admin@virtuoso-gems.com', 'admin123');
+        const data = await fetchAdminDiscounts();
+        setDiscountList((data.results || data).map((discount) => ({ ...discount, type: discount.discount_type === 'FIXED_AMOUNT' ? 'Fixed Amount' : 'Percentage', value: discount.discount_type === 'PERCENTAGE' ? `${discount.value}%` : `$${discount.value}`, usageCount: `${discount.current_uses} / ${discount.max_uses || '∞'}`, expiryDate: discount.end_date ? new Date(discount.end_date).toLocaleDateString() : 'No Expiry', status: discount.is_active ? 'active' : 'expired' })));
+      } catch (loadError) { setError(loadError.message || 'Unable to load discounts.'); }
+      finally { setLoading(false); }
+    }
+    loadDiscounts();
+  }, []);
 
   const toggleDrawer = () => {
     setDrawerOpen(!drawerOpen);
@@ -29,17 +45,26 @@ export default function Discounts() {
     setFormData((prev) => ({ ...prev, type }));
   };
 
-  const handleSubmit = (e) => {
+  const handleDelete = async (discount) => {
+    if (!window.confirm(`Delete discount ${discount.code}?`)) return;
+    try { await deleteDiscount(discount.id); setDiscountList((current) => current.filter((item) => item.id !== discount.id)); }
+    catch (deleteError) { setError(deleteError.message || 'Unable to delete discount.'); }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Saving discount:', formData);
-    alert('Promo saved successfully!');
-    setDrawerOpen(false);
+    try {
+      if (!isAuthenticated()) await login('admin@virtuoso-gems.com', 'admin123');
+      await createDiscount({ code: formData.code, discount_type: formData.type === 'fixed' ? 'FIXED_AMOUNT' : 'PERCENTAGE', value: formData.value, start_date: `${formData.startDate || new Date().toISOString().slice(0, 10)}T00:00:00Z`, end_date: `${formData.endDate || '2099-12-31'}T23:59:59Z`, max_uses: Number(formData.usageLimit) || 0, is_active: true });
+      setDrawerOpen(false);
+      window.location.reload();
+    } catch (submitError) { setError(submitError.message || 'Unable to save promo.'); }
   };
 
   return (
-    <div className="min-h-screen bg-background text-on-background">
+    <div className="w-full">
       {/* SideNavBar */}
-      <aside className="bg-primary h-screen w-64 fixed left-0 top-0 border-r border-outline-variant shadow-md flex flex-col h-full py-6 z-20">
+      <aside className="hidden bg-primary h-screen w-64 fixed left-0 top-0 border-r border-outline-variant shadow-md h-full py-6 z-20">
         <div className="px-6 mb-8 flex items-center gap-3">
           <div className="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center shrink-0">
             <span className="material-symbols-outlined text-on-secondary-fixed text-sm">diamond</span>
@@ -92,9 +117,9 @@ export default function Discounts() {
       </aside>
 
       {/* Main Content Area */}
-      <div className="ml-64 flex-1 flex flex-col h-screen">
+      <div className="ml-0 flex-1 flex flex-col min-h-screen">
         {/* TopNavBar */}
-        <header className="bg-surface-container-lowest fixed top-0 right-0 left-64 h-16 border-b border-surface-container-highest shadow-sm flex justify-between items-center px-6 z-10">
+        <header className="hidden bg-surface-container-lowest fixed top-0 right-0 left-64 h-16 border-b border-surface-container-highest shadow-sm justify-between items-center px-6 z-10">
           <div className="text-[24px] leading-[32px] tracking-[-0.01em] font-semibold text-on-surface">Admin Dashboard</div>
           <div className="flex items-center gap-4">
             <button className="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container-low transition-all duration-200" aria-label="Search">
@@ -110,9 +135,9 @@ export default function Discounts() {
         </header>
 
         {/* Canvas */}
-        <main className="flex-1 mt-16 p-6 md:p-8 overflow-y-auto flex relative w-full">
+        <main className="flex-1 p-0 overflow-visible flex relative w-full">
           {/* Left Side: Content */}
-          <div className={`flex-1 pr-6 flex flex-col max-w-[1440px] mx-auto w-full transition-all duration-300 ${drawerOpen ? 'mr-[400px]' : ''}`} id="main-content">
+          <div className={`flex-1 pr-0 flex flex-col max-w-none mx-0 w-full transition-all duration-300 ${drawerOpen ? 'mr-[400px]' : ''}`} id="main-content">
             {/* Header & Actions */}
             <div className="flex justify-between items-center mb-8">
               <h2 className="text-[36px] leading-[44px] tracking-[-0.02em] font-bold text-on-surface">Promotions & Discounts</h2>
@@ -142,6 +167,7 @@ export default function Discounts() {
             </div>
 
             {/* Data Table Container */}
+            {error && <div className="mb-4 rounded-lg border border-error/30 bg-error-bg px-4 py-3 text-sm text-error-text">{error}</div>}
             <div className="card overflow-hidden flex-1">
               <table className="w-full text-left border-collapse">
                 <thead className="bg-[#F1F5F9] border-b border-outline-variant text-[12px] leading-[16px] font-semibold uppercase tracking-wider text-on-surface-variant">
@@ -155,7 +181,7 @@ export default function Discounts() {
                   </tr>
                 </thead>
                 <tbody>
-                  {discounts.map((discount) => (
+                  {loading ? <tr><td colSpan="6" className="py-12 text-center text-on-surface-variant">Loading discounts...</td></tr> : discountList.filter((discount) => activeTab === 'active' ? discount.status === 'active' : discount.status !== 'active').map((discount) => (
                     <tr key={discount.id} className="border-b border-[#F1F5F9] hover:bg-surface-container-low transition-colors group">
                       <td className="py-4 px-6 font-mono text-[13px] leading-[18px] font-medium text-primary-container">{discount.code}</td>
                       <td className="py-4 px-6 text-on-surface">{discount.type}</td>
@@ -163,7 +189,7 @@ export default function Discounts() {
                       <td className="py-4 px-6 text-on-surface-variant">{discount.usageCount}</td>
                       <td className="py-4 px-6 text-on-surface-variant">{discount.expiryDate}</td>
                       <td className="py-4 px-6 text-right">
-                        <button className="text-on-surface-variant hover:text-primary transition-colors opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button type="button" onClick={() => handleDelete(discount)} className="text-on-surface-variant hover:text-error transition-colors opacity-0 group-hover:opacity-100 transition-opacity" aria-label={`Delete ${discount.code}`}>
                           <span className="material-symbols-outlined">more_vert</span>
                         </button>
                       </td>
@@ -186,7 +212,7 @@ export default function Discounts() {
               </button>
             </div>
             <div className="p-6 flex-1 overflow-y-auto">
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form id="discount-form" onSubmit={handleSubmit} className="space-y-6">
                 {/* Code Name */}
                 <div>
                   <label className="block text-[12px] leading-[16px] font-semibold uppercase tracking-wider text-on-surface-variant mb-2">Code Name</label>

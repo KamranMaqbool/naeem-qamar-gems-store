@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { createProduct, fetchCategories, isAuthenticated, login, receiveStock } from '../../lib/api';
 
 const categories = [
   { value: '', label: 'Select a category' },
@@ -22,6 +23,21 @@ export default function AddProduct() {
   });
   const [images, setImages] = useState([]);
   const [dragActive, setDragActive] = useState(false);
+  const [categoryOptions, setCategoryOptions] = useState(categories);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const data = await fetchCategories();
+        const options = (data.results || data).map((category) => ({ value: category.id, label: category.name }));
+        if (options.length) setCategoryOptions([{ value: '', label: 'Select a category' }, ...options]);
+      } catch {
+        // Keep the local options available when the API is not reachable.
+      }
+    })();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value, type } = e.target;
@@ -64,17 +80,39 @@ export default function AddProduct() {
     setImages((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Saving product:', { ...formData, images });
-    alert('Product saved successfully!');
-    navigate('/products');
+    setSaving(true);
+    setError('');
+    try {
+      if (!isAuthenticated()) await login('admin@virtuoso-gems.com', 'admin123');
+      const slug = formData.title.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      const createdProduct = await createProduct({
+        title: formData.title,
+        slug,
+        sku: formData.sku,
+        description: formData.description,
+        base_price: formData.regularPrice,
+        sale_price: formData.salePrice || null,
+        category: formData.category && Number.isFinite(Number(formData.category)) ? Number(formData.category) : null,
+        status: 'DRAFT',
+        is_featured: false,
+      });
+      if (formData.quantity > 0 && createdProduct?.id) {
+        await receiveStock({ product_id: createdProduct.id, quantity: formData.quantity, reason: 'RECEIVE_STOCK', notes: 'Opening stock received with product creation.' });
+      }
+      navigate('/products');
+    } catch (submitError) {
+      setError(submitError.message || 'Unable to save product. Please try again.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-background text-on-background antialiased flex">
+    <div className="w-full">
       {/* SideNavBar */}
-      <nav className="bg-primary h-screen w-64 fixed left-0 top-0 border-r border-outline-variant shadow-md z-20">
+      <nav className="hidden bg-primary h-screen w-64 fixed left-0 top-0 border-r border-outline-variant shadow-md z-20">
         <div className="flex flex-col h-full py-6 text-on-primary">
           <div className="px-6 mb-8 flex items-center gap-4">
             <div className="w-10 h-10 rounded-lg bg-surface-container-lowest flex items-center justify-center">
@@ -115,9 +153,9 @@ export default function AddProduct() {
       </nav>
 
       {/* Main Content Wrapper */}
-      <div className="flex-1 ml-64 flex flex-col min-h-screen">
+      <div className="ml-0 flex-1 flex flex-col min-h-screen">
         {/* TopNavBar */}
-        <header className="bg-surface-container-lowest fixed top-0 right-0 left-64 h-16 border-b border-surface-container-highest shadow-sm z-10 flex justify-between items-center px-6 transition-all duration-200">
+        <header className="hidden bg-surface-container-lowest fixed top-0 right-0 left-64 h-16 border-b border-surface-container-highest shadow-sm z-10 justify-between items-center px-6 transition-all duration-200">
           <div className="text-[24px] leading-[32px] tracking-[-0.01em] font-semibold text-on-surface">Admin Dashboard</div>
           <div className="flex items-center gap-4">
             <div className="relative hidden md:block">
@@ -134,13 +172,15 @@ export default function AddProduct() {
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 mt-16 p-6 md:p-8 max-w-[1440px] mx-auto w-full">
-          <div className="max-w-[1440px] mx-auto">
+        <main className="flex-1 w-full">
+          <div className="w-full">
             <div className="flex items-center justify-between mb-8">
               <h1 className="text-[24px] leading-[32px] tracking-[-0.01em] font-semibold text-on-surface">Add New Product</h1>
             </div>
 
-            <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {error && <div className="mb-6 rounded-lg border border-error/30 bg-error-bg px-4 py-3 text-sm text-error-text">{error}</div>}
+
+            <form id="product-form" onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-6">
               {/* Left Column */}
               <div className="lg:col-span-8 flex flex-col gap-6">
                 {/* Basic Info Card */}
@@ -179,7 +219,7 @@ export default function AddProduct() {
                         className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-4 py-2 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/10 text-on-surface"
                         required
                       >
-                        {categories.map((cat) => (
+                        {categoryOptions.map((cat) => (
                           <option key={cat.value} value={cat.value}>{cat.label}</option>
                         ))}
                       </select>
@@ -314,8 +354,8 @@ export default function AddProduct() {
               <button type="button" onClick={() => navigate('/products')} className="px-4 py-2 border border-outline-variant rounded-md text-[12px] leading-[16px] font-semibold uppercase tracking-wider text-on-surface hover:bg-surface-container-low transition-colors shadow-sm">
                 Cancel
               </button>
-              <button type="submit" form="product-form" className="px-4 py-2 bg-primary-container text-white rounded-md text-[12px] leading-[16px] font-semibold uppercase tracking-wider hover:bg-primary transition-colors shadow-resting flex items-center gap-2">
-                Save Product
+              <button type="submit" form="product-form" disabled={saving} className="px-4 py-2 bg-primary-container text-white rounded-md text-[12px] leading-[16px] font-semibold uppercase tracking-wider hover:bg-primary transition-colors shadow-resting flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed">
+                {saving ? 'Saving...' : 'Save Product'}
               </button>
             </div>
           </div>
