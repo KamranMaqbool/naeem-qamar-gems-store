@@ -22,7 +22,30 @@ class AdminInventoryListView(generics.ListAPIView):
         stock_status = self.request.query_params.get('stock_status')
         if stock_status:
             qs = qs.filter(stock_status=stock_status)
+        search = self.request.query_params.get('search')
+        if search:
+            qs = qs.filter(product__title__icontains=search) | qs.filter(product__sku__icontains=search)
         return qs
+
+
+class AdminInventoryDetailView(generics.RetrieveUpdateAPIView):
+    """GET/PATCH: inspect or manually adjust an inventory record."""
+
+    serializer_class = InventorySerializer
+    permission_classes = [IsAdminUser]
+    queryset = Inventory.objects.select_related('product').all()
+
+    def perform_update(self, serializer):
+        previous = self.get_object().current_stock
+        inventory = serializer.save()
+        if inventory.current_stock != previous:
+            StockLog.objects.create(
+                product=inventory.product,
+                quantity_change=inventory.current_stock - previous,
+                reason=StockLog.Reason.MANUAL_ADJUSTMENT,
+                admin_user=self.request.user,
+                notes='Manual adjustment from admin inventory screen.',
+            )
 
 
 class AdminReceiveStockView(APIView):

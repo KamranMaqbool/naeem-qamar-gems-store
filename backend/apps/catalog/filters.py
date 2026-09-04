@@ -49,5 +49,6 @@ class ProductFilter(django_filters.FilterSet):
     def filter_search(self, queryset, name, value):
         return queryset.filter(
             models.Q(title__icontains=value)
+            | models.Q(sku__icontains=value)
             | models.Q(description__icontains=value)
         )

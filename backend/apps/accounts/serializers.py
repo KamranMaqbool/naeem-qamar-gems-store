@@ -54,12 +54,22 @@ class CustomerNoteSerializer(serializers.ModelSerializer):
 
 
 class CustomerListSerializer(serializers.ModelSerializer):
+    orders_count = serializers.SerializerMethodField()
+    last_order = serializers.SerializerMethodField()
     class Meta:
         model = User
         fields = [
             'id', 'email', 'username', 'phone_number',
             'is_vip', 'total_lifetime_spend', 'date_joined',
+            'orders_count', 'last_order',
         ]
+
+    def get_orders_count(self, obj):
+        return obj.orders.count()
+
+    def get_last_order(self, obj):
+        order = obj.orders.order_by('-created_at').first()
+        return order.created_at.strftime('%b %d, %Y') if order else '-'
 
 
 class CustomerDetailSerializer(serializers.ModelSerializer):

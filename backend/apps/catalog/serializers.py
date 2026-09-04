@@ -57,6 +57,8 @@ class ProductDetailSerializer(serializers.ModelSerializer):
 class AdminProductSerializer(serializers.ModelSerializer):
     gemstone_attributes = GemstoneAttributesSerializer(required=False)
     images = ProductImageSerializer(many=True, required=False)
+    inventory_stock = serializers.SerializerMethodField()
+    inventory_status = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
@@ -64,6 +66,7 @@ class AdminProductSerializer(serializers.ModelSerializer):
             'id', 'title', 'slug', 'sku', 'description', 'base_price',
             'sale_price', 'is_featured', 'status', 'category',
             'tags', 'gemstone_attributes', 'images',
+            'inventory_stock', 'inventory_status',
             'created_at', 'updated_at',
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']
@@ -81,6 +84,12 @@ class AdminProductSerializer(serializers.ModelSerializer):
             ProductImage.objects.create(product=product, **image_data)
 
         return product
+
+    def get_inventory_stock(self, obj):
+        return getattr(getattr(obj, 'inventory', None), 'current_stock', 0)
+
+    def get_inventory_status(self, obj):
+        return getattr(getattr(obj, 'inventory', None), 'stock_status', 'OUT_OF_STOCK')
 
     def update(self, instance, validated_data):
         gemstone_data = validated_data.pop('gemstone_attributes', None)

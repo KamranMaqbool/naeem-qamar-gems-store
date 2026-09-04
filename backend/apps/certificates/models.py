@@ -18,7 +18,7 @@ class Certificate(models.Model):
     )
     lab_name = models.CharField(max_length=100)
     certificate_number = models.CharField(max_length=100, unique=True)
-    pdf_file = models.URLField()
+    pdf_file = models.URLField(max_length=500)
     issue_date = models.DateField()
 
     class Meta:

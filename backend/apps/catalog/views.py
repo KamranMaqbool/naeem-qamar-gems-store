@@ -60,6 +60,7 @@ class AdminProductListCreateView(generics.ListCreateAPIView):
 
     serializer_class = AdminProductSerializer
     permission_classes = [IsAdminUser]
+    filterset_class = ProductFilter
     queryset = Product.objects.select_related(
         'category', 'gemstone_attributes',
     ).prefetch_related('images')

@@ -15,7 +15,10 @@ class StoreSettings(models.Model):
         max_digits=12, decimal_places=2, default=500,
     )
     order_prefix = models.CharField(max_length=20, default='GEM-')
-    logo_url = models.URLField(blank=True)
+    logo_url = models.URLField(max_length=500, blank=True)
+    payment_settings = models.JSONField(default=dict, blank=True)
+    shipping_settings = models.JSONField(default=dict, blank=True)
+    notification_settings = models.JSONField(default=dict, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

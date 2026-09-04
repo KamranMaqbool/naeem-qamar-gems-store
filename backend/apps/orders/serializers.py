@@ -104,5 +104,16 @@ class AdminOrderSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'order_number', 'order_status', 'tracking_number',
             'carrier_name', 'total_amount', 'created_at', 'updated_at',
+            'customer_name', 'customer_email', 'items_count',
         ]
         read_only_fields = ['id', 'order_number', 'total_amount', 'created_at', 'updated_at']
+
+    customer_name = serializers.SerializerMethodField()
+    customer_email = serializers.SerializerMethodField()
+    items_count = serializers.IntegerField(source='items.count', read_only=True)
+
+    def get_customer_name(self, obj):
+        return obj.user.get_full_name() or obj.user.username if obj.user else 'Guest'
+
+    def get_customer_email(self, obj):
+        return obj.user.email if obj.user else obj.guest_email

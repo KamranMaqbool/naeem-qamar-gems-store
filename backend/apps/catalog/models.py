@@ -17,7 +17,7 @@ class Category(models.Model):
         blank=True,
         related_name='children',
     )
-    image = models.URLField(blank=True)
+    image = models.URLField(max_length=500, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -121,7 +121,7 @@ class ProductImage(models.Model):
         on_delete=models.CASCADE,
         related_name='images',
     )
-    image_url = models.URLField()
+    image_url = models.URLField(max_length=500)
     alt_text = models.CharField(max_length=255, blank=True)
     display_order = models.IntegerField(default=0)
     is_primary = models.BooleanField(default=False)
