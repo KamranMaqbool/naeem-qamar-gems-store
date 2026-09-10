@@ -39,10 +39,7 @@ async function refreshAccessToken() {
 }
 
 async function authFetch(url, options = {}) {
-  const headers = {
-    'Content-Type': 'application/json',
-    ...options.headers,
-  };
+  const headers = options.body instanceof FormData ? { ...options.headers } : { 'Content-Type': 'application/json', ...options.headers };
   if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
 
   let res = await fetch(`${API_BASE}${url}`, { ...options, headers });
@@ -185,6 +182,10 @@ export async function fetchTopProducts() {
   return authFetch('/admin/analytics/top-products/');
 }
 
+export async function fetchSalesChannels() {
+  return authFetch('/admin/analytics/sales-channels/');
+}
+
 export async function fetchAdminDiscounts() {
   return authFetch('/admin/discounts/');
 }
@@ -224,6 +225,19 @@ export async function fetchProfile() {
 
 export async function updateProfile(data) {
   return authFetch('/users/me/', { method: 'PATCH', body: JSON.stringify(data) });
+}
+
+export async function changePassword(data) {
+  return authFetch('/users/me/password/', { method: 'POST', body: JSON.stringify(data) });
+}
+
+export async function uploadProfileAvatar(file) {
+  const formData = new FormData(); formData.append('avatar', file);
+  return authFetch('/users/me/avatar/', { method: 'POST', body: formData, headers: {} });
+}
+
+export async function fetchLoginActivity() {
+  return authFetch('/users/me/login-activity/');
 }
 
 export async function updateAdminSettings(data) {

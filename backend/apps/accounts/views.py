@@ -5,7 +5,7 @@ from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import Address, CustomerNote
+from .models import Address, CustomerNote, LoginActivity
 from .serializers import (
     AddressSerializer,
     CustomerDetailSerializer,
@@ -13,6 +13,7 @@ from .serializers import (
     CustomerNoteSerializer,
     RegisterSerializer,
     UserProfileSerializer,
+    PasswordChangeSerializer,
 )
 
 User = get_user_model()
@@ -54,6 +55,39 @@ class UserProfileView(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user
+
+
+class PasswordChangeView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = PasswordChangeSerializer
+
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        request.user.set_password(serializer.validated_data['new_password'])
+        request.user.save(update_fields=['password'])
+        return Response({'message': 'Password updated successfully.'})
+
+
+class ProfileAvatarView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        upload = request.FILES.get('avatar')
+        if not upload or not upload.content_type.startswith('image/'):
+            return Response({'message': 'Please upload an image file.'}, status=status.HTTP_400_BAD_REQUEST)
+        from django.core.files.storage import default_storage
+        path = default_storage.save(f'avatars/{request.user.pk}_{upload.name}', upload)
+        request.user.avatar = default_storage.url(path)
+        request.user.save(update_fields=['avatar'])
+        return Response({'avatar': request.user.avatar})
+
+
+class LoginActivityView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def list(self, request, *args, **kwargs):
+        return Response([{'id': item.id, 'created_at': item.created_at, 'ip_address': item.ip_address, 'user_agent': item.user_agent} for item in LoginActivity.objects.filter(user=request.user)[:10]])
 
 
 class AddressListCreateView(generics.ListCreateAPIView):

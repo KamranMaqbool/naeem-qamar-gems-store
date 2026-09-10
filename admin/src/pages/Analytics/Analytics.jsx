@@ -6,7 +6,7 @@ import {
   topProductsData,
   channelData,
 } from '../../data/analytics';
-import { fetchDashboardKPIs, fetchRevenueChart, fetchSalesByGemstone, fetchTopProducts, isAuthenticated, login } from '../../lib/api';
+import { fetchDashboardKPIs, fetchRevenueChart, fetchSalesByGemstone, fetchSalesChannels, fetchTopProducts, isAuthenticated, login } from '../../lib/api';
 
 export default function Analytics() {
   const [dateRange, setDateRange] = useState('Last 30 Days');
@@ -15,6 +15,7 @@ export default function Analytics() {
   const [gemstoneData, setGemstoneData] = useState(gemstoneDistribution);
   const [products, setProducts] = useState(topProductsData);
   const [totalUnits, setTotalUnits] = useState(0);
+  const [channels, setChannels] = useState(channelData);
   const chartRef = useRef(null);
 
   useEffect(() => {
@@ -27,19 +28,20 @@ export default function Analytics() {
     (async () => {
       try {
         if (!isAuthenticated()) await login('admin@virtuoso-gems.com', 'admin123');
-        const [kpis, chart, gemstoneSales, topProducts] = await Promise.all([
+        const [kpis, chart, gemstoneSales, topProducts, salesChannels] = await Promise.all([
           fetchDashboardKPIs(),
           fetchRevenueChart(dateRange === 'Last 30 Days' ? 'daily' : 'monthly'),
           fetchSalesByGemstone(),
           fetchTopProducts(),
+          fetchSalesChannels(),
         ]);
         const revenue = Number(kpis.total_revenue || 0);
         const orders = Number(kpis.total_orders || 0);
         setCards([
           { ...kpiCards[0], value: `$${revenue.toLocaleString()}` },
-          { ...kpiCards[1], value: `$${Math.round(revenue * 0.3).toLocaleString()}` },
-          { ...kpiCards[2], value: String(kpis.active_orders_count || 0) },
-          { ...kpiCards[3], value: `$${Math.round(revenue / Math.max(orders, 1)).toLocaleString()}` },
+          { ...kpiCards[1], value: `$${Number(kpis.net_profit || revenue * 0.3).toLocaleString()}` },
+          { ...kpiCards[2], value: Number(kpis.total_units_sold || 0).toLocaleString() },
+          { ...kpiCards[3], value: `$${Number(kpis.avg_order_value || revenue / Math.max(orders, 1)).toLocaleString()}` },
         ]);
         const mapped = (chart || []).map((entry) => ({
           week: new Date(entry.period).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
@@ -57,6 +59,7 @@ export default function Analytics() {
           })));
         }
         if (topProducts?.length) setProducts(topProducts.map((item) => ({ ...item, revenue: Number(item.revenue || 0) })));
+        if (salesChannels?.length) setChannels(salesChannels.map((channel) => ({ ...channel, revenue: Number(channel.revenue || 0), avgOrderValue: Number(channel.avg_order_value || 0), change: 'API' })));
       } catch { /* retain the designed fallback values */ }
     })();
   }, [dateRange]);
@@ -209,7 +212,7 @@ export default function Analytics() {
                   <option>Last 30 Days</option><option>This Quarter</option><option>This Year</option>
                 </select>
               </label>
-              <button className="px-4 py-2 bg-primary hover:bg-primary-container text-on-primary font-semibold text-[12px] leading-[16px] uppercase tracking-wider rounded-md shadow-md transition-colors flex items-center gap-2">
+              <button onClick={() => window.print()} className="px-4 py-2 bg-primary hover:bg-primary-container text-on-primary font-semibold text-[12px] leading-[16px] uppercase tracking-wider rounded-md shadow-md transition-colors flex items-center gap-2">
                 <span className="material-symbols-outlined text-[18px]">download</span>
                 Download Full PDF Report
               </button>
@@ -338,7 +341,7 @@ export default function Analytics() {
                 <h3 className="text-[20px] leading-[28px] font-semibold text-on-surface">Sales Channel Breakdown</h3>
               </div>
               <div className="p-6 bg-white space-y-6">
-                {channelData.map((channel, index) => (
+                {channels.map((channel, index) => (
                   <div key={channel.id}>
                     <div className="flex justify-between items-end mb-2">
                       <div>
@@ -349,7 +352,7 @@ export default function Analytics() {
                         <div className="text-[20px] leading-[28px] font-semibold text-on-surface">${channel.revenue.toLocaleString()}</div>
                         <div className="text-xs text-success font-medium flex items-center justify-end gap-1">
                           <span className="material-symbols-outlined text-[14px]">trending_up</span>
-                          {channel.change}
+                          {channel.change || 'API'}
                         </div>
                       </div>
                     </div>
@@ -364,11 +367,11 @@ export default function Analytics() {
                 <div className="grid grid-cols-2 gap-4 pt-4">
                   <div className="bg-surface p-4 rounded-md border border-surface-container-highest">
                     <div className="text-xs text-on-surface-variant uppercase tracking-wider mb-1">Avg. Order Value (Web)</div>
-                    <div className="text-[20px] leading-[28px] font-semibold">$3,250</div>
+                    <div className="text-[20px] leading-[28px] font-semibold">${(channels[0]?.avgOrderValue || 0).toLocaleString()}</div>
                   </div>
                   <div className="bg-surface p-4 rounded-md border border-surface-container-highest">
                     <div className="text-xs text-on-surface-variant uppercase tracking-wider mb-1">Avg. Order Value (Custom)</div>
-                    <div className="text-[20px] leading-[28px] font-semibold text-primary">$12,820</div>
+                    <div className="text-[20px] leading-[28px] font-semibold text-primary">${(channels[1]?.avgOrderValue || 0).toLocaleString()}</div>
                   </div>
                 </div>
               </div>

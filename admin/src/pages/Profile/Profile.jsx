@@ -1,11 +1,14 @@
-import { useEffect, useState } from 'react';
-import { fetchProfile, isAuthenticated, login, updateProfile } from '../../lib/api';
+import { useEffect, useRef, useState } from 'react';
+import { changePassword, fetchLoginActivity, fetchProfile, isAuthenticated, login, updateProfile, uploadProfileAvatar } from '../../lib/api';
 
 export default function Profile() {
   const [toggle2FA, setToggle2FA] = useState(true);
   const [profile, setProfile] = useState({ username: 'Eleanor Vance', email: 'admin@luxefacet.com', phone_number: '', role: 'Super Admin', avatar: '' });
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
+  const [passwords, setPasswords] = useState({ current_password: '', new_password: '', confirm_password: '' });
+  const [activity, setActivity] = useState([]);
+  const fileRef = useRef(null);
 
   useEffect(() => {
     async function loadProfile() {
@@ -13,10 +16,14 @@ export default function Profile() {
         if (!isAuthenticated()) await login('admin@virtuoso-gems.com', 'admin123');
         const data = await fetchProfile();
         if (data) setProfile(data);
+        setActivity(await fetchLoginActivity());
       } catch { /* Keep the local profile preview when unavailable. */ }
     }
     loadProfile();
   }, []);
+
+  const handlePassword = async () => { setSaving(true); setMessage(''); try { await changePassword(passwords); setPasswords({ current_password: '', new_password: '', confirm_password: '' }); setMessage('Password updated successfully.'); } catch (error) { setMessage(error.message || 'Unable to update password.'); } finally { setSaving(false); } };
+  const handleAvatar = async (event) => { const file = event.target.files?.[0]; if (!file) return; try { const data = await uploadProfileAvatar(file); setProfile((prev) => ({ ...prev, avatar: data.avatar })); setMessage('Profile photo updated successfully.'); } catch (error) { setMessage(error.message || 'Unable to upload photo.'); } };
 
   const saveProfile = async () => {
     setSaving(true); setMessage('');
@@ -119,7 +126,7 @@ export default function Profile() {
             {/* Profile Header */}
             <div className="card p-6 lg:p-8 flex flex-col md:flex-row items-center md:items-start gap-6">
               <div className="relative shrink-0">
-                <img className="w-24 h-24 rounded-full object-cover border-2 border-outline-variant" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAIDyJpwsivG2TaL8vXP2zPhIzEDQcxeViWcuU1cz0P9xx0RyF20fM9RRABtI69foWrDlcxEi_ok0u1Eh5AZyNhSMWuFW-oQtuitI75gQW8OmNYQdFANPIusQxnFcgDOEZAR61sN5a2qu_3Jz5lQ2o-NQ_ZkbdHedii6Bx1yafHon-pps13SIqEP8UwVAPjgejtQZCombnduKIN3oBvlqk2U4jI_6Yky4IUbVDqDqAx44m2t-Yif6k_EQ" alt="Eleanor Vance" />
+                <img className="w-24 h-24 rounded-full object-cover border-2 border-outline-variant" src={profile.avatar || "https://lh3.googleusercontent.com/aida-public/AB6AXuAIDyJpwsivG2TaL8vXP2zPhIzEDQcxeViWcuU1cz0P9xx0RyF20fM9RRABtI69foWrDlcxEi_ok0u1Eh5AZyNhSMWuFW-oQtuitI75gQW8OmNYQdFANPIusQxnFcgDOEZAR61sN5a2qu_3Jz5lQ2o-NQ_ZkbdHedii6Bx1yafHon-pps13SIqEP8UwVAPjgejtQZCombnduKIN3oBvlqk2U4jI_6Yky4IUbVDqDqAx44m2t-Yif6k_EQ"} alt={profile.username} />
                 <div className="absolute bottom-0 right-0 w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center border-2 border-surface-container-lowest">
                   <span className="material-symbols-outlined text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
                 </div>
@@ -131,7 +138,8 @@ export default function Profile() {
                 </div>
                 <p className="text-[14px] leading-[20px] text-on-surface-variant mb-4">{profile.email}</p>
                 <div className="flex gap-3">
-                  <button className="bg-surface-container-lowest border border-outline font-semibold text-[12px] leading-[16px] uppercase tracking-wider text-on-surface px-4 py-2 rounded hover:bg-surface-container-low transition-colors shadow-sm">
+                  <input ref={fileRef} onChange={handleAvatar} type="file" accept="image/*" className="hidden" />
+                  <button type="button" onClick={() => fileRef.current?.click()} className="bg-surface-container-lowest border border-outline font-semibold text-[12px] leading-[16px] uppercase tracking-wider text-on-surface px-4 py-2 rounded hover:bg-surface-container-low transition-colors shadow-sm">
                     Upload New Photo
                   </button>
                   <button className="font-semibold text-[12px] leading-[16px] uppercase tracking-wider text-error px-4 py-2 hover:bg-error/5 transition-colors rounded">
@@ -173,17 +181,17 @@ export default function Profile() {
                 <form className="flex flex-col gap-5 flex-1">
                   <div>
                     <label className="block text-[12px] leading-[16px] font-semibold uppercase tracking-wider text-on-surface-variant mb-1">Current Password</label>
-                    <input className="w-full h-10 px-4 bg-surface-container-lowest border border-outline-variant rounded focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all text-on-surface" placeholder="••••••••" type="password" />
+                    <input value={passwords.current_password} onChange={(e) => setPasswords({ ...passwords, current_password: e.target.value })} className="w-full h-10 px-4 bg-surface-container-lowest border border-outline-variant rounded focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all text-on-surface" placeholder="••••••••" type="password" />
                   </div>
                   <div>
                     <label className="block text-[12px] leading-[16px] font-semibold uppercase tracking-wider text-on-surface-variant mb-1">New Password</label>
-                    <input className="w-full h-10 px-4 bg-surface-container-lowest border border-outline-variant rounded focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all text-on-surface" type="password" />
+                    <input value={passwords.new_password} onChange={(e) => setPasswords({ ...passwords, new_password: e.target.value })} className="w-full h-10 px-4 bg-surface-container-lowest border border-outline-variant rounded focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all text-on-surface" type="password" />
                   </div>
                   <div>
                     <label className="block text-[12px] leading-[16px] font-semibold uppercase tracking-wider text-on-surface-variant mb-1">Confirm Password</label>
-                    <input className="w-full h-10 px-4 bg-surface-container-lowest border border-outline-variant rounded focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all text-on-surface" type="password" />
+                    <input value={passwords.confirm_password} onChange={(e) => setPasswords({ ...passwords, confirm_password: e.target.value })} className="w-full h-10 px-4 bg-surface-container-lowest border border-outline-variant rounded focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all text-on-surface" type="password" />
                   </div>
-                  <button className="w-full bg-primary text-white font-semibold text-[12px] leading-[16px] uppercase tracking-wider py-3 rounded hover:bg-primary/90 transition-colors shadow-sm mt-2" type="button">
+                  <button onClick={handlePassword} className="w-full bg-primary text-white font-semibold text-[12px] leading-[16px] uppercase tracking-wider py-3 rounded hover:bg-primary/90 transition-colors shadow-sm mt-2" type="button">
                     Update Password
                   </button>
                   {/* 2FA Section */}
@@ -226,33 +234,15 @@ export default function Profile() {
                     </tr>
                   </thead>
                   <tbody className="text-[14px] leading-[20px] text-on-surface">
-                    <tr className="border-b border-surface-container-highest hover:bg-surface-container-low/50 transition-colors">
-                      <td className="py-4 px-6 lg:px-8">Oct 26, 2023 10:45 AM</td>
-                      <td className="py-4 px-6 lg:px-8 font-mono text-[13px] leading-[18px]">192.168.1.1</td>
+                    {activity.map((item) => <tr key={item.id} className="border-b border-surface-container-highest hover:bg-surface-container-low/50 transition-colors">
+                      <td className="py-4 px-6 lg:px-8">{new Date(item.created_at).toLocaleString()}</td>
+                      <td className="py-4 px-6 lg:px-8 font-mono text-[13px] leading-[18px]">{item.ip_address || '-'}</td>
                       <td className="py-4 px-6 lg:px-8 flex items-center gap-2">
                         <span className="material-symbols-outlined text-[16px] text-on-surface-variant" data-icon="location_on">location_on</span>
-                        London, UK
+                        {item.user_agent || 'Unknown device'}
                       </td>
-                      <td className="py-4 px-6 lg:px-8">Chrome on MacOS</td>
-                    </tr>
-                    <tr className="border-b border-surface-container-highest hover:bg-surface-container-low/50 transition-colors">
-                      <td className="py-4 px-6 lg:px-8">Oct 25, 2023 09:12 AM</td>
-                      <td className="py-4 px-6 lg:px-8 font-mono text-[13px] leading-[18px]">192.168.1.1</td>
-                      <td className="py-4 px-6 lg:px-8 flex items-center gap-2">
-                        <span className="material-symbols-outlined text-[16px] text-on-surface-variant" data-icon="location_on">location_on</span>
-                        London, UK
-                      </td>
-                      <td className="py-4 px-6 lg:px-8">Safari on iOS</td>
-                    </tr>
-                    <tr className="hover:bg-surface-container-low/50 transition-colors">
-                      <td className="py-4 px-6 lg:px-8">Oct 20, 2023 14:30 PM</td>
-                      <td className="py-4 px-6 lg:px-8 font-mono text-[13px] leading-[18px]">82.13.204.15</td>
-                      <td className="py-4 px-6 lg:px-8 flex items-center gap-2">
-                        <span className="material-symbols-outlined text-[16px] text-on-surface-variant" data-icon="location_on">location_on</span>
-                        Manchester, UK
-                      </td>
-                      <td className="py-4 px-6 lg:px-8">Chrome on Windows</td>
-                    </tr>
+                      <td className="py-4 px-6 lg:px-8">{item.user_agent || '-'}</td>
+                    </tr>)}
                   </tbody>
                 </table>
               </div>

@@ -82,3 +82,13 @@ class CustomerNote(models.Model):
 
     def __str__(self):
         return f'Note on {self.customer.email} by {self.author.email}'
+
+
+class LoginActivity(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='login_activities')
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.CharField(max_length=500, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']

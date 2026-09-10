@@ -8,6 +8,7 @@ class StoreSettings(models.Model):
     contact_email = models.EmailField(blank=True)
     contact_phone = models.CharField(max_length=20, blank=True)
     default_currency = models.CharField(max_length=10, default='USD')
+    timezone = models.CharField(max_length=100, default='UTC')
     tax_rate_percentage = models.DecimalField(
         max_digits=5, decimal_places=2, default=8.5,
     )

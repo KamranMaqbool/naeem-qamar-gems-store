@@ -4,7 +4,12 @@ import { currencies, timezones, settingsSections } from '../../data/discounts';
 import { fetchAdminSettings, isAuthenticated, login, updateAdminSettings } from '../../lib/api';
 
 export default function Settings() {
-  const [activeSection, setActiveSection] = useState(() => window.location.hash.slice(1) || 'general');
+  const validSections = ['general', 'payments', 'shipping', 'taxes', 'notifications'];
+  const readSection = () => {
+    const requested = window.location.hash.slice(1).toLowerCase();
+    return requested === 'genera' ? 'general' : (validSections.includes(requested) ? requested : 'general');
+  };
+  const [activeSection, setActiveSection] = useState(readSection);
   const [testMode, setTestMode] = useState(false);
   const [paypalEnabled, setPaypalEnabled] = useState(false);
   const [payoutSchedule, setPayoutSchedule] = useState('weekly');
@@ -36,7 +41,7 @@ export default function Settings() {
     setSaving(true); setError(''); setSaved(false);
     try {
       if (!isAuthenticated()) await login('admin@virtuoso-gems.com', 'admin123');
-      await updateAdminSettings({ store_name: formData.storeName, contact_email: formData.contactEmail, contact_phone: formData.phoneNumber, default_currency: formData.defaultCurrency, order_prefix: formData.orderPrefix, tax_rate_percentage: taxRate, payment_settings: { test_mode: testMode, paypal_enabled: paypalEnabled, payout_schedule: payoutSchedule }, shipping_settings: { method: shippingMethod }, notification_settings: notifications });
+      await updateAdminSettings({ store_name: formData.storeName, contact_email: formData.contactEmail, contact_phone: formData.phoneNumber, default_currency: formData.defaultCurrency, timezone: formData.timezone, order_prefix: formData.orderPrefix, tax_rate_percentage: taxRate, payment_settings: { test_mode: testMode, paypal_enabled: paypalEnabled, payout_schedule: payoutSchedule }, shipping_settings: { method: shippingMethod }, notification_settings: notifications });
       setSaved(true);
     } catch (saveError) { setError(saveError.message || 'Unable to save settings.'); }
     finally { setSaving(false); }
@@ -47,7 +52,7 @@ export default function Settings() {
       try {
         if (!isAuthenticated()) await login('admin@virtuoso-gems.com', 'admin123');
         const data = await fetchAdminSettings();
-        setFormData((prev) => ({ ...prev, storeName: data.store_name || prev.storeName, contactEmail: data.contact_email || prev.contactEmail, phoneNumber: data.contact_phone || prev.phoneNumber, defaultCurrency: data.default_currency || prev.defaultCurrency, orderPrefix: data.order_prefix || prev.orderPrefix }));
+        setFormData((prev) => ({ ...prev, storeName: data.store_name || prev.storeName, contactEmail: data.contact_email || prev.contactEmail, phoneNumber: data.contact_phone || prev.phoneNumber, defaultCurrency: data.default_currency || prev.defaultCurrency, timezone: data.timezone || prev.timezone, orderPrefix: data.order_prefix || prev.orderPrefix }));
         if (data.tax_rate_percentage !== undefined) setTaxRate(String(data.tax_rate_percentage));
         if (data.payment_settings) { setTestMode(Boolean(data.payment_settings.test_mode)); setPaypalEnabled(Boolean(data.payment_settings.paypal_enabled)); setPayoutSchedule(data.payment_settings.payout_schedule || 'weekly'); }
         if (data.shipping_settings?.method) setShippingMethod(data.shipping_settings.method);
@@ -58,7 +63,7 @@ export default function Settings() {
   }, []);
 
   useEffect(() => {
-    const syncSection = () => setActiveSection(window.location.hash.slice(1) || 'general');
+    const syncSection = () => setActiveSection(readSection());
     window.addEventListener('hashchange', syncSection);
     return () => window.removeEventListener('hashchange', syncSection);
   }, []);
