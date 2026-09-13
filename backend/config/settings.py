@@ -22,6 +22,10 @@ SECRET_KEY = os.getenv(
 
 DEBUG = os.getenv('DEBUG', 'True').lower() in ('true', '1', 'yes')
 
+# Railway/Vercel requests arrive through an HTTPS proxy. Preserve the original
+# scheme when Django builds absolute media URLs in production.
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 ALLOWED_HOSTS = [
     h.strip()
     for h in os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')

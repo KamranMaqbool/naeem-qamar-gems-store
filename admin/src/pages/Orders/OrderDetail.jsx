@@ -8,6 +8,8 @@ export default function OrderDetail() {
   const [status, setStatus] = useState(orderDetail.status);
   const [order, setOrder] = useState(orderDetail);
   const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     async function loadOrder() {
@@ -20,15 +22,17 @@ export default function OrderDetail() {
           id: `#${data.order_number}`,
           status: data.order_status?.toLowerCase() || 'pending',
           date: new Date(data.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
-          customer: { name: data.user?.username || data.guest_email || 'Guest', email: data.user?.email || data.guest_email || '', phone: data.guest_phone || '' },
-          shipping: { name: data.user?.username || data.guest_email || 'Guest', address1: address.address1 || address.street || '', address2: address.address2 || '', city: address.city || '', state: address.state || '', zip: address.zip || address.postal_code || '', country: address.country || '' },
-          items: (data.items || []).map((item) => ({ id: item.id, name: item.product_title, category: '', unitPrice: Number(item.unit_price_at_purchase), quantity: item.quantity, total: Number(item.unit_price_at_purchase) * item.quantity })),
+          customer: { name: data.customer_name || data.user?.username || data.guest_email || 'Guest', email: data.customer_email || data.user?.email || data.guest_email || '', phone: data.guest_phone || '' },
+          shipping: { name: address.recipient_name || data.customer_name || data.guest_email || 'Guest', address1: address.address1 || address.street || '', address2: address.address2 || '', city: address.city || '', state: address.state || '', zip: address.zip || address.postal_code || '', country: address.country || '' },
+          items: (data.items || []).map((item) => ({ id: item.id, name: item.product_title, category: item.product_category || '', image: item.product_image || '', unitPrice: Number(item.unit_price_at_purchase), quantity: item.quantity, total: Number(item.unit_price_at_purchase) * item.quantity })),
           summary: { subtotal: Number(data.subtotal || 0), shipping: Number(data.shipping_cost || 0), tax: Number(data.tax_amount || 0), total: Number(data.total_amount || 0) },
         };
         setOrder(mapped);
         setStatus(mapped.status);
-      } catch {
-        // Keep the static preview if the API is unavailable.
+      } catch (loadError) {
+        setError(loadError.message || 'Unable to load this order from the API.');
+      } finally {
+        setLoading(false);
       }
     }
     loadOrder();
@@ -60,6 +64,8 @@ export default function OrderDetail() {
     <div className="min-h-screen bg-surface text-on-surface">
       <main>
         <div className="max-w-[1440px] mx-auto p-6 md:p-8">
+          {loading && <div className="mb-5 rounded-lg border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">Loading order details…</div>}
+          {error && <div className="mb-5 rounded-lg border border-error/30 bg-error-bg px-4 py-3 text-sm text-error-text">{error}</div>}
           {/* Page Header */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
             <div>
@@ -126,25 +132,23 @@ export default function OrderDetail() {
                   </table>
                 </div>
                 {/* Summary Section */}
-                <div className="px-6 py-6 bg-surface-bright border-t border-surface-variant">
-                  <div className="flex justify-end">
-                    <div className="w-full max-w-sm space-y-3">
-                      <div className="flex items-center justify-between gap-6 text-on-surface-variant">
-                        <span>Subtotal</span>
-                        <span className="text-on-surface">{formatPrice(order.summary.subtotal)}</span>
-                      </div>
-                      <div className="flex items-center justify-between gap-6 text-on-surface-variant">
-                        <span>Shipping (Insured Overnight)</span>
-                        <span className="text-on-surface">{formatPrice(order.summary.shipping)}</span>
-                      </div>
-                      <div className="flex items-center justify-between gap-6 text-on-surface-variant">
-                        <span>Tax (8.5%)</span>
-                        <span className="text-on-surface">{formatPrice(order.summary.tax)}</span>
-                      </div>
-                      <div className="pt-4 border-t border-surface-variant flex justify-between items-center">
-                        <span className="text-[20px] leading-[28px] font-semibold text-on-surface">Total</span>
-                        <span className="text-[20px] leading-[28px] font-semibold text-primary">{formatPrice(order.summary.total)}</span>
-                      </div>
+                <div className="w-full min-w-0 px-6 py-6 bg-surface-bright border-t border-surface-variant">
+                  <div className="order-summary ml-auto flex flex-col space-y-3">
+                    <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-6 text-on-surface-variant">
+                      <span className="min-w-0 break-words">Subtotal</span>
+                      <span className="shrink-0 whitespace-nowrap text-on-surface">{formatPrice(order.summary.subtotal)}</span>
+                    </div>
+                    <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-6 text-on-surface-variant">
+                      <span className="min-w-0 break-words">Shipping (Insured Overnight)</span>
+                      <span className="shrink-0 whitespace-nowrap text-on-surface">{formatPrice(order.summary.shipping)}</span>
+                    </div>
+                    <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-6 text-on-surface-variant">
+                      <span className="min-w-0 break-words">Tax (8.5%)</span>
+                      <span className="shrink-0 whitespace-nowrap text-on-surface">{formatPrice(order.summary.tax)}</span>
+                    </div>
+                    <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-6 border-t border-surface-variant pt-4">
+                      <span className="text-[20px] leading-[28px] font-semibold text-on-surface">Total</span>
+                      <span className="shrink-0 whitespace-nowrap text-[20px] leading-[28px] font-semibold text-primary">{formatPrice(order.summary.total)}</span>
                     </div>
                   </div>
                 </div>

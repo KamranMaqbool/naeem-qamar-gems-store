@@ -1,8 +1,10 @@
 import { useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { CartContext } from '../../context/CartContext';
 
 export default function CartDrawer({ isOpen, onClose }) {
-  const { items, subtotal, removeItem, clearCart } = useContext(CartContext);
+  const { items, subtotal, removeItem } = useContext(CartContext);
+  const navigate = useNavigate();
 
   if (!isOpen) return null;
 
@@ -44,7 +46,7 @@ export default function CartDrawer({ isOpen, onClose }) {
             </div>
           ) : (
             <>
-              {items.map((item, index) => (
+              {items.map((item) => (
                 <div key={item.id} className="flex gap-6 group">
                   <div className="w-24 h-24 flex-shrink-0 bg-surface-container-low overflow-hidden">
                     <img
@@ -86,6 +88,8 @@ export default function CartDrawer({ isOpen, onClose }) {
               Shipping and taxes calculated at checkout.
             </p>
             <button
+              type="button"
+              onClick={() => { onClose(); navigate('/checkout'); }}
               className="w-full py-4 px-8 bg-primary-container text-on-primary font-button text-button uppercase tracking-widest rounded hover:bg-primary transition-colors duration-300 flex items-center justify-center gap-2 group"
             >
               Proceed to Secure Checkout

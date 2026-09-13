@@ -1,3 +1,4 @@
+from django.db.models import Count, Q
 from rest_framework import generics, status
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
@@ -18,14 +19,30 @@ class AdminInventoryListView(generics.ListAPIView):
     permission_classes = [IsAdminUser]
 
     def get_queryset(self):
-        qs = Inventory.objects.select_related('product').all()
+        qs = Inventory.objects.select_related('product', 'product__category').prefetch_related('product__images').all()
         stock_status = self.request.query_params.get('stock_status')
         if stock_status:
             qs = qs.filter(stock_status=stock_status)
         search = self.request.query_params.get('search')
         if search:
-            qs = qs.filter(product__title__icontains=search) | qs.filter(product__sku__icontains=search)
+            qs = qs.filter(Q(product__title__icontains=search) | Q(product__sku__icontains=search))
         return qs
+
+
+class AdminInventoryStatsView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def get(self, request):
+        stats = Inventory.objects.aggregate(
+            total_skus=Count('id'),
+            low_stock_alerts=Count('id', filter=Q(stock_status=Inventory.StockStatus.LOW_STOCK)),
+            out_of_stock=Count('id', filter=Q(stock_status=Inventory.StockStatus.OUT_OF_STOCK)),
+        )
+        return Response({
+            'totalSKUs': stats['total_skus'] or 0,
+            'lowStockAlerts': stats['low_stock_alerts'] or 0,
+            'outOfStock': stats['out_of_stock'] or 0,
+        })
 
 
 class AdminInventoryDetailView(generics.RetrieveUpdateAPIView):

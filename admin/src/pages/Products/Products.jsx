@@ -3,6 +3,13 @@ import { Link } from 'react-router-dom';
 import { products as staticProducts, categories, stockStatuses, statusConfig } from '../../data/products';
 import { deleteProduct, fetchAdminProducts, isAuthenticated, login } from '../../lib/api';
 
+const imageUrl = (value) => {
+  if (!value) return '';
+  // The backend may return a Docker service hostname for older records.
+  // Relative media URLs are served through the Vite /media proxy.
+  return value.replace(/^https?:\/\/backend:8000/, '');
+};
+
 export default function Products() {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
@@ -13,6 +20,8 @@ export default function Products() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalProducts, setTotalProducts] = useState(0);
   const [deleting, setDeleting] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleteError, setDeleteError] = useState('');
 
   useEffect(() => {
     async function loadProducts() {
@@ -25,14 +34,15 @@ export default function Products() {
         setApiProducts(productList.map((p) => ({
           id: p.id,
           name: p.title,
-          category: p.category?.name || p.category || '',
+          category: p.category_name || p.category?.name || p.category || '',
           sku: p.sku,
+          isFeatured: Boolean(p.is_featured),
           stock: p.inventory_stock ?? p.inventory?.current_stock ?? 0,
           price: parseFloat(p.base_price),
           salePrice: p.sale_price ? parseFloat(p.sale_price) : null,
           status: (p.inventory_status || p.inventory?.stock_status) === 'OUT_OF_STOCK' ? 'out-of-stock'
             : (p.inventory_status || p.inventory?.stock_status) === 'LOW_STOCK' ? 'low-stock' : 'active',
-          image: typeof p.primary_image === 'object' ? p.primary_image?.image_url : p.primary_image || '',
+          image: imageUrl(typeof p.primary_image === 'object' ? p.primary_image?.image_url : p.primary_image) || imageUrl(p.images?.[0]?.image_url),
         })));
         setTotalProducts(data.count ?? productList.length);
         setTotalPages(data.count ? Math.max(1, Math.ceil(data.count / 20)) : 1);
@@ -57,15 +67,20 @@ export default function Products() {
   const updateSearch = (value) => { setSearch(value); setPage(1); };
   const updateCategory = (value) => { setCategory(value); setPage(1); };
   const updateStockStatus = (value) => { setStockStatus(value); setPage(1); };
-  const handleDelete = async (product) => {
-    if (!window.confirm(`Delete “${product.name}”? This cannot be undone.`)) return;
-    setDeleting(product.id);
+  const handleDelete = (product) => {
+    setDeleteError('');
+    setDeleteTarget(product);
+  };
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(deleteTarget.id);
     try {
-      await deleteProduct(product.id);
-      setApiProducts((current) => current ? current.filter((item) => item.id !== product.id) : current);
+      await deleteProduct(deleteTarget.id);
+      setApiProducts((current) => current ? current.filter((item) => item.id !== deleteTarget.id) : current);
       setTotalProducts((count) => Math.max(0, count - 1));
+      setDeleteTarget(null);
     } catch (deleteError) {
-      window.alert(deleteError.message || 'Unable to delete product.');
+      setDeleteError(deleteError.message || 'Unable to delete product.');
     } finally { setDeleting(null); }
   };
 
@@ -129,7 +144,7 @@ export default function Products() {
                   <td className="py-4 px-6">
                     <div className="flex items-center gap-3">
                       <img src={product.image} alt={product.name} className="w-12 h-12 rounded-md object-cover" />
-                      <div><p className="font-medium text-on-surface">{product.name}</p></div>
+                      <div><p className="font-medium text-on-surface">{product.name}</p>{product.isFeatured && <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-secondary-container/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary"><span className="material-symbols-outlined text-xs">star</span>Featured</span>}</div>
                     </div>
                   </td>
                   <td className="py-4 px-6 text-on-surface-variant">{product.category}</td>
@@ -159,13 +174,11 @@ export default function Products() {
                     </span>
                   </td>
                   <td className="py-4 px-6 text-right">
-                    <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Link to={`/products/${product.id}/edit`} className="px-4 py-2 text-on-surface-variant hover:text-primary transition-colors hover:bg-surface-container-low rounded-md" aria-label="Edit product">
-                        <span className="material-symbols-outlined">edit</span>
-                      </Link>
-                      <button onClick={() => handleDelete(product)} disabled={deleting === product.id} className="px-4 py-2 text-on-surface-variant hover:text-error transition-colors hover:bg-surface-container-low rounded-md disabled:opacity-50" aria-label="Delete product">
-                        <span className="material-symbols-outlined">delete</span>
-                      </button>
+                    <div className="flex items-center justify-end gap-1">
+                      <div className="group/action relative"><Link to={`/products/${product.id}`} className="rounded-md px-3 py-2 text-on-surface-variant hover:bg-surface-container-low hover:text-primary" aria-label="View product"><span className="material-symbols-outlined">visibility</span><span className="pointer-events-none absolute bottom-full right-0 z-10 mb-2 whitespace-nowrap rounded-md bg-slate-900 px-2.5 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity group-hover/action:opacity-100">View product</span></Link></div>
+                      <div className="group/action relative"><Link to={`/inventory?product=${product.id}`} className="rounded-md px-3 py-2 text-on-surface-variant hover:bg-surface-container-low hover:text-primary" aria-label="Open inventory"><span className="material-symbols-outlined">archive</span><span className="pointer-events-none absolute bottom-full right-0 z-10 mb-2 whitespace-nowrap rounded-md bg-slate-900 px-2.5 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity group-hover/action:opacity-100">Open inventory</span></Link></div>
+                      <div className="group/action relative"><Link to={`/products/${product.id}/edit`} className="px-4 py-2 text-on-surface-variant hover:text-primary transition-colors hover:bg-surface-container-low rounded-md" aria-label="Edit product"><span className="material-symbols-outlined">edit</span><span className="pointer-events-none absolute bottom-full right-0 z-10 mb-2 whitespace-nowrap rounded-md bg-slate-900 px-2.5 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity group-hover/action:opacity-100">Edit product</span></Link></div>
+                      <div className="group/action relative"><button onClick={() => handleDelete(product)} disabled={deleting === product.id} className="px-4 py-2 text-on-surface-variant hover:text-error transition-colors hover:bg-surface-container-low rounded-md disabled:opacity-50" aria-label="Delete product"><span className="material-symbols-outlined">delete</span><span className="pointer-events-none absolute bottom-full right-0 z-10 mb-2 whitespace-nowrap rounded-md bg-slate-900 px-2.5 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity group-hover/action:opacity-100">Delete product</span></button></div>
                     </div>
                   </td>
                 </tr>
@@ -189,6 +202,18 @@ export default function Products() {
           </div>
         </div>
       </div>
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 px-4 backdrop-blur-sm" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget && !deleting) setDeleteTarget(null); }}>
+          <div className="flex-none rounded-2xl bg-surface-container-lowest p-6 shadow-2xl" style={{ width: 'calc(100vw - 2rem)', maxWidth: '28rem' }} role="dialog" aria-modal="true" aria-labelledby="delete-product-title">
+            <div className="flex items-start gap-4">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-error-bg text-error-text"><span className="material-symbols-outlined">delete_forever</span></div>
+              <div className="min-w-0 flex-1"><h2 id="delete-product-title" className="text-xl font-semibold text-on-surface">Delete product?</h2><p className="mt-2 text-sm leading-6 text-on-surface-variant">You are about to permanently delete <span className="font-semibold text-on-surface">{deleteTarget.name}</span>. This action cannot be undone.</p></div>
+            </div>
+            {deleteError && <p className="mt-4 rounded-lg border border-error/30 bg-error-bg px-3 py-2 text-sm text-error-text">{deleteError}</p>}
+            <div className="mt-6 flex justify-end gap-3"><button type="button" disabled={Boolean(deleting)} onClick={() => setDeleteTarget(null)} className="rounded-lg border border-outline-variant px-4 py-2 text-sm font-semibold text-on-surface hover:bg-surface-container-low disabled:opacity-50">Cancel</button><button type="button" disabled={Boolean(deleting)} onClick={confirmDelete} className="inline-flex items-center gap-2 rounded-lg bg-error px-4 py-2 text-sm font-semibold text-white hover:bg-error/90 disabled:cursor-wait disabled:opacity-60">{deleting ? <span className="material-symbols-outlined animate-spin text-base">progress_activity</span> : <span className="material-symbols-outlined text-base">delete</span>}{deleting ? 'Deleting…' : 'Delete product'}</button></div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

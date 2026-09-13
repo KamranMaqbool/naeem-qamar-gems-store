@@ -7,18 +7,41 @@ import { fetchProducts } from '../lib/api';
 export default function Shop() {
   const [apiProducts, setApiProducts] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
+  const [totalCount, setTotalCount] = useState(0);
   const [filters, setFilters] = useState({
     types: [],
     carats: [],
     cut: '',
-    priceRange: { min: 1000, max: 50000 },
+    // Keep the catalog unfiltered by price until the shopper chooses a range.
+    priceRange: { min: '', max: '' },
+    inStock: false,
     sortBy: 'Featured',
   });
 
   useEffect(() => {
+    setPage(1);
+  }, [filters.types, filters.carats, filters.cut, filters.priceRange.min, filters.priceRange.max, filters.inStock, filters.sortBy]);
+
+  useEffect(() => {
     setLoading(true);
-    fetchProducts()
-      .then((products) => {
+    const caratCodes = { 'Under 1.00 ct': 'under', '1.00 - 2.00 ct': 'one_two', '2.00 - 5.00 ct': 'two_five', 'Over 5.00 ct': 'over' };
+    const ordering = { Featured: '-is_featured,-created_at', 'Price: Low to High': 'base_price', 'Price: High to Low': '-base_price', 'Carat: High to Low': '-gemstone_attributes__carat_weight', 'Newest Arrivals': '-created_at' }[filters.sortBy];
+    fetchProducts({
+      gemstone_type: filters.types.join(','),
+      carat_ranges: filters.carats.map((item) => caratCodes[item]).join(','),
+      cut_shape: filters.cut,
+      min_price: filters.priceRange.min,
+      max_price: filters.priceRange.max,
+      stock_status: filters.inStock ? 'IN_STOCK' : '',
+      ordering,
+      page,
+      page_size: 9,
+      withMeta: true,
+    })
+      .then((data) => {
+        const products = data.results || data;
         const mapped = products.map((p) => ({
           id: p.id,
           name: p.title,
@@ -26,27 +49,36 @@ export default function Shop() {
           carat: p.gemstone_attributes?.carat_weight || '',
           cut: p.gemstone_attributes?.cut_shape || '',
           price: parseFloat(p.sale_price || p.base_price),
-          image: typeof p.primary_image === 'object' ? p.primary_image?.image_url : p.primary_image,
+          image: (typeof p.primary_image === 'object' ? p.primary_image?.image_url : p.primary_image) || p.images?.[0]?.image_url || '',
           alt: p.title,
           tags: (p.tags || '').split(',').map((t) => t.trim()).filter(Boolean),
           type: p.category?.name || p.category || '',
           category: 'loose',
           priceOnRequest: parseFloat(p.base_price) === 0,
         }));
-        setApiProducts(mapped);
+        setApiProducts((current) => page === 1 || !current ? mapped : [...current, ...mapped]);
+        setTotalCount(data.count ?? mapped.length);
+        setHasMore(Boolean(data.next));
       })
-      .catch(() => setApiProducts(null))
+      .catch(() => { if (page === 1) setApiProducts(null); setHasMore(false); })
       .finally(() => setLoading(false));
-  }, []);
+  }, [page, filters.types, filters.carats, filters.cut, filters.priceRange.min, filters.priceRange.max, filters.inStock, filters.sortBy]);
 
   const products = apiProducts || staticProducts;
 
   const handleFilterChange = (newFilters) => {
     setFilters((prev) => ({ ...prev, ...newFilters }));
+    setPage(1);
+  };
+
+  const resetFilters = () => {
+    setFilters({ types: [], carats: [], cut: '', priceRange: { min: '', max: '' }, inStock: false, sortBy: 'Featured' });
+    setPage(1);
   };
 
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
+      if (apiProducts !== null) return true;
       if (filters.types.length > 0 && !filters.types.includes(product.type)) return false;
       if (filters.carats.length > 0) {
         const carat = parseFloat(product.carat);
@@ -60,10 +92,11 @@ export default function Shop() {
         if (!inRange) return false;
       }
       if (filters.cut && product.cut !== filters.cut) return false;
-      if (product.price > 0 && (product.price < filters.priceRange.min || product.price > filters.priceRange.max)) return false;
+      if (filters.priceRange.min !== '' && product.price < Number(filters.priceRange.min)) return false;
+      if (filters.priceRange.max !== '' && product.price > Number(filters.priceRange.max)) return false;
       return true;
     });
-  }, [products, filters]);
+  }, [products, filters, apiProducts]);
 
   const sortedProducts = useMemo(() => {
     const sorted = [...filteredProducts];
@@ -91,12 +124,12 @@ export default function Shop() {
       </div>
 
       <div className="flex flex-col md:flex-row gap-6 md:gap-24">
-        <FilterSidebar onFilterChange={handleFilterChange} initialFilters={filters} />
+        <FilterSidebar onFilterChange={handleFilterChange} onReset={resetFilters} initialFilters={filters} />
 
         <div className="flex-grow">
           <div className="flex justify-between items-center mb-8 pb-4 border-b border-outline-variant/30">
             <p className="font-body text-body-md text-on-surface-variant">
-              {loading ? 'Loading...' : `Showing ${sortedProducts.length} exceptional stones`}
+              {loading && page === 1 ? 'Loading...' : `Showing ${apiProducts !== null ? totalCount : sortedProducts.length} exceptional stones`}
             </p>
             <div className="flex items-center gap-2">
               <span className="font-label text-label-caps text-on-surface-variant">SORT BY:</span>
@@ -140,9 +173,9 @@ export default function Shop() {
           )}
 
           <div className="mt-16 text-center">
-            <button className="bg-primary-container text-on-primary font-button text-button rounded-lg px-8 py-4 hover:bg-primary-fixed-dim hover:text-primary-container transition-colors duration-300">
-              View More Gemstones
-            </button>
+            {hasMore && <button type="button" disabled={loading} onClick={() => setPage((current) => current + 1)} className="bg-primary-container text-on-primary font-button text-button rounded-lg px-8 py-4 hover:bg-primary-fixed-dim hover:text-primary-container transition-colors duration-300 disabled:cursor-wait disabled:opacity-60">
+              {loading ? 'Loading…' : 'View More Gemstones'}
+            </button>}
           </div>
         </div>
       </div>

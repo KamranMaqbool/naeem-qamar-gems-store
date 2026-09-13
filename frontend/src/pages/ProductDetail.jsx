@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { products } from '../data/products';
 import { useCart } from '../context/CartContext';
-import { brandConfig, footerLinks, navLinks } from '../config/brand';
-import { fetchProductBySlug } from '../lib/api';
+import ProductCard from '../components/product/ProductCard';
+import { fetchProductBySlug, fetchProducts } from '../lib/api';
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -11,6 +11,9 @@ export default function ProductDetail() {
   const [activeImage, setActiveImage] = useState(0);
   const [activeAccordion, setActiveAccordion] = useState(null);
   const [product, setProduct] = useState(null);
+  const [relatedProducts, setRelatedProducts] = useState([]);
+  const [quantity, setQuantity] = useState(1);
+  const [isWishlisted, setIsWishlisted] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -19,8 +22,19 @@ export default function ProductDetail() {
 
     if (id && !/^\d+$/.test(id)) {
       fetchProductBySlug(id)
-        .then((p) => {
-          setProduct(mapApiProduct(p));
+        .then(async (p) => {
+          const mapped = mapApiProduct(p);
+          setProduct(mapped);
+          try {
+            const catalog = await fetchProducts({ page_size: 100 });
+            setRelatedProducts(catalog
+              .filter((item) => item.id !== mapped.id)
+              .filter((item) => !mapped.type || item.category === mapped.type)
+              .slice(0, 4)
+              .map(mapApiProduct));
+          } catch {
+            setRelatedProducts([]);
+          }
         })
         .catch(() => {
           setProduct(staticProduct || products[6]);
@@ -28,6 +42,7 @@ export default function ProductDetail() {
         .finally(() => setLoading(false));
     } else {
       setProduct(staticProduct || products[6]);
+      setRelatedProducts(products.filter((item) => item.id !== staticProduct?.id).slice(0, 4));
       setLoading(false);
     }
   }, [id]);
@@ -38,6 +53,7 @@ export default function ProductDetail() {
       id: p.id,
       name: p.title,
       slug: p.slug,
+      sku: p.sku || '',
       price: parseFloat(p.sale_price || p.base_price),
       priceOnRequest: parseFloat(p.base_price) === 0,
       image: p.images?.[0]?.image_url || '',
@@ -81,50 +97,11 @@ export default function ProductDetail() {
     setActiveAccordion((prev) => (prev === key ? null : key));
   };
 
-  const thumbnailImages = product.images || [product.image];
+  const thumbnailImages = product.images?.length ? product.images : [product.image];
 
   return (
     <div className="bg-background text-on-background antialiased font-body text-body-md flex flex-col min-h-screen">
-      <header className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-md">
-        <div className="max-w-[1440px] mx-auto px-5 md:px-20 flex justify-between items-center h-20">
-          <nav className="hidden md:flex space-x-6">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                to={link.href}
-                className={`font-label text-label-caps transition-all active:scale-95 ${
-                  link.href === '/shop'
-                    ? 'text-secondary relative after:content-[""] after:absolute after:-bottom-1 after:left-1/2 after:-translate-x-1/2 after:w-1 after:h-1 after:bg-secondary after:rounded-full'
-                    : 'text-on-surface-variant hover:text-primary'
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
-          <div className="flex-shrink-0 flex items-center justify-center cursor-pointer hover:opacity-70 transition-opacity duration-300">
-            <span className="font-headline text-headline-md text-primary tracking-tighter">{brandConfig.name}</span>
-          </div>
-          <div className="flex items-center space-x-2 cursor-pointer transition-all active:scale-95">
-            <button aria-label="Search" className="p-2 text-on-surface-variant hover:text-primary hover:opacity-70 transition-opacity duration-300">
-              <span className="material-symbols-outlined">search</span>
-            </button>
-            <button aria-label="Profile" className="p-2 text-on-surface-variant hover:text-primary hover:opacity-70 transition-opacity duration-300 hidden md:block">
-              <span className="material-symbols-outlined">person</span>
-            </button>
-            <Link to="/cart" aria-label="Cart" className="p-2 text-on-surface-variant hover:text-primary hover:opacity-70 transition-opacity duration-300">
-              <span className="material-symbols-outlined">shopping_bag</span>
-            </Link>
-            <div className="md:hidden flex items-center">
-              <button aria-label="Menu" className="p-2 text-on-surface-variant hover:text-primary">
-                <span className="material-symbols-outlined">menu</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <main className="flex-grow pt-[140px] pb-section-gap max-w-[1440px] mx-auto px-5 md:px-20 w-full">
+      <main className="flex-grow pt-32 pb-section-gap max-w-[1440px] mx-auto px-5 md:px-20 w-full">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-x-24">
           <div className="md:col-span-7 flex flex-col space-y-2">
             <div className="w-full bg-surface-container-lowest flex items-center justify-center overflow-hidden">
@@ -162,21 +139,62 @@ export default function ProductDetail() {
               <Link className="hover:text-primary transition-colors" to="/shop">{product.type}s</Link>
             </nav>
 
-            <h1 className="font-headline text-headline-lg-mobile md:text-headline-lg text-primary mb-4">{product.name}</h1>
-            <p className="font-headline text-headline-md text-on-surface mb-8">{formatPrice(product.price)}</p>
+            <div className="flex items-start justify-between gap-4">
+              <h1 className="font-headline text-headline-lg-mobile md:text-headline-lg text-primary mb-3">{product.name}</h1>
+              <button
+                type="button"
+                aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
+                onClick={() => setIsWishlisted((value) => !value)}
+                className="shrink-0 rounded-full border border-outline-variant/60 p-3 text-primary transition-colors hover:border-primary hover:bg-surface-container-low"
+              >
+                <span className="material-symbols-outlined" style={{ fontVariationSettings: isWishlisted ? "'FILL' 1" : "'FILL' 0" }}>favorite</span>
+              </button>
+            </div>
+            <div className="flex flex-wrap items-center gap-3 mb-6">
+              <p className="font-headline text-headline-md text-on-surface">{formatPrice(product.price)}</p>
+              {product.tags?.[0] && <span className="rounded-full bg-secondary-container/30 px-3 py-1 font-label text-[11px] uppercase tracking-wider text-primary">{product.tags[0]}</span>}
+            </div>
+            <p className="mb-6 font-mono text-xs uppercase tracking-wider text-on-surface-variant">SKU: {product.sku || 'Available on request'}</p>
 
             <div className="prose prose-sm font-body text-body-lg text-on-surface-variant mb-10 leading-relaxed">
-              <p>{product.description}</p>
+              <p>{product.description || 'A carefully selected gemstone with exceptional character, documented provenance, and refined finishing.'}</p>
             </div>
 
-            <div className="mb-12">
+            <div className="mb-10 space-y-3">
+              {!product.priceOnRequest && (
+                <div className="flex items-center gap-3">
+                  <label htmlFor="quantity" className="font-label text-label-caps text-on-surface-variant">Quantity</label>
+                  <div className="flex items-center rounded border border-outline-variant">
+                    <button type="button" onClick={() => setQuantity((value) => Math.max(1, value - 1))} className="px-3 py-2 text-primary hover:bg-surface-container-low" aria-label="Decrease quantity">−</button>
+                    <span className="min-w-10 text-center text-sm">{quantity}</span>
+                    <button type="button" onClick={() => setQuantity((value) => value + 1)} className="px-3 py-2 text-primary hover:bg-surface-container-low" aria-label="Increase quantity">+</button>
+                  </div>
+                </div>
+              )}
               <button
-                onClick={() => addItem(product)}
+                onClick={() => addItem(product, quantity)}
                 className="w-full bg-primary-container text-on-primary font-button text-button py-4 px-8 rounded flex justify-center items-center hover:bg-primary transition-colors duration-300"
               >
-                Add to Bag
+                <span className="material-symbols-outlined mr-2 text-lg">shopping_bag</span>
+                {product.priceOnRequest ? 'Request Availability' : 'Add to Bag'}
               </button>
-              <p className="font-body text-sm text-center text-on-surface-variant mt-4">Complimentary shipping & returns on all orders.</p>
+              <Link to="/contact" className="block w-full border border-primary py-3 text-center font-button text-button uppercase tracking-wider text-primary transition-colors hover:bg-surface-container-low">Speak with a Gem Specialist</Link>
+              <p className="font-body text-sm text-center text-on-surface-variant">Complimentary insured shipping and 30-day returns.</p>
+            </div>
+
+            <div className="mb-10 grid grid-cols-1 gap-3 border-y border-outline-variant/30 py-5 sm:grid-cols-3">
+              {[['verified', 'Authenticity guaranteed'], ['local_shipping', 'Insured worldwide delivery'], ['workspace_premium', 'Independent certification']].map(([icon, label]) => (
+                <div key={label} className="flex items-center gap-2 text-sm text-on-surface-variant"><span className="material-symbols-outlined text-secondary">{icon}</span>{label}</div>
+              ))}
+            </div>
+
+            <div className="mb-10">
+              <h2 className="mb-4 font-headline text-headline-sm text-primary">Gemstone specifications</h2>
+              <dl className="grid grid-cols-2 gap-x-6 gap-y-4 border-y border-outline-variant/30 py-5 text-sm sm:grid-cols-3">
+                {product.details && Object.entries(product.details).filter(([, value]) => value).map(([key, value]) => (
+                  <div key={key}><dt className="font-label text-[11px] uppercase tracking-wider text-on-surface-variant">{key.replace(/([A-Z])/g, ' $1')}</dt><dd className="mt-1 text-on-surface">{value}</dd></div>
+                ))}
+              </dl>
             </div>
 
             <div className="border-t border-outline-variant/30">
@@ -223,31 +241,23 @@ export default function ProductDetail() {
             </div>
           </div>
         </div>
+
+        {relatedProducts.length > 0 && (
+          <section className="mt-20 border-t border-outline-variant/30 pt-12" aria-labelledby="related-products-heading">
+            <div className="mb-8 flex items-end justify-between gap-4">
+              <div>
+                <p className="font-label text-label-caps text-secondary">Curated for you</p>
+                <h2 id="related-products-heading" className="mt-2 font-headline text-headline-lg-mobile md:text-headline-lg text-primary">More from this collection</h2>
+              </div>
+              <Link to="/shop" className="hidden font-button text-button text-primary underline-offset-4 hover:underline sm:block">View all gemstones</Link>
+            </div>
+            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+              {relatedProducts.map((item) => <ProductCard key={item.id} product={item} variant="grid" />)}
+            </div>
+          </section>
+        )}
       </main>
 
-      <footer className="bg-surface-container-low border-t border-outline-variant/30 w-full py-section-gap mt-auto">
-        <div className="max-w-[1440px] mx-auto px-5 md:px-20 grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-24">
-          <div className="flex flex-col space-y-4">
-            <span className="font-headline text-headline-md text-primary">{brandConfig.name}</span>
-            <p className="font-body text-body-md text-on-surface-variant">{brandConfig.getCopyright()}</p>
-          </div>
-          <div className="flex flex-col space-y-2 font-body text-body-md">
-            {footerLinks.support.map((link) => (
-              <Link
-                key={link.href}
-                to={link.href}
-                className="text-on-surface-variant hover:text-secondary transition-colors duration-200 w-fit"
-              >
-                {link.label}
-              </Link>
-            ))}
-          </div>
-          <div className="flex flex-col space-y-2 font-body text-body-md">
-            <Link className="text-on-surface-variant hover:text-secondary transition-colors duration-200 w-fit" to="/terms">Terms</Link>
-            <Link className="text-on-surface-variant hover:text-secondary transition-colors duration-200 w-fit" to="/contact">Contact</Link>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

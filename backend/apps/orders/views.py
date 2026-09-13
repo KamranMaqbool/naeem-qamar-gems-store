@@ -186,7 +186,7 @@ class AdminOrderListView(generics.ListAPIView):
     permission_classes = [IsAdminUser]
 
     def get_queryset(self):
-        qs = Order.objects.all()
+        qs = Order.objects.all().prefetch_related('items__product')
         order_status = self.request.query_params.get('status')
         if order_status:
             qs = qs.filter(order_status=order_status)
@@ -194,6 +194,9 @@ class AdminOrderListView(generics.ListAPIView):
         if search:
             from django.db.models import Q
             qs = qs.filter(Q(order_number__icontains=search) | Q(guest_email__icontains=search) | Q(user__email__icontains=search) | Q(user__username__icontains=search))
+        product_id = self.request.query_params.get('product')
+        if product_id:
+            qs = qs.filter(items__product_id=product_id).distinct()
         return qs
 
     def post(self, request, *args, **kwargs):
@@ -234,4 +237,4 @@ class AdminOrderDetailView(generics.RetrieveUpdateAPIView):
 
     serializer_class = AdminOrderSerializer
     permission_classes = [IsAdminUser]
-    queryset = Order.objects.all()
+    queryset = Order.objects.prefetch_related('items__product__category', 'items__product__images').all()

@@ -91,12 +91,12 @@ export default function CartPage() {
             <p className="font-body text-body-md text-on-surface-variant mb-6 text-sm text-center">
               Shipping and taxes calculated at checkout.
             </p>
-            <button className="w-full py-4 px-8 bg-primary-container text-on-primary font-button text-button uppercase tracking-widest rounded hover:bg-primary transition-colors duration-300 flex items-center justify-center gap-2 group">
+            <Link to="/checkout" className="w-full py-4 px-8 bg-primary-container text-on-primary font-button text-button uppercase tracking-widest rounded hover:bg-primary transition-colors duration-300 flex items-center justify-center gap-2 group">
               Proceed to Secure Checkout
               <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform" data-icon="arrow_forward">
                 arrow_forward
               </span>
-            </button>
+            </Link>
             <p className="font-body text-body-sm text-on-surface-variant/70 mt-4 text-center">
               By proceeding, you agree to our <Link to="/terms" className="underline hover:text-primary">Terms</Link> and <Link to="/privacy" className="underline hover:text-primary">Privacy Policy</Link>.
             </p>

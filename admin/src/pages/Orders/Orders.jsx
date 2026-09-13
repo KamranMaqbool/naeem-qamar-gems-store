@@ -12,6 +12,9 @@ export default function Orders() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalOrders, setTotalOrders] = useState(0);
   const [error, setError] = useState('');
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleteError, setDeleteError] = useState('');
+  const [deleting, setDeleting] = useState(null);
 
   useEffect(() => {
     async function loadOrders() {
@@ -61,12 +64,19 @@ export default function Orders() {
 
   const setSearchAndReset = (value) => { setSearch(value); setPage(1); };
   const setStatusAndReset = (value) => { setStatus(value); setPage(1); };
-  const handleDelete = async (order) => {
-    if (!window.confirm(`Delete order ${order.id}?`)) return;
+  const handleDelete = (order) => {
+    setDeleteError('');
+    setDeleteTarget(order);
+  };
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(deleteTarget.id);
     try {
-      await deleteOrder(order.rawId || order.id.replace('#', ''));
-      setApiOrders((current) => current?.filter((item) => item.id !== order.id) || current);
-    } catch (err) { setError(err.message || 'Unable to delete order.'); }
+      await deleteOrder(deleteTarget.rawId || deleteTarget.id.replace('#', ''));
+      setApiOrders((current) => current?.filter((item) => item.id !== deleteTarget.id) || current);
+      setDeleteTarget(null);
+    } catch (err) { setDeleteError(err.message || 'Unable to delete order.'); setError(err.message || 'Unable to delete order.'); }
+    finally { setDeleting(null); }
   };
 
   const statusOptions = [
@@ -147,12 +157,11 @@ export default function Orders() {
                     </span>
                   </td>
                   <td className="py-4 px-6 text-right">
-                    <Link to={`/orders/${order.rawId || order.id.replace('#', '')}`} className="text-on-surface-variant hover:text-primary transition-colors opacity-0 group-hover:opacity-100">
-                      <span className="material-symbols-outlined text-sm">edit</span>
-                    </Link>
-                    <button type="button" onClick={() => handleDelete(order)} className="ml-3 text-on-surface-variant hover:text-error transition-colors opacity-0 group-hover:opacity-100" aria-label="Delete order">
-                      <span className="material-symbols-outlined text-sm">delete</span>
-                    </button>
+                    <div className="flex items-center justify-end gap-1">
+                      <div className="group/action relative"><Link to={`/orders/${order.rawId || order.id.replace('#', '')}`} className="rounded-md px-3 py-2 text-on-surface-variant hover:bg-surface-container-low hover:text-primary" aria-label="View order"><span className="material-symbols-outlined">visibility</span><span className="pointer-events-none absolute bottom-full right-0 z-10 mb-2 whitespace-nowrap rounded-md bg-slate-900 px-2.5 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity group-hover/action:opacity-100">View order</span></Link></div>
+                      <div className="group/action relative"><Link to={`/orders/${order.rawId || order.id.replace('#', '')}`} className="rounded-md px-3 py-2 text-on-surface-variant hover:bg-surface-container-low hover:text-primary" aria-label="Edit order"><span className="material-symbols-outlined">edit</span><span className="pointer-events-none absolute bottom-full right-0 z-10 mb-2 whitespace-nowrap rounded-md bg-slate-900 px-2.5 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity group-hover/action:opacity-100">Edit order</span></Link></div>
+                      <div className="group/action relative"><button type="button" onClick={() => handleDelete(order)} className="rounded-md px-3 py-2 text-on-surface-variant hover:bg-error-bg hover:text-error" aria-label="Delete order"><span className="material-symbols-outlined">delete</span><span className="pointer-events-none absolute bottom-full right-0 z-10 mb-2 whitespace-nowrap rounded-md bg-slate-900 px-2.5 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity group-hover/action:opacity-100">Delete order</span></button></div>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -174,6 +183,7 @@ export default function Orders() {
           </div>
         </div>
       </div>
+      {deleteTarget && <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 px-4 backdrop-blur-sm" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget && !deleting) setDeleteTarget(null); }}><div className="flex-none rounded-2xl bg-surface-container-lowest p-6 shadow-2xl" style={{ width: 'calc(100vw - 2rem)', maxWidth: '28rem' }} role="dialog" aria-modal="true" aria-labelledby="delete-order-title"><div className="flex items-start gap-4"><div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-error-bg text-error-text"><span className="material-symbols-outlined">delete_forever</span></div><div className="min-w-0 flex-1"><h2 id="delete-order-title" className="text-xl font-semibold text-on-surface">Delete order?</h2><p className="mt-2 text-sm leading-6 text-on-surface-variant">You are about to permanently delete <span className="font-semibold text-on-surface">{deleteTarget.id}</span>. This action cannot be undone.</p></div></div>{deleteError && <p className="mt-4 rounded-lg border border-error/30 bg-error-bg px-3 py-2 text-sm text-error-text">{deleteError}</p>}<div className="mt-6 flex justify-end gap-3"><button type="button" disabled={Boolean(deleting)} onClick={() => setDeleteTarget(null)} className="rounded-lg border border-outline-variant px-4 py-2 text-sm font-semibold text-on-surface hover:bg-surface-container-low disabled:opacity-50">Cancel</button><button type="button" disabled={Boolean(deleting)} onClick={confirmDelete} className="inline-flex items-center gap-2 rounded-lg bg-error px-4 py-2 text-sm font-semibold text-white hover:bg-error/90 disabled:cursor-wait disabled:opacity-60">{deleting ? 'Deleting…' : 'Delete order'}</button></div></div></div>}
     </div>
   );
 }

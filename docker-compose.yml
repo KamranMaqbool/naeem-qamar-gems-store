@@ -50,6 +50,8 @@ services:
   frontend:
     image: node:20-alpine
     working_dir: /app
+    environment:
+      - VITE_API_PROXY_TARGET=http://backend:8000
     volumes:
       - ./frontend:/app
     ports:

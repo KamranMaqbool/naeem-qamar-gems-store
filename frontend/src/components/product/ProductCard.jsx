@@ -14,7 +14,7 @@ export default function ProductCard({ product, variant = 'default' }) {
 
   if (variant === 'featured') {
     return (
-      <Link to={`/product/${product.id}`} className="group cursor-pointer block">
+      <Link to={`/product/${product.slug || product.id}`} className="group cursor-pointer block">
         <div className="relative aspect-square overflow-hidden bg-surface-container-lowest mb-6 border border-outline-variant/30">
           <img
             alt={alt}
@@ -38,7 +38,7 @@ export default function ProductCard({ product, variant = 'default' }) {
 
   if (variant === 'grid') {
     return (
-      <Link to={`/product/${product.id}`} className="group block image-scale">
+      <Link to={`/product/${product.slug || product.id}`} className="group block image-scale">
         <div className="relative bg-surface-container-lowest aspect-square mb-6 overflow-hidden flex items-center justify-center p-4">
           {tags.length > 0 && (
             <div className="absolute top-4 left-4 z-10 px-3 py-1 border border-[#D4AF37] font-label text-label-caps text-primary bg-background/80 backdrop-blur-sm rounded-sm uppercase tracking-widest text-[10px]">

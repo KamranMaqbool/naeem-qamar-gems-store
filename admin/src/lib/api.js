@@ -112,6 +112,12 @@ export async function createProduct(data) {
   return authFetch('/admin/products/', { method: 'POST', body: JSON.stringify(data) });
 }
 
+export async function uploadProductImage(file) {
+  const formData = new FormData();
+  formData.append('image', file);
+  return authFetch('/admin/products/images/upload/', { method: 'POST', body: formData });
+}
+
 export async function fetchAdminProduct(id) {
   return authFetch(`/admin/products/${id}/`);
 }
@@ -129,6 +135,7 @@ export async function fetchAdminOrders(params = {}) {
   if (params.search) query.set('search', params.search);
   if (params.status) query.set('status', params.status);
   if (params.page) query.set('page', params.page);
+  if (params.product) query.set('product', params.product);
   const qs = query.toString();
   return authFetch(`/admin/orders/${qs ? '?' + qs : ''}`);
 }
@@ -151,11 +158,16 @@ export async function deleteOrder(id) {
 
 export async function fetchInventory(params = {}) {
   const query = new URLSearchParams();
-  if (params.status) query.set('stock_status', params.status);
+  if (params.status) query.set('stock_status', { 'in-stock': 'IN_STOCK', 'low-stock': 'LOW_STOCK', 'out-of-stock': 'OUT_OF_STOCK' }[params.status] || params.status);
   if (params.search) query.set('search', params.search);
   if (params.page) query.set('page', params.page);
+  if (params.page_size) query.set('page_size', params.page_size);
   const qs = query.toString();
   return authFetch(`/admin/inventory/${qs ? '?' + qs : ''}`);
+}
+
+export async function fetchInventoryStats() {
+  return authFetch('/admin/inventory/stats/');
 }
 
 export async function updateInventory(id, data) {

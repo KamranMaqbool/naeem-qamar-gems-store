@@ -17,7 +17,7 @@ export default function ReceiveStock() {
     async function loadItems() {
       try {
         if (!isAuthenticated()) await login('admin@virtuoso-gems.com', 'admin123');
-        const data = await fetchInventory();
+        const data = await fetchInventory({ page_size: 100 });
         setItems(data.results || data);
       } catch {
         setItems(fallbackItems.map((item) => ({ id: item.id, product: item.id, product_title: item.name, product_sku: item.sku, current_stock: item.stock })));
@@ -37,7 +37,8 @@ export default function ReceiveStock() {
     setMessage(null);
     try {
       if (!form.productId) throw new Error('Select a product first.');
-      await receiveStock({ product_id: Number(form.productId), quantity: Number(form.quantity), reason: form.reason, notes: form.notes });
+      const updated = await receiveStock({ product_id: Number(form.productId), quantity: Number(form.quantity), reason: form.reason, notes: form.notes });
+      setItems((current) => current.map((item) => item.id === updated.id ? { ...item, current_stock: updated.current_stock, stock_status: updated.stock_status } : item));
       setMessage({ type: 'success', text: 'Stock received and inventory updated successfully.' });
       setForm((prev) => ({ ...prev, quantity: 1, notes: '' }));
     } catch (error) {

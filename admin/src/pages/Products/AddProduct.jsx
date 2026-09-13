@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { createProduct, fetchAdminProduct, fetchCategories, isAuthenticated, login, receiveStock, updateProduct } from '../../lib/api';
+import { createProduct, fetchAdminProduct, fetchCategories, isAuthenticated, login, receiveStock, updateProduct, uploadProductImage } from '../../lib/api';
 
 const categories = [
   { value: '', label: 'Select a category' },
@@ -9,6 +9,8 @@ const categories = [
   { value: 'earrings', label: 'Earrings' },
   { value: 'bracelets', label: 'Bracelets' },
 ];
+
+const mediaUrl = (value) => value?.replace(/^https?:\/\/backend:8000/, '') || '';
 
 export default function AddProduct() {
   const navigate = useNavigate();
@@ -21,6 +23,8 @@ export default function AddProduct() {
     salePrice: '',
     sku: '',
     quantity: 0,
+    isFeatured: false,
+    isPublished: true,
   });
   const [images, setImages] = useState([]);
   const [dragActive, setDragActive] = useState(false);
@@ -42,17 +46,26 @@ export default function AddProduct() {
 
   useEffect(() => {
     if (!id) return;
-    fetchAdminProduct(id).then((product) => setFormData({
-      title: product.title || '', description: product.description || '', category: product.category?.id || '',
+    fetchAdminProduct(id).then((product) => {
+      setImages((product.images || []).map((image) => ({
+        image_url: image.image_url,
+        preview: mediaUrl(image.image_url),
+        alt_text: image.alt_text || '',
+      })));
+      return setFormData({
+      title: product.title || '', description: product.description || '', category: product.category?.id || product.category || '',
       regularPrice: product.base_price || '', salePrice: product.sale_price || '', sku: product.sku || '', quantity: product.inventory_stock || 0,
-    })).catch((loadError) => setError(loadError.message || 'Unable to load product.'));
+      isFeatured: Boolean(product.is_featured),
+      isPublished: String(product.status || '').toUpperCase() === 'PUBLISHED',
+      });
+    }).catch((loadError) => setError(loadError.message || 'Unable to load product.'));
   }, [id]);
 
   const handleChange = (e) => {
     const { name, value, type } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: type === 'number' ? (value === '' ? 0 : Number(value)) : value,
+      [name]: type === 'checkbox' ? e.target.checked : type === 'number' ? (value === '' ? 0 : Number(value)) : value,
     }));
   };
 
@@ -72,7 +85,7 @@ export default function AddProduct() {
     setDragActive(false);
     if (e.dataTransfer.files) {
       const files = Array.from(e.dataTransfer.files).filter((f) => f.type.startsWith('image/'));
-      const newImages = files.map((file) => URL.createObjectURL(file));
+      const newImages = files.map((file) => ({ file, preview: URL.createObjectURL(file) }));
       setImages((prev) => [...prev, ...newImages].slice(0, 5));
     }
   };
@@ -80,7 +93,7 @@ export default function AddProduct() {
   const handleFileSelect = (e) => {
     if (e.target.files) {
       const files = Array.from(e.target.files).filter((f) => f.type.startsWith('image/'));
-      const newImages = files.map((file) => URL.createObjectURL(file));
+      const newImages = files.map((file) => ({ file, preview: URL.createObjectURL(file) }));
       setImages((prev) => [...prev, ...newImages].slice(0, 5));
     }
   };
@@ -96,6 +109,15 @@ export default function AddProduct() {
     try {
       if (!isAuthenticated()) await login('admin@virtuoso-gems.com', 'admin123');
       const slug = formData.title.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      const uploadedImages = await Promise.all(images.map(async (image, index) => {
+        const uploaded = image.file ? await uploadProductImage(image.file) : { image_url: image.image_url };
+        return {
+          image_url: uploaded.image_url,
+          alt_text: image.alt_text || formData.title,
+          display_order: index,
+          is_primary: index === 0,
+        };
+      }));
       const payload = {
         title: formData.title,
         slug,
@@ -104,8 +126,10 @@ export default function AddProduct() {
         base_price: formData.regularPrice,
         sale_price: formData.salePrice || null,
         category: formData.category && Number.isFinite(Number(formData.category)) ? Number(formData.category) : null,
-        ...(id ? {} : { status: 'DRAFT' }),
-        is_featured: false,
+        // Keep the storefront visibility controlled by the publish checkbox.
+        status: formData.isPublished ? 'PUBLISHED' : 'DRAFT',
+        is_featured: formData.isFeatured,
+        images: uploadedImages,
       };
       const savedProduct = id ? await updateProduct(id, payload) : await createProduct(payload);
       if (!id && formData.quantity > 0 && savedProduct?.id) {
@@ -234,6 +258,17 @@ export default function AddProduct() {
                         ))}
                       </select>
                     </div>
+                    <label className="flex items-start gap-3 rounded-lg border border-outline-variant/60 bg-surface-container-low p-4 cursor-pointer">
+                      <input name="isFeatured" type="checkbox" checked={formData.isFeatured} onChange={handleChange} className="mt-1 h-4 w-4 rounded border-outline-variant text-primary focus:ring-primary" />
+                      <span><span className="block text-sm font-semibold text-on-surface">Feature this product</span><span className="mt-1 block text-xs text-on-surface-variant">Show this product in the storefront’s Featured Acquisitions section.</span></span>
+                    </label>
+                    <label className="flex items-start gap-3 rounded-lg border border-primary/30 bg-primary/5 p-4 cursor-pointer">
+                      <input name="isPublished" type="checkbox" checked={formData.isPublished} onChange={handleChange} className="mt-1 h-4 w-4 rounded border-outline-variant text-primary focus:ring-primary" />
+                      <span>
+                        <span className="block text-sm font-semibold text-on-surface">Publish to storefront</span>
+                        <span className="mt-1 block text-xs text-on-surface-variant">Published products are visible on the public shop. Uncheck to save this product as a draft.</span>
+                      </span>
+                    </label>
                   </div>
                 </div>
 
@@ -311,7 +346,7 @@ export default function AddProduct() {
                     <div className="mt-4 grid grid-cols-3 gap-2">
                       {images.map((img, index) => (
                         <div key={index} className="relative aspect-square rounded-lg overflow-hidden">
-                          <img src={img} alt={`Preview ${index + 1}`} className="w-full h-full object-cover" />
+                          <img src={img.preview} alt={`Preview ${index + 1}`} className="w-full h-full object-cover" />
                           <button
                             type="button"
                             onClick={() => removeImage(index)}

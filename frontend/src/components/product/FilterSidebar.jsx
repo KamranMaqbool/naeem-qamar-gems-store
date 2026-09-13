@@ -4,11 +4,12 @@ const gemstoneTypes = ['Ruby', 'Sapphire', 'Emerald', 'Diamond'];
 const caratRanges = ['Under 1.00 ct', '1.00 - 2.00 ct', '2.00 - 5.00 ct', 'Over 5.00 ct'];
 const cuts = ['Oval', 'Cushion', 'Round', 'Emerald', 'Pear'];
 
-export default function FilterSidebar({ onFilterChange, initialFilters = {} }) {
+export default function FilterSidebar({ onFilterChange, onReset, initialFilters = {} }) {
   const [selectedTypes, setSelectedTypes] = useState(initialFilters.types || []);
   const [selectedCarats, setSelectedCarats] = useState(initialFilters.carats || []);
   const [selectedCut, setSelectedCut] = useState(initialFilters.cut || '');
-  const [priceRange, setPriceRange] = useState(initialFilters.priceRange || { min: 1000, max: 50000 });
+  const [priceRange, setPriceRange] = useState(initialFilters.priceRange || { min: '', max: '' });
+  const [inStock, setInStock] = useState(Boolean(initialFilters.inStock));
 
   const handleTypeChange = (type) => {
     const newSelected = selectedTypes.includes(type)
@@ -29,6 +30,15 @@ export default function FilterSidebar({ onFilterChange, initialFilters = {} }) {
   const handleCutChange = (cut) => {
     setSelectedCut(cut);
     onFilterChange({ cut });
+  };
+
+  const handleReset = () => {
+    setSelectedTypes([]);
+    setSelectedCarats([]);
+    setSelectedCut('');
+    setPriceRange({ min: '', max: '' });
+    setInStock(false);
+    onReset?.();
   };
 
   return (
@@ -97,7 +107,7 @@ export default function FilterSidebar({ onFilterChange, initialFilters = {} }) {
                 placeholder="Min"
                 type="number"
                 value={priceRange.min}
-                onChange={(e) => setPriceRange({ ...priceRange, min: parseInt(e.target.value) || 0 })}
+                onChange={(e) => { const next = { ...priceRange, min: e.target.value }; setPriceRange(next); onFilterChange({ priceRange: next }); }}
               />
             </div>
             <span className="text-outline">-</span>
@@ -108,11 +118,23 @@ export default function FilterSidebar({ onFilterChange, initialFilters = {} }) {
                 placeholder="Max"
                 type="number"
                 value={priceRange.max}
-                onChange={(e) => setPriceRange({ ...priceRange, max: parseInt(e.target.value) || 50000 })}
+                onChange={(e) => { const next = { ...priceRange, max: e.target.value }; setPriceRange(next); onFilterChange({ priceRange: next }); }}
               />
             </div>
           </div>
         </div>
+
+        <div>
+          <h3 className="font-label text-label-caps text-primary mb-4 tracking-widest border-b border-outline-variant/30 pb-2">AVAILABILITY</h3>
+          <label className="flex items-center gap-3 cursor-pointer group">
+            <input type="checkbox" checked={inStock} onChange={(event) => { setInStock(event.target.checked); onFilterChange({ inStock: event.target.checked }); }} className="form-checkbox h-4 w-4 text-primary-container border-outline-variant rounded-sm focus:ring-primary-container focus:ring-offset-background bg-transparent transition duration-200" />
+            <span className="font-body text-body-md text-on-surface-variant group-hover:text-primary transition-colors">In stock only</span>
+          </label>
+        </div>
+
+        <button type="button" onClick={handleReset} className="w-full border border-outline-variant/50 rounded-sm px-4 py-3 font-button text-button text-primary hover:bg-primary-container hover:text-on-primary transition-colors">
+          Reset all filters
+        </button>
       </div>
     </aside>
   );

@@ -29,17 +29,19 @@ export default function Home() {
       })
       .catch(() => {});
 
-    fetchCategories()
-      .then((cats) => {
-        const catImages = {
-          'loose-gemstones': staticCategories[0]?.image,
-          'bespoke-rings': staticCategories[1]?.image,
-          'fine-necklaces': staticCategories[2]?.image,
-        };
+    Promise.all([fetchCategories(), fetchProducts({ page_size: 100 })])
+      .then(([cats, catalogProducts]) => {
+        const imageFor = (product) => (typeof product.primary_image === 'object'
+          ? product.primary_image?.image_url
+          : product.primary_image) || product.images?.[0]?.image_url || '';
         const mapped = cats.slice(0, 3).map((c, i) => ({
           id: c.slug,
           name: c.name,
-          image: c.image || catImages[c.slug] || staticCategories[i]?.image || '',
+          // Prefer the API-provided category cover, then a live product image
+          // from that category, and finally another live catalog image.
+          image: c.cover_image || c.image
+            || imageFor(catalogProducts.find((p) => p.category === c.name || p.category?.name === c.name))
+            || imageFor(catalogProducts[i]) || '',
           alt: c.name,
           href: '/shop',
         }));

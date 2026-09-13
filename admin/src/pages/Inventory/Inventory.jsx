@@ -1,7 +1,9 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { inventoryItems as staticItems, inventoryStats as staticStats, stockStatusOptions, statusConfig } from '../../data/inventory';
-import { fetchInventory, isAuthenticated, login, updateInventory } from '../../lib/api';
+import { fetchInventory, fetchInventoryStats, isAuthenticated, login, updateInventory } from '../../lib/api';
+
+const mediaUrl = (value) => value?.replace(/^https?:\/\/backend:8000/, '') || '';
 
 export default function Inventory() {
   const [search, setSearch] = useState('');
@@ -17,11 +19,13 @@ export default function Inventory() {
 
   useEffect(() => {
     async function loadInventory() {
+      setLoading(true);
       try {
         if (!isAuthenticated()) {
           await login('admin@virtuoso-gems.com', 'admin123');
         }
         const data = await fetchInventory({ search, status, page });
+        const stats = await fetchInventoryStats();
         const items = data.results || data;
         const mapped = items.map((inv) => ({
           id: inv.id,
@@ -30,16 +34,12 @@ export default function Inventory() {
           sku: inv.product_sku || inv.product?.sku || '',
           stock: inv.current_stock,
           threshold: inv.low_stock_threshold,
-          image: inv.product_image || '',
+          image: mediaUrl(inv.product_image),
           status: inv.stock_status === 'IN_STOCK' ? 'in-stock'
             : inv.stock_status === 'LOW_STOCK' ? 'low-stock' : 'out-of-stock',
         }));
         setApiItems(mapped);
-        setInventoryStats({
-          totalSKUs: mapped.length,
-          lowStockAlerts: mapped.filter((i) => i.status === 'low-stock').length,
-          outOfStock: mapped.filter((i) => i.status === 'out-of-stock').length,
-        });
+        setInventoryStats(stats);
         setTotalItems(data.count ?? mapped.length);
         setTotalPages(data.count ? Math.max(1, Math.ceil(data.count / 20)) : 1);
       } catch {
@@ -72,9 +72,21 @@ export default function Inventory() {
     setSavingId(item.id); setError('');
     try {
       await updateInventory(item.id, { current_stock: stock, low_stock_threshold: item.threshold });
-      setApiItems((current) => current?.map((entry) => entry.id === item.id ? { ...entry, stock } : entry) || current);
+      const updatedStatus = stock <= 0 ? 'out-of-stock' : stock <= item.threshold ? 'low-stock' : 'in-stock';
+      setApiItems((current) => current?.map((entry) => entry.id === item.id ? { ...entry, stock, status: updatedStatus } : entry) || current);
     } catch (err) { setError(err.message || 'Unable to update stock.'); }
     finally { setSavingId(null); }
+  };
+
+  const exportCsv = async () => {
+    try {
+      const data = await fetchInventory({ search, status, page_size: 100 });
+      const rows = data.results || data;
+      const csv = [['Product', 'SKU', 'Category', 'Current Stock', 'Threshold', 'Status'], ...rows.map((item) => [item.product_title || '', item.product_sku || '', item.product_category || '', item.current_stock ?? 0, item.low_stock_threshold ?? 0, item.stock_status || ''])]
+        .map((row) => row.map((value) => `"${String(value).replaceAll('"', '""')}"`).join(',')).join('\n');
+      const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+      const anchor = document.createElement('a'); anchor.href = url; anchor.download = 'inventory.csv'; anchor.click(); URL.revokeObjectURL(url);
+    } catch (exportError) { setError(exportError.message || 'Unable to export inventory.'); }
   };
 
   return (
@@ -85,7 +97,7 @@ export default function Inventory() {
           <p className="text-[16px] leading-[24px] text-on-surface-variant mt-2">Monitor and control your luxury gemstone stock.</p>
         </div>
         <div className="flex gap-4">
-          <button className="px-6 py-2.5 bg-surface-container-lowest border border-tertiary-container text-tertiary-container rounded-md text-[12px] leading-[16px] font-bold uppercase tracking-wider hover:bg-surface-container-low transition-colors flex items-center gap-2">
+          <button type="button" onClick={exportCsv} className="px-6 py-2.5 bg-surface-container-lowest border border-tertiary-container text-tertiary-container rounded-md text-[12px] leading-[16px] font-bold uppercase tracking-wider hover:bg-surface-container-low transition-colors flex items-center gap-2">
             <span className="material-symbols-outlined text-[18px]">download</span>
             Export CSV
           </button>

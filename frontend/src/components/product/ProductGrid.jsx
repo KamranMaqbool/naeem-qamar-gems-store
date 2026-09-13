@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import ProductCard from './ProductCard';
 
 export default function ProductGrid({ products, title = 'Featured Acquisitions', subtitle = 'Exceptional pieces recently added to the vault.', showViewAll = true, onViewAllClick }) {
@@ -10,13 +11,13 @@ export default function ProductGrid({ products, title = 'Featured Acquisitions',
             <p className="font-body text-body-md text-on-surface-variant">{subtitle}</p>
           </div>
           {showViewAll && (
-            <a
-              href="#"
+            <Link
+              to="/shop"
               onClick={onViewAllClick}
               className="hidden md:inline-flex items-center text-primary font-button text-button border border-secondary/30 px-6 py-3 rounded hover:bg-surface-container transition-colors"
             >
               View All
-            </a>
+            </Link>
           )}
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16">
@@ -26,13 +27,13 @@ export default function ProductGrid({ products, title = 'Featured Acquisitions',
         </div>
         {showViewAll && (
           <div className="mt-12 text-center md:hidden">
-            <a
-              href="#"
+            <Link
+              to="/shop"
               onClick={onViewAllClick}
               className="inline-flex items-center text-primary font-button text-button border border-secondary/30 px-6 py-3 rounded hover:bg-surface-container transition-colors w-full justify-center"
             >
               View All
-            </a>
+            </Link>
           </div>
         )}
       </div>

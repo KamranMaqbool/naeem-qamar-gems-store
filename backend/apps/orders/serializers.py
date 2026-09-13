@@ -53,12 +53,20 @@ class OrderItemSerializer(serializers.ModelSerializer):
     product_title = serializers.CharField(
         source='product.title', read_only=True, default='Deleted product',
     )
+    product_category = serializers.CharField(source='product.category.name', read_only=True, default='')
+    product_image = serializers.SerializerMethodField()
+
+    def get_product_image(self, obj):
+        if not obj.product:
+            return ''
+        image = obj.product.images.filter(is_primary=True).first() or obj.product.images.first()
+        return image.image_url if image else ''
 
     class Meta:
         model = OrderItem
         fields = [
             'id', 'product', 'product_title', 'unit_price_at_purchase',
-            'quantity', 'gemstone_snapshot',
+            'quantity', 'gemstone_snapshot', 'product_category', 'product_image',
         ]
 
 
@@ -104,13 +112,16 @@ class AdminOrderSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'order_number', 'order_status', 'tracking_number',
             'carrier_name', 'total_amount', 'created_at', 'updated_at',
-            'customer_name', 'customer_email', 'items_count',
+            'customer_name', 'customer_email', 'items_count', 'items',
+            'guest_phone', 'shipping_address', 'billing_address', 'subtotal',
+            'discount_amount', 'tax_amount', 'shipping_cost',
         ]
-        read_only_fields = ['id', 'order_number', 'total_amount', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'order_number', 'total_amount', 'created_at', 'updated_at', 'items', 'items_count', 'customer_name', 'customer_email']
 
     customer_name = serializers.SerializerMethodField()
     customer_email = serializers.SerializerMethodField()
     items_count = serializers.IntegerField(source='items.count', read_only=True)
+    items = OrderItemSerializer(many=True, read_only=True)
 
     def get_customer_name(self, obj):
         return obj.user.get_full_name() or obj.user.username if obj.user else 'Guest'

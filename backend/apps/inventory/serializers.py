@@ -6,6 +6,12 @@ from apps.inventory.models import Inventory, StockLog
 class InventorySerializer(serializers.ModelSerializer):
     product_title = serializers.CharField(source='product.title', read_only=True)
     product_sku = serializers.CharField(source='product.sku', read_only=True)
+    product_category = serializers.CharField(source='product.category.name', read_only=True, default='Loose Gems')
+    product_image = serializers.SerializerMethodField()
+
+    def get_product_image(self, obj):
+        image = obj.product.images.filter(is_primary=True).first() or obj.product.images.first()
+        return image.image_url if image else ''
 
     class Meta:
         model = Inventory
@@ -14,6 +20,8 @@ class InventorySerializer(serializers.ModelSerializer):
             'product',
             'product_title',
             'product_sku',
+            'product_category',
+            'product_image',
             'current_stock',
             'low_stock_threshold',
             'stock_status',

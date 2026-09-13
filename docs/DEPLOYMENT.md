@@ -354,6 +354,16 @@ add a second Railway service running `celery -A config worker -l info`.
 
 ## 13. Local development
 
+The application uses the same source code in local Docker and production deployments. Local
+Vite servers proxy `/api` and `/media` to the Docker `backend` service through
+`VITE_API_PROXY_TARGET`; Vercel builds use `VITE_API_URL` and call Railway directly. No source
+code edits are required when moving between environments. Vite environment variables are the
+only deployment-specific values and are injected by Docker Compose or Vercel at build time.
+
+Product uploads are saved under Django's media storage. API responses convert relative media
+paths into absolute backend URLs in production, while local development continues to serve
+media through the Vite proxy.
+
 Full stack via Docker (see `Makefile` + `docker-compose.yml`):
 
 ```bash
