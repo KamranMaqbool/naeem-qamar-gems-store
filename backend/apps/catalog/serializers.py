@@ -71,7 +71,10 @@ class ProductListSerializer(serializers.ModelSerializer):
     def get_primary_image(self, obj):
         image = obj.images.filter(is_primary=True).first() or obj.images.first()
         if image:
-            return ProductImageSerializer(image).data
+            # Preserve the request context so production responses use the
+            # Railway media origin rather than a relative /media URL that
+            # would otherwise resolve against the Vercel frontend domain.
+            return ProductImageSerializer(image, context=self.context).data
         return None
 
 

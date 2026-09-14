@@ -1,7 +1,7 @@
 from django.conf import settings
-from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import include, path, re_path
+from django.views.static import serve as serve_media
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 urlpatterns = [
@@ -51,6 +51,9 @@ urlpatterns = [
     path('api/v1/admin/analytics/', include('apps.analytics.urls')),
 ]
 
-# Serve media files in development
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# django.conf.urls.static.static intentionally disables itself when DEBUG is
+# false. Product media is still required by the separately hosted storefront
+# and admin in production, so serve this bounded MEDIA_ROOT path explicitly.
+urlpatterns += [
+    re_path(r'^media/(?P<path>.*)$', serve_media, {'document_root': settings.MEDIA_ROOT}),
+]
