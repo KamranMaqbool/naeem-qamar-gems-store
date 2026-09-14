@@ -3,6 +3,11 @@ import { useParams, Link } from 'react-router-dom';
 import { orderDetail, statusOptions, statusConfig } from '../../data/orders';
 import { fetchAdminOrder, isAuthenticated, login, updateOrder } from '../../lib/api';
 
+const displayOrderNumber = (value) => {
+  const orderNumber = String(value || '');
+  return orderNumber.startsWith('#') ? orderNumber : `#${orderNumber}`;
+};
+
 export default function OrderDetail() {
   const { id } = useParams();
   const [status, setStatus] = useState(orderDetail.status);
@@ -19,7 +24,7 @@ export default function OrderDetail() {
         const address = data.shipping_address || {};
         const mapped = {
           ...orderDetail,
-          id: `#${data.order_number}`,
+          id: displayOrderNumber(data.order_number),
           status: data.order_status?.toLowerCase() || 'pending',
           date: new Date(data.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
           customer: { name: data.customer_name || data.user?.username || data.guest_email || 'Guest', email: data.customer_email || data.user?.email || data.guest_email || '', phone: data.guest_phone || '' },

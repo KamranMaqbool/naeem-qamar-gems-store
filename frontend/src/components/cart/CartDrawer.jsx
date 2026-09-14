@@ -1,20 +1,14 @@
 import { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CartContext } from '../../context/CartContext';
+import { useStoreSettings } from '../../context/StoreSettingsContext';
 
 export default function CartDrawer({ isOpen, onClose }) {
   const { items, subtotal, removeItem } = useContext(CartContext);
+  const { formatPrice } = useStoreSettings();
   const navigate = useNavigate();
 
   if (!isOpen) return null;
-
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-    }).format(price);
-  };
 
   return (
     <div aria-modal="true" className="fixed inset-0 z-50 flex justify-end" role="dialog">

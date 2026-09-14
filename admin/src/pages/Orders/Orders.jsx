@@ -3,6 +3,11 @@ import { Link } from 'react-router-dom';
 import { orders as staticOrders, statusConfig } from '../../data/orders';
 import { deleteOrder, fetchAdminOrders, isAuthenticated, login } from '../../lib/api';
 
+const displayOrderNumber = (value) => {
+  const orderNumber = String(value || '');
+  return orderNumber.startsWith('#') ? orderNumber : `#${orderNumber}`;
+};
+
 export default function Orders() {
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState('');
@@ -25,7 +30,7 @@ export default function Orders() {
         const data = await fetchAdminOrders({ search, status, page });
         const orderList = data.results || data;
         setApiOrders(orderList.map((o) => ({
-          id: `#${o.order_number || o.id}`,
+          id: displayOrderNumber(o.order_number || o.id),
           rawId: o.id,
           customer: {
             name: o.customer_name || o.user?.username || o.guest_email || 'Guest',

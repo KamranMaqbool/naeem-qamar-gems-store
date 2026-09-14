@@ -1,13 +1,14 @@
 import { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CartContext } from '../context/CartContext';
+import { useStoreSettings } from '../context/StoreSettingsContext';
 import { addToServerCart, checkoutOrder } from '../lib/api';
-import { formatPrice } from '../utils/helpers';
 
 const emptyForm = { email: '', phone: '', firstName: '', lastName: '', address: '', city: '', state: '', postalCode: '', country: 'United States' };
 
 export default function Checkout() {
   const { items, subtotal, clearCart } = useContext(CartContext);
+  const { formatPrice, settings } = useStoreSettings();
   const [form, setForm] = useState(emptyForm);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -98,7 +99,7 @@ export default function Checkout() {
               {items.map((item) => <div key={item.id} className="flex gap-3"><img src={item.image} alt="" className="h-16 w-16 object-cover" /><div className="min-w-0 flex-1"><p className="truncate text-sm text-primary">{item.name}</p><p className="mt-1 text-xs text-on-surface-variant">Qty {item.quantity}</p></div><span className="whitespace-nowrap text-sm text-primary">{formatPrice(item.price * item.quantity)}</span></div>)}
             </div>
             <div className="flex justify-between pt-6 text-on-surface-variant"><span>Subtotal</span><span className="font-semibold text-primary">{formatPrice(subtotal)}</span></div>
-            <p className="mt-3 text-xs text-on-surface-variant">Shipping and taxes are confirmed by your client advisor.</p>
+            <p className="mt-3 text-xs text-on-surface-variant">Taxes are calculated using the store’s {settings.tax_rate_percentage || 0}% rate. Shipping is confirmed by your client advisor.</p>
             <button type="submit" disabled={submitting} className="mt-6 flex w-full items-center justify-center gap-2 bg-primary-container px-5 py-4 font-button text-button uppercase tracking-wider text-on-primary hover:bg-primary disabled:cursor-wait disabled:opacity-60"><span className="material-symbols-outlined">lock</span>{submitting ? 'Placing order…' : 'Place secure order'}</button>
           </aside>
         </form>

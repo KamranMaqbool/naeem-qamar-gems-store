@@ -3,6 +3,11 @@ import { Link } from 'react-router-dom';
 import { kpiCards as staticKpiCards, recentActivity, recentOrders as staticRecentOrders, statusConfig } from '../../data/dashboard';
 import { fetchDashboardKPIs, fetchAdminOrders, fetchRevenueChart, isAuthenticated, login } from '../../lib/api';
 
+const displayOrderNumber = (value) => {
+  const orderNumber = String(value || '');
+  return orderNumber.startsWith('#') ? orderNumber : `#${orderNumber}`;
+};
+
 export default function Dashboard() {
   const [chartPeriod, setChartPeriod] = useState('Last 30 Days');
   const [kpiCards, setKpiCards] = useState(staticKpiCards);
@@ -29,7 +34,7 @@ export default function Dashboard() {
         const ordersList = ordersData.results || ordersData;
         if (ordersList.length > 0) {
           setRecentOrders(ordersList.slice(0, 5).map((o) => ({
-            id: `#${o.order_number || o.id}`,
+            id: displayOrderNumber(o.order_number || o.id),
             customer: {
               name: o.user?.username || o.guest_email || 'Guest',
               initials: (o.user?.username || o.guest_email || 'G').substring(0, 2).toUpperCase(),

@@ -218,8 +218,9 @@ export default function Settings() {
                         className="w-full bg-surface-bright border border-[#E2E8F0] rounded-md px-4 py-2.5 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/10"
                         placeholder="#GEM-"
                         type="text"
+                        maxLength="20"
                       />
-                      <p className="text-[14px] leading-[20px] text-on-surface-variant mt-2 text-sm">Example: #GEM-1001</p>
+                      <p className="text-[14px] leading-[20px] text-on-surface-variant mt-2 text-sm">Example: {(formData.orderPrefix || 'GEM-').trim() || 'GEM-'}1001</p>
                     </div>
                   </div>
                 </div>

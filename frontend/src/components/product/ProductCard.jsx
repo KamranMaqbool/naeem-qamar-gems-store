@@ -1,16 +1,10 @@
 import { Link } from 'react-router-dom';
+import { useStoreSettings } from '../../context/StoreSettingsContext';
 
 export default function ProductCard({ product, variant = 'default' }) {
   const { name, carat, cut, price, image, alt, tags = [], priceOnRequest } = product;
-
-  const formatPrice = (price) => {
-    if (priceOnRequest) return 'Price on Request';
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-    }).format(price);
-  };
+  const { formatPrice } = useStoreSettings();
+  const displayPrice = (amount) => formatPrice(amount, { priceOnRequest, minimumFractionDigits: 0 });
 
   if (variant === 'featured') {
     return (
@@ -30,7 +24,7 @@ export default function ProductCard({ product, variant = 'default' }) {
         <div className="text-center">
           <h3 className="font-headline text-[24px] text-primary mb-2">{name}</h3>
           <p className="font-body text-body-md text-on-surface-variant mb-3">{carat} • {cut}</p>
-          <p className="font-body text-body-lg text-primary">{formatPrice(price)}</p>
+          <p className="font-body text-body-lg text-primary">{displayPrice(price)}</p>
         </div>
       </Link>
     );
@@ -54,7 +48,7 @@ export default function ProductCard({ product, variant = 'default' }) {
         <div className="text-center">
           <h4 className="font-headline text-headline-md text-primary mb-1">{name}</h4>
           <p className="font-body text-body-md text-on-surface-variant mb-2">{carat} Carat • {cut}</p>
-          <p className="font-button text-button text-primary">{formatPrice(price)}</p>
+          <p className="font-button text-button text-primary">{displayPrice(price)}</p>
         </div>
       </Link>
     );
@@ -77,7 +71,7 @@ export default function ProductCard({ product, variant = 'default' }) {
       <div className="text-center">
         <h3 className="font-headline text-headline-md text-primary mb-2">{name}</h3>
         <p className="font-body text-body-md text-on-surface-variant mb-3">{carat} • {cut}</p>
-        <p className="font-body text-body-lg text-primary">{formatPrice(price)}</p>
+        <p className="font-body text-body-lg text-primary">{displayPrice(price)}</p>
       </div>
     </article>
   );

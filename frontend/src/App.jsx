@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import { CartProvider } from './context/CartContext';
+import { StoreSettingsProvider } from './context/StoreSettingsContext';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import CartDrawer from './components/cart/CartDrawer';
@@ -49,10 +50,12 @@ function AppContent() {
 
 export default function App() {
   return (
-    <CartProvider>
-      <Router>
-        <AppContent />
-      </Router>
-    </CartProvider>
+    <StoreSettingsProvider>
+      <CartProvider>
+        <Router>
+          <AppContent />
+        </Router>
+      </CartProvider>
+    </StoreSettingsProvider>
   );
 }

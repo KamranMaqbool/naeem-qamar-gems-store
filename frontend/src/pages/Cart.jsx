@@ -1,10 +1,11 @@
 import { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { CartContext } from '../context/CartContext';
-import { formatPrice } from '../utils/helpers';
+import { useStoreSettings } from '../context/StoreSettingsContext';
 
 export default function CartPage() {
   const { items, subtotal, removeItem, updateQuantity, clearCart } = useContext(CartContext);
+  const { formatPrice } = useStoreSettings();
 
   const handleQuantityChange = (id, delta) => {
     const item = items.find((i) => i.id === id);

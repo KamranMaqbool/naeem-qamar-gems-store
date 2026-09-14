@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.db import models
 
+from apps.settings_app.models import StoreSettings
+
 
 class Cart(models.Model):
     """Shopping cart for authenticated users or anonymous sessions."""
@@ -89,8 +91,13 @@ class Order(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.order_number:
+            store_settings = StoreSettings.load()
+            # The prefix is intentionally stored exactly as the administrator
+            # enters it, so "#GEM-" produces "#GEM-1001". Trim accidental
+            # whitespace but retain meaningful symbols such as '#'.
+            prefix = (store_settings.order_prefix or 'GEM-').strip()
             last_count = Order.objects.count()
-            self.order_number = f'GEM-{last_count + 1001:04d}'
+            self.order_number = f'{prefix}{last_count + 1001:04d}'
         super().save(*args, **kwargs)
 
 

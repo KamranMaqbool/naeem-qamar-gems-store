@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { products } from '../data/products';
 import { useCart } from '../context/CartContext';
+import { useStoreSettings } from '../context/StoreSettingsContext';
 import ProductCard from '../components/product/ProductCard';
 import { fetchProductBySlug, fetchProducts } from '../lib/api';
 
 export default function ProductDetail() {
   const { id } = useParams();
   const { addItem } = useCart();
+  const { formatPrice: formatStorePrice } = useStoreSettings();
   const [activeImage, setActiveImage] = useState(0);
   const [activeAccordion, setActiveAccordion] = useState(null);
   const [product, setProduct] = useState(null);
@@ -84,14 +86,10 @@ export default function ProductDetail() {
 
   if (!product) return null;
 
-  const formatPrice = (price) => {
-    if (product.priceOnRequest) return 'Price on Request';
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-    }).format(price);
-  };
+  const formatPrice = (price) => formatStorePrice(price, {
+    priceOnRequest: product.priceOnRequest,
+    minimumFractionDigits: 0,
+  });
 
   const toggleAccordion = (key) => {
     setActiveAccordion((prev) => (prev === key ? null : key));

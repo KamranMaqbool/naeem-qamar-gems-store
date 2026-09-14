@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 
 from apps.catalog.models import Product
 from apps.orders.models import Cart, CartItem, Order, OrderItem
+from apps.settings_app.models import StoreSettings
 from apps.orders.serializers import (
     AddToCartSerializer,
     AdminOrderSerializer,
@@ -129,7 +130,15 @@ class CheckoutView(APIView):
             })
             subtotal += price * ci.quantity
 
-        total_amount = subtotal  # discount / tax / shipping can be applied later
+        # Store-wide financial rules are applied server-side so a browser
+        # cannot change the amount used for the persisted order.
+        store_settings = StoreSettings.load()
+        tax_rate = Decimal(store_settings.tax_rate_percentage or 0)
+        tax_amount = (subtotal * tax_rate / Decimal('100')).quantize(Decimal('0.01'))
+        # A shipping price is not yet configurable in the settings model, so
+        # it remains zero until the store configures delivery rates.
+        shipping_cost = Decimal('0.00')
+        total_amount = subtotal + tax_amount + shipping_cost
 
         order = Order.objects.create(
             user=request.user if request.user.is_authenticated else None,
@@ -138,6 +147,8 @@ class CheckoutView(APIView):
             shipping_address=data['shipping_address'],
             billing_address=data['billing_address'],
             subtotal=subtotal,
+            tax_amount=tax_amount,
+            shipping_cost=shipping_cost,
             total_amount=total_amount,
             discount_code=data.get('discount_code', ''),
         )
@@ -217,10 +228,12 @@ class AdminOrderListView(generics.ListAPIView):
             'address1': data['address'], 'city': data['city'],
             'postal_code': data.get('postal_code', ''), 'country': data['country'],
         }
+        store_settings = StoreSettings.load()
+        tax_amount = (subtotal * Decimal(store_settings.tax_rate_percentage or 0) / Decimal('100')).quantize(Decimal('0.01'))
         order = Order.objects.create(
             guest_email=data['customer_email'], guest_phone=data.get('customer_phone', ''),
             shipping_address=address,
-            subtotal=subtotal, total_amount=subtotal,
+            subtotal=subtotal, tax_amount=tax_amount, total_amount=subtotal + tax_amount,
             # Keep admin notes in the JSON address until a dedicated notes field is added.
             billing_address={**address, 'notes': data.get('notes', '')},
         )

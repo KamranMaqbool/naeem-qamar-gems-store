@@ -11,7 +11,7 @@ class PublicStoreSettingsSerializer(serializers.ModelSerializer):
         fields = [
             'store_name', 'contact_email', 'contact_phone',
             'default_currency', 'timezone', 'tax_rate_percentage',
-            'free_shipping_threshold', 'logo_url',
+            'free_shipping_threshold', 'order_prefix', 'logo_url',
         ]
         read_only_fields = fields
 
