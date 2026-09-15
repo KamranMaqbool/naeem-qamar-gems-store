@@ -10,7 +10,7 @@ class PublicStoreSettingsSerializer(serializers.ModelSerializer):
         model = StoreSettings
         fields = [
             'store_name', 'contact_email', 'contact_phone',
-            'default_currency', 'timezone', 'tax_rate_percentage',
+            'default_currency', 'pricing_currency', 'timezone', 'tax_rate_percentage',
             'free_shipping_threshold', 'order_prefix', 'logo_url',
         ]
         read_only_fields = fields
@@ -23,9 +23,9 @@ class AdminStoreSettingsSerializer(serializers.ModelSerializer):
         model = StoreSettings
         fields = [
             'id', 'store_name', 'contact_email', 'contact_phone',
-            'default_currency', 'timezone', 'tax_rate_percentage',
+            'default_currency', 'pricing_currency', 'timezone', 'tax_rate_percentage',
             'free_shipping_threshold', 'order_prefix', 'logo_url',
             'payment_settings', 'shipping_settings', 'notification_settings',
             'created_at', 'updated_at',
         ]
-        read_only_fields = ['id', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'pricing_currency', 'created_at', 'updated_at']

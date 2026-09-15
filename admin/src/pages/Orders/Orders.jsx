@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { orders as staticOrders, statusConfig } from '../../data/orders';
 import { deleteOrder, fetchAdminOrders, isAuthenticated, login } from '../../lib/api';
+import { useAdminStoreSettings } from '../../context/StoreSettingsContext';
 
 const displayOrderNumber = (value) => {
   const orderNumber = String(value || '');
@@ -9,6 +10,7 @@ const displayOrderNumber = (value) => {
 };
 
 export default function Orders() {
+  const { formatPrice } = useAdminStoreSettings();
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState('');
   const [apiOrders, setApiOrders] = useState(null);
@@ -38,7 +40,7 @@ export default function Orders() {
             email: o.customer_email || o.user?.email || o.guest_email || '',
           },
           date: new Date(o.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
-          amount: `$${parseFloat(o.total_amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
+          amount: formatPrice(o.total_amount, { minimumFractionDigits: 2 }),
           status: o.order_status?.toLowerCase() || 'pending',
           items: o.items_count ?? o.items?.length ?? 0,
         })));
@@ -53,7 +55,7 @@ export default function Orders() {
       }
     }
     loadOrders();
-  }, [search, status, page]);
+  }, [search, status, page, formatPrice]);
 
   const orders = apiOrders || staticOrders;
 

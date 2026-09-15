@@ -5,6 +5,7 @@ import { formatPrice as formatCurrency } from '../utils/helpers';
 const DEFAULT_SETTINGS = {
   store_name: "Virtuoso's Gems",
   default_currency: 'USD',
+  pricing_currency: 'USD',
   tax_rate_percentage: '0',
   free_shipping_threshold: '0',
 };
@@ -38,9 +39,11 @@ export function StoreSettingsProvider({ children }) {
     settings,
     loaded,
     refreshSettings,
-    currency: settings.default_currency || 'USD',
+    // Until the backend has converted stored prices, retain their actual
+    // currency instead of merely relabeling their numeric value.
+    currency: settings.pricing_currency || settings.default_currency || 'USD',
     formatPrice: (price, options = {}) => formatCurrency(price, {
-      currency: settings.default_currency || 'USD',
+      currency: settings.pricing_currency || settings.default_currency || 'USD',
       ...options,
     }),
   }), [settings, loaded, refreshSettings]);

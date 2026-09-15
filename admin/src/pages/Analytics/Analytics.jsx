@@ -7,8 +7,10 @@ import {
   channelData,
 } from '../../data/analytics';
 import { fetchDashboardKPIs, fetchRevenueChart, fetchSalesByGemstone, fetchSalesChannels, fetchTopProducts, isAuthenticated, login } from '../../lib/api';
+import { useAdminStoreSettings } from '../../context/StoreSettingsContext';
 
 export default function Analytics() {
+  const { formatPrice } = useAdminStoreSettings();
   const [dateRange, setDateRange] = useState('Last 30 Days');
   const [cards, setCards] = useState(kpiCards);
   const [revenueValues, setRevenueValues] = useState(revenueChartData);
@@ -22,7 +24,7 @@ export default function Analytics() {
     if (chartRef.current) {
       drawRevenueChart(chartRef.current);
     }
-  }, [dateRange, revenueValues]);
+  }, [dateRange, formatPrice, revenueValues]);
 
   useEffect(() => {
     (async () => {
@@ -38,10 +40,10 @@ export default function Analytics() {
         const revenue = Number(kpis.total_revenue || 0);
         const orders = Number(kpis.total_orders || 0);
         setCards([
-          { ...kpiCards[0], value: `$${revenue.toLocaleString()}` },
-          { ...kpiCards[1], value: `$${Number(kpis.net_profit || revenue * 0.3).toLocaleString()}` },
+          { ...kpiCards[0], value: formatPrice(revenue) },
+          { ...kpiCards[1], value: formatPrice(Number(kpis.net_profit || revenue * 0.3)) },
           { ...kpiCards[2], value: Number(kpis.total_units_sold || 0).toLocaleString() },
-          { ...kpiCards[3], value: `$${Number(kpis.avg_order_value || revenue / Math.max(orders, 1)).toLocaleString()}` },
+          { ...kpiCards[3], value: formatPrice(Number(kpis.avg_order_value || revenue / Math.max(orders, 1))) },
         ]);
         const mapped = (chart || []).map((entry) => ({
           week: new Date(entry.period).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
@@ -62,7 +64,7 @@ export default function Analytics() {
         if (salesChannels?.length) setChannels(salesChannels.map((channel) => ({ ...channel, revenue: Number(channel.revenue || 0), avgOrderValue: Number(channel.avg_order_value || 0), change: 'API' })));
       } catch { /* retain the designed fallback values */ }
     })();
-  }, [dateRange]);
+  }, [dateRange, formatPrice]);
 
   const drawRevenueChart = (canvas) => {
     const ctx = canvas.getContext('2d');
@@ -107,7 +109,7 @@ export default function Analytics() {
     for (let i = 0; i <= 4; i++) {
       const val = maxVal - (range / 4) * i;
       const y = padding.top + (graphHeight / 4) * i;
-      ctx.fillText('$' + (val / 1000).toFixed(0) + 'k', padding.left - 10, y);
+      ctx.fillText(`${formatPrice(val / 1000, { maximumFractionDigits: 0 })}k`, padding.left - 10, y);
     }
 
     // Profit area (grey)
@@ -327,7 +329,7 @@ export default function Analytics() {
                       <tr key={product.id} className="hover:bg-surface-container-low transition-colors">
                         <td className="py-4 px-6 font-medium">{product.name}</td>
                         <td className="py-4 px-6 text-on-surface-variant text-sm">{product.sku}</td>
-                        <td className="py-4 px-6 text-right font-semibold">${product.revenue.toLocaleString()}</td>
+                        <td className="py-4 px-6 text-right font-semibold">{formatPrice(product.revenue)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -349,7 +351,7 @@ export default function Analytics() {
                         <p className="text-xs text-on-surface-variant mt-1">{channel.description}</p>
                       </div>
                       <div className="text-right">
-                        <div className="text-[20px] leading-[28px] font-semibold text-on-surface">${channel.revenue.toLocaleString()}</div>
+                        <div className="text-[20px] leading-[28px] font-semibold text-on-surface">{formatPrice(channel.revenue)}</div>
                         <div className="text-xs text-success font-medium flex items-center justify-end gap-1">
                           <span className="material-symbols-outlined text-[14px]">trending_up</span>
                           {channel.change || 'API'}
@@ -367,11 +369,11 @@ export default function Analytics() {
                 <div className="grid grid-cols-2 gap-4 pt-4">
                   <div className="bg-surface p-4 rounded-md border border-surface-container-highest">
                     <div className="text-xs text-on-surface-variant uppercase tracking-wider mb-1">Avg. Order Value (Web)</div>
-                    <div className="text-[20px] leading-[28px] font-semibold">${(channels[0]?.avgOrderValue || 0).toLocaleString()}</div>
+                    <div className="text-[20px] leading-[28px] font-semibold">{formatPrice(channels[0]?.avgOrderValue || 0)}</div>
                   </div>
                   <div className="bg-surface p-4 rounded-md border border-surface-container-highest">
                     <div className="text-xs text-on-surface-variant uppercase tracking-wider mb-1">Avg. Order Value (Custom)</div>
-                    <div className="text-[20px] leading-[28px] font-semibold text-primary">${(channels[1]?.avgOrderValue || 0).toLocaleString()}</div>
+                    <div className="text-[20px] leading-[28px] font-semibold text-primary">{formatPrice(channels[1]?.avgOrderValue || 0)}</div>
                   </div>
                 </div>
               </div>

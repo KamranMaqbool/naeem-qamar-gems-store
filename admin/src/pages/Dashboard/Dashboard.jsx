@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { kpiCards as staticKpiCards, recentActivity, recentOrders as staticRecentOrders, statusConfig } from '../../data/dashboard';
 import { fetchDashboardKPIs, fetchAdminOrders, fetchRevenueChart, isAuthenticated, login } from '../../lib/api';
+import { useAdminStoreSettings } from '../../context/StoreSettingsContext';
 
 const displayOrderNumber = (value) => {
   const orderNumber = String(value || '');
@@ -9,6 +10,7 @@ const displayOrderNumber = (value) => {
 };
 
 export default function Dashboard() {
+  const { formatPrice } = useAdminStoreSettings();
   const [chartPeriod, setChartPeriod] = useState('Last 30 Days');
   const [kpiCards, setKpiCards] = useState(staticKpiCards);
   const [recentOrders, setRecentOrders] = useState(staticRecentOrders);
@@ -24,10 +26,10 @@ export default function Dashboard() {
         const kpis = await fetchDashboardKPIs();
         const revenue = Number(kpis.total_revenue || 0);
         setKpiCards([
-          { ...staticKpiCards[0], value: `$${revenue.toLocaleString()}` },
+          { ...staticKpiCards[0], value: formatPrice(revenue) },
           { ...staticKpiCards[1], value: String(kpis.active_orders_count || 0) },
           { ...staticKpiCards[2], value: String(kpis.low_stock_count || 0) },
-          { ...staticKpiCards[3], value: `$${Math.round(revenue / Math.max(Number(kpis.total_orders) || 1, 1)).toLocaleString()}` },
+          { ...staticKpiCards[3], value: formatPrice(Math.round(revenue / Math.max(Number(kpis.total_orders) || 1, 1))) },
         ]);
 
         const ordersData = await fetchAdminOrders();
@@ -40,7 +42,7 @@ export default function Dashboard() {
               initials: (o.user?.username || o.guest_email || 'G').substring(0, 2).toUpperCase(),
             },
             date: new Date(o.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }),
-            amount: `$${parseFloat(o.total_amount).toLocaleString()}`,
+            amount: formatPrice(o.total_amount),
             status: o.order_status?.toLowerCase() || 'pending',
           })));
         }
@@ -49,7 +51,7 @@ export default function Dashboard() {
       }
     }
     loadData();
-  }, []);
+  }, [formatPrice]);
 
   useEffect(() => {
     const period = chartPeriod === 'Last 30 Days' ? 'daily' : 'monthly';

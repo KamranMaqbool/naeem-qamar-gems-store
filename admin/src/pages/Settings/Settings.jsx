@@ -2,8 +2,11 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { currencies, timezones, settingsSections } from '../../data/discounts';
 import { fetchAdminSettings, isAuthenticated, login, updateAdminSettings } from '../../lib/api';
+import { useAdminStoreSettings } from '../../context/StoreSettingsContext';
 
 export default function Settings() {
+  const { formatPrice, refreshStoreSettings, settings: storeSettings } = useAdminStoreSettings();
+  const conversionPending = Boolean(storeSettings.pricing_currency && storeSettings.default_currency && storeSettings.pricing_currency !== storeSettings.default_currency);
   const validSections = ['general', 'payments', 'shipping', 'taxes', 'notifications'];
   const readSection = () => {
     const requested = window.location.hash.slice(1).toLowerCase();
@@ -42,6 +45,7 @@ export default function Settings() {
     try {
       if (!isAuthenticated()) await login('admin@virtuoso-gems.com', 'admin123');
       await updateAdminSettings({ store_name: formData.storeName, contact_email: formData.contactEmail, contact_phone: formData.phoneNumber, default_currency: formData.defaultCurrency, timezone: formData.timezone, order_prefix: formData.orderPrefix, tax_rate_percentage: taxRate, payment_settings: { test_mode: testMode, paypal_enabled: paypalEnabled, payout_schedule: payoutSchedule }, shipping_settings: { method: shippingMethod }, notification_settings: notifications });
+      await refreshStoreSettings();
       setSaved(true);
     } catch (saveError) { setError(saveError.message || 'Unable to save settings.'); }
     finally { setSaving(false); }
@@ -77,6 +81,7 @@ export default function Settings() {
           </div>
           {error && <div className="mb-6 rounded-lg border border-error/30 bg-error-bg px-4 py-3 text-sm text-error-text">{error}</div>}
           {saved && <div className="mb-6 rounded-lg border border-success/30 bg-success-bg px-4 py-3 text-sm text-success-text">Settings saved successfully.</div>}
+          {conversionPending && <div className="mb-6 rounded-lg border border-warning/40 bg-warning-bg px-4 py-3 text-sm text-warning-text"><strong>Currency conversion required.</strong> Existing prices are stored in {storeSettings.pricing_currency}, while the selected operating currency is {storeSettings.default_currency}. Save these settings to convert product prices, fixed discounts, orders, payments, and reports using the latest exchange rate.</div>}
 
           {/* Bento Grid Layout for Settings Area */}
           <form id="settings-form" onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-6 items-start pb-24">
@@ -238,7 +243,7 @@ export default function Settings() {
               {/* Section 5: Shipping */}
               <section id="shipping" className={`space-y-6 ${activeSection === 'shipping' ? '' : 'hidden'}`}>
                 <div><h3 className="text-3xl font-bold tracking-tight text-on-surface">Shipping Settings</h3><p className="mt-1 text-base text-on-surface-variant">Configure delivery zones, rates, and fulfillment options.</p></div>
-                <div className="card p-6 lg:p-8"><h4 className="text-xl font-semibold text-on-surface">Shipping method</h4><p className="mt-1 text-sm text-on-surface-variant">Choose the default delivery option shown at checkout.</p><div className="mt-6 space-y-3"><label className="flex cursor-pointer items-center justify-between rounded-lg border border-outline-variant p-4"><span><span className="block font-medium">Standard delivery</span><span className="text-sm text-on-surface-variant">3–5 business days · $15.00</span></span><input type="radio" name="shippingMethod" value="standard" checked={shippingMethod === 'standard'} onChange={(e) => setShippingMethod(e.target.value)} className="h-5 w-5 text-primary focus:ring-primary" /></label><label className="flex cursor-pointer items-center justify-between rounded-lg border border-outline-variant p-4"><span><span className="block font-medium">Express delivery</span><span className="text-sm text-on-surface-variant">1–2 business days · $35.00</span></span><input type="radio" name="shippingMethod" value="express" checked={shippingMethod === 'express'} onChange={(e) => setShippingMethod(e.target.value)} className="h-5 w-5 text-primary focus:ring-primary" /></label><label className="flex cursor-pointer items-center justify-between rounded-lg border border-outline-variant p-4"><span><span className="block font-medium">Local pickup</span><span className="text-sm text-on-surface-variant">Ready within 24 hours · Free</span></span><input type="radio" name="shippingMethod" value="pickup" checked={shippingMethod === 'pickup'} onChange={(e) => setShippingMethod(e.target.value)} className="h-5 w-5 text-primary focus:ring-primary" /></label></div></div>
+                <div className="card p-6 lg:p-8"><h4 className="text-xl font-semibold text-on-surface">Shipping method</h4><p className="mt-1 text-sm text-on-surface-variant">Choose the default delivery option shown at checkout.</p><div className="mt-6 space-y-3"><label className="flex cursor-pointer items-center justify-between rounded-lg border border-outline-variant p-4"><span><span className="block font-medium">Standard delivery</span><span className="text-sm text-on-surface-variant">3–5 business days · {formatPrice(15)}</span></span><input type="radio" name="shippingMethod" value="standard" checked={shippingMethod === 'standard'} onChange={(e) => setShippingMethod(e.target.value)} className="h-5 w-5 text-primary focus:ring-primary" /></label><label className="flex cursor-pointer items-center justify-between rounded-lg border border-outline-variant p-4"><span><span className="block font-medium">Express delivery</span><span className="text-sm text-on-surface-variant">1–2 business days · {formatPrice(35)}</span></span><input type="radio" name="shippingMethod" value="express" checked={shippingMethod === 'express'} onChange={(e) => setShippingMethod(e.target.value)} className="h-5 w-5 text-primary focus:ring-primary" /></label><label className="flex cursor-pointer items-center justify-between rounded-lg border border-outline-variant p-4"><span><span className="block font-medium">Local pickup</span><span className="text-sm text-on-surface-variant">Ready within 24 hours · Free</span></span><input type="radio" name="shippingMethod" value="pickup" checked={shippingMethod === 'pickup'} onChange={(e) => setShippingMethod(e.target.value)} className="h-5 w-5 text-primary focus:ring-primary" /></label></div></div>
                 <div className="card p-6 lg:p-8"><h4 className="text-xl font-semibold text-on-surface">Shipping origin</h4><p className="mt-1 text-sm text-on-surface-variant">Address used for delivery estimates and labels.</p><div className="mt-6 grid gap-4 md:grid-cols-2"><label className="text-sm font-medium">Warehouse address<input className="mt-2 w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2.5 text-sm" defaultValue="House 45, Street 12, Phase 5" /></label><label className="text-sm font-medium">City<input className="mt-2 w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2.5 text-sm" defaultValue="Lahore" /></label></div></div>
               </section>
 

@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { products as staticProducts, categories, stockStatuses, statusConfig } from '../../data/products';
 import { deleteProduct, fetchAdminProducts, isAuthenticated, login } from '../../lib/api';
+import { useAdminStoreSettings } from '../../context/StoreSettingsContext';
 
 const imageUrl = (value) => {
   if (!value) return '';
@@ -11,6 +12,7 @@ const imageUrl = (value) => {
 };
 
 export default function Products() {
+  const { formatPrice } = useAdminStoreSettings();
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
   const [stockStatus, setStockStatus] = useState('');
@@ -161,11 +163,11 @@ export default function Products() {
                   <td className="py-4 px-6 font-medium text-on-surface">
                     {product.salePrice ? (
                       <>
-                        <span className="line-through text-on-surface-variant">${product.price.toLocaleString()}</span>
-                        <span className="ml-2 text-primary">${product.salePrice.toLocaleString()}</span>
+                        <span className="line-through text-on-surface-variant">{formatPrice(product.price)}</span>
+                        <span className="ml-2 text-primary">{formatPrice(product.salePrice)}</span>
                       </>
                     ) : (
-                      `$${product.price.toLocaleString()}`
+                      formatPrice(product.price)
                     )}
                   </td>
                   <td className="py-4 px-6">

@@ -4,6 +4,12 @@ import { fetchInventory, isAuthenticated, login, receiveStock } from '../../lib/
 import { inventoryItems as fallbackItems } from '../../data/inventory';
 
 const inputClass = 'mt-2 w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2.5 text-sm text-on-surface placeholder:text-on-surface-variant/60 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10';
+const countWords = (value = '') => value.trim() ? value.trim().split(/\s+/).length : 0;
+
+function FieldMessage({ messages }) {
+  if (!messages) return null;
+  return <p className="mt-1 text-xs text-error-text">{Array.isArray(messages) ? messages.join(' ') : String(messages)}</p>;
+}
 
 export default function ReceiveStock() {
   const navigate = useNavigate();
@@ -11,6 +17,7 @@ export default function ReceiveStock() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState(null);
+  const [fieldErrors, setFieldErrors] = useState({});
   const [form, setForm] = useState({ productId: '', quantity: 1, reason: 'RECEIVE_STOCK', notes: '' });
 
   useEffect(() => {
@@ -29,12 +36,17 @@ export default function ReceiveStock() {
   }, []);
 
   const selected = useMemo(() => items.find((item) => String(item.product) === String(form.productId)), [items, form.productId]);
-  const update = (event) => setForm((prev) => ({ ...prev, [event.target.name]: event.target.value }));
+  const update = (event) => {
+    const apiField = { productId: 'product_id' }[event.target.name] || event.target.name;
+    setForm((prev) => ({ ...prev, [event.target.name]: event.target.value }));
+    setFieldErrors((current) => ({ ...current, [apiField]: undefined }));
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setSaving(true);
     setMessage(null);
+    setFieldErrors({});
     try {
       if (!form.productId) throw new Error('Select a product first.');
       const updated = await receiveStock({ product_id: Number(form.productId), quantity: Number(form.quantity), reason: form.reason, notes: form.notes });
@@ -43,6 +55,7 @@ export default function ReceiveStock() {
       setForm((prev) => ({ ...prev, quantity: 1, notes: '' }));
     } catch (error) {
       setMessage({ type: 'error', text: error.message || 'Unable to receive stock.' });
+      setFieldErrors(error.details || {});
     } finally {
       setSaving(false);
     }
@@ -56,19 +69,19 @@ export default function ReceiveStock() {
         <p className="mt-1 text-sm text-on-surface-variant">Add incoming units to a product and keep an auditable stock record.</p>
       </div>
 
-      {message && <div className={`mb-6 rounded-lg border px-4 py-3 text-sm ${message.type === 'success' ? 'border-success/30 bg-success-bg text-success-text' : 'border-error/30 bg-error-bg text-error-text'}`}>{message.text}</div>}
+      {message && <div className={`mb-6 rounded-lg border px-4 py-3 text-sm ${message.type === 'success' ? 'border-success/30 bg-success-bg text-success-text' : 'border-error/30 bg-error-bg text-error-text'}`} role={message.type === 'error' ? 'alert' : 'status'}>{message.type === 'error' && <p className="font-semibold">Please correct the highlighted fields.</p>}<p className={message.type === 'error' ? 'mt-1' : ''}>{message.text}</p></div>}
 
       <form onSubmit={handleSubmit} className="grid gap-6 lg:grid-cols-[1fr_280px]">
         <section className="card p-6">
           <h2 className="text-xl font-semibold text-on-surface">Stock receipt details</h2>
           <p className="mt-1 text-sm text-on-surface-variant">All fields marked required must be completed.</p>
           <div className="mt-6 space-y-5">
-            <label className="block text-sm font-medium text-on-surface">Product <select className={inputClass} name="productId" value={form.productId} onChange={update} required><option value="" disabled>{loading ? 'Loading products...' : 'Select a product'}</option>{items.map((item) => <option key={item.id} value={item.product}>{item.product_title || item.name} {item.product_sku ? `(${item.product_sku})` : ''}</option>)}</select></label>
+            <label className="block text-sm font-medium text-on-surface">Product <select className={`${inputClass} ${fieldErrors.product_id ? 'border-error' : ''}`} name="productId" value={form.productId} onChange={update} required><option value="" disabled>{loading ? 'Loading products...' : 'Select a product'}</option>{items.map((item) => <option key={item.id} value={item.product}>{item.product_title || item.name} {item.product_sku ? `(${item.product_sku})` : ''}</option>)}</select><FieldMessage messages={fieldErrors.product_id} /></label>
             <div className="grid gap-5 sm:grid-cols-2">
-              <label className="block text-sm font-medium text-on-surface">Quantity received <input className={inputClass} name="quantity" type="number" min="1" step="1" value={form.quantity} onChange={update} required /></label>
+              <label className="block text-sm font-medium text-on-surface">Quantity received <input className={`${inputClass} ${fieldErrors.quantity ? 'border-error' : ''}`} name="quantity" type="number" min="1" step="1" value={form.quantity} onChange={update} required /><FieldMessage messages={fieldErrors.quantity} /></label>
               <label className="block text-sm font-medium text-on-surface">Receipt reason <select className={inputClass} name="reason" value={form.reason} onChange={update}><option value="RECEIVE_STOCK">New stock received</option><option value="RETURN">Customer return</option><option value="MANUAL_ADJUSTMENT">Manual adjustment</option></select></label>
             </div>
-            <label className="block text-sm font-medium text-on-surface">Notes <textarea className={`${inputClass} min-h-32 resize-y`} name="notes" value={form.notes} onChange={update} placeholder="Supplier, invoice number, or condition notes" /></label>
+            <label className="block text-sm font-medium text-on-surface">Notes <textarea className={`${inputClass} min-h-32 resize-y ${fieldErrors.notes ? 'border-error' : ''}`} name="notes" value={form.notes} onChange={update} placeholder="Supplier, invoice number, or condition notes" /><span className="mt-1 block text-right text-xs font-normal text-on-surface-variant" aria-live="polite">{countWords(form.notes)} words</span><FieldMessage messages={fieldErrors.notes} /></label>
           </div>
           <div className="mt-8 flex flex-wrap justify-end gap-3 border-t border-surface-container-highest pt-5"><button type="button" onClick={() => navigate('/inventory')} className="rounded-lg px-4 py-2.5 text-sm font-medium text-on-surface-variant hover:bg-surface-container-low">Cancel</button><button type="submit" disabled={saving || loading} className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-on-primary shadow-resting hover:bg-primary-container disabled:cursor-not-allowed disabled:opacity-60"><span className="material-symbols-outlined text-lg">inventory</span>{saving ? 'Saving...' : 'Receive stock'}</button></div>
         </section>

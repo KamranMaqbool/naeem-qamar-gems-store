@@ -3,6 +3,34 @@ const API_BASE = import.meta.env.VITE_API_URL || '/api/v1';
 let accessToken = localStorage.getItem('access_token');
 let refreshToken = localStorage.getItem('refresh_token');
 
+function fieldLabel(key) {
+  if (!key || key === 'non_field_errors') return '';
+  return key.replace(/_/g, ' ').replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function flattenValidationErrors(value, field = '') {
+  if (Array.isArray(value)) return value.flatMap((item) => flattenValidationErrors(item, field));
+  if (value && typeof value === 'object') {
+    return Object.entries(value).flatMap(([key, item]) => flattenValidationErrors(item, key === 'non_field_errors' ? field : key));
+  }
+  if (value === undefined || value === null || value === '') return [];
+  return [`${fieldLabel(field) ? `${fieldLabel(field)}: ` : ''}${String(value)}`];
+}
+
+export function getApiErrorMessage(payload, fallback = 'Something went wrong. Please try again.') {
+  if (!payload) return fallback;
+  if (typeof payload === 'string') return payload;
+  const details = payload.details && typeof payload.details === 'object' ? payload.details : payload;
+  const messages = flattenValidationErrors(details);
+  const message = typeof payload.message === 'string' ? payload.message : '';
+  const isGenericValidationMessage = /^validation failed\.?$/i.test(message);
+  if (messages.length && (!message || isGenericValidationMessage)) return messages.join(' ');
+  if (message) return message;
+  if (payload.detail && typeof payload.detail === 'string') return payload.detail;
+  if (payload.error && typeof payload.error === 'string') return payload.error;
+  return messages.length ? messages.join(' ') : fallback;
+}
+
 export function setTokens(access, refresh) {
   accessToken = access;
   refreshToken = refresh;
@@ -56,7 +84,11 @@ async function authFetch(url, options = {}) {
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err.message || `API error: ${res.status}`);
+    const error = new Error(getApiErrorMessage(err, `Request failed (${res.status}). Please try again.`));
+    error.status = res.status;
+    // Django wraps validation fields in `details`; retain the field map for form controls.
+    error.details = err.details || err;
+    throw error;
   }
   if (res.status === 204) return null;
   return res.json();

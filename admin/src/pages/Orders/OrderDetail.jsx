@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { orderDetail, statusOptions, statusConfig } from '../../data/orders';
 import { fetchAdminOrder, isAuthenticated, login, updateOrder } from '../../lib/api';
+import { useAdminStoreSettings } from '../../context/StoreSettingsContext';
 
 const displayOrderNumber = (value) => {
   const orderNumber = String(value || '');
@@ -9,6 +10,7 @@ const displayOrderNumber = (value) => {
 };
 
 export default function OrderDetail() {
+  const { formatPrice } = useAdminStoreSettings();
   const { id } = useParams();
   const [status, setStatus] = useState(orderDetail.status);
   const [order, setOrder] = useState(orderDetail);
@@ -42,14 +44,6 @@ export default function OrderDetail() {
     }
     loadOrder();
   }, [id]);
-
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2,
-    }).format(price);
-  };
 
   const handleStatusChange = (e) => {
     setStatus(e.target.value);

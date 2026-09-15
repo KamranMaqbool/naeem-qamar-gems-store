@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { discounts as staticDiscounts, discountTypes } from '../../data/discounts';
 import { createDiscount, deleteDiscount, fetchAdminDiscounts, isAuthenticated, login } from '../../lib/api';
+import { useAdminStoreSettings } from '../../context/StoreSettingsContext';
 
 export default function Discounts() {
+  const { formatPrice } = useAdminStoreSettings();
   const [activeTab, setActiveTab] = useState('active');
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -22,12 +24,12 @@ export default function Discounts() {
       try {
         if (!isAuthenticated()) await login('admin@virtuoso-gems.com', 'admin123');
         const data = await fetchAdminDiscounts();
-        setDiscountList((data.results || data).map((discount) => ({ ...discount, type: discount.discount_type === 'FIXED_AMOUNT' ? 'Fixed Amount' : 'Percentage', value: discount.discount_type === 'PERCENTAGE' ? `${discount.value}%` : `$${discount.value}`, usageCount: `${discount.current_uses} / ${discount.max_uses || '∞'}`, expiryDate: discount.end_date ? new Date(discount.end_date).toLocaleDateString() : 'No Expiry', status: discount.is_active ? 'active' : 'expired' })));
+        setDiscountList((data.results || data).map((discount) => ({ ...discount, type: discount.discount_type === 'FIXED_AMOUNT' ? 'Fixed Amount' : 'Percentage', value: discount.discount_type === 'PERCENTAGE' ? `${discount.value}%` : formatPrice(discount.value), usageCount: `${discount.current_uses} / ${discount.max_uses || '∞'}`, expiryDate: discount.end_date ? new Date(discount.end_date).toLocaleDateString() : 'No Expiry', status: discount.is_active ? 'active' : 'expired' })));
       } catch (loadError) { setError(loadError.message || 'Unable to load discounts.'); }
       finally { setLoading(false); }
     }
     loadDiscounts();
-  }, []);
+  }, [formatPrice]);
 
   const toggleDrawer = () => {
     setDrawerOpen(!drawerOpen);

@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AdminProvider } from './context/AdminContext';
+import { AdminStoreSettingsProvider } from './context/StoreSettingsContext';
 import Layout from './components/layout/Layout';
 import Dashboard from './pages/Dashboard/Dashboard';
 import Products from './pages/Products/Products';
@@ -23,7 +24,8 @@ function AppContent() {
   return (
     <Router>
       <AdminProvider>
-        <Routes>
+        <AdminStoreSettingsProvider>
+          <Routes>
           <Route path="/signin" element={<SignIn />} />
           <Route element={<ProtectedRoute />}>
             <Route element={<Layout />}>
@@ -45,7 +47,8 @@ function AppContent() {
               <Route path="/customers" element={<Customers />} />
             </Route>
           </Route>
-        </Routes>
+          </Routes>
+        </AdminStoreSettingsProvider>
       </AdminProvider>
     </Router>
   );

@@ -1,8 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { customers, kpiCards, filterOptions } from '../../data/customers';
 import { fetchAdminCustomer, fetchAdminCustomers, isAuthenticated, login } from '../../lib/api';
+import { useAdminStoreSettings } from '../../context/StoreSettingsContext';
 
 export default function Customers() {
+  const { formatPrice } = useAdminStoreSettings();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState(customers[0]);
   const drawerRef = useRef(null);
@@ -170,7 +172,7 @@ export default function Customers() {
                             </div>
                           </td>
                           <td className="px-6 py-4 text-right font-mono text-[13px] leading-[18px]">{customer.orders}</td>
-                          <td className="px-6 py-4 text-right font-mono text-[13px] leading-[18px]">{customer.totalSpend.toLocaleString()} PKR</td>
+                          <td className="px-6 py-4 text-right font-mono text-[13px] leading-[18px]">{formatPrice(customer.totalSpend)}</td>
                           <td className="px-6 py-4 text-on-surface-variant text-[13px]">{customer.lastOrder}</td>
                           <td className="px-6 py-4 text-center">
                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config.className}`}>
@@ -267,7 +269,7 @@ export default function Customers() {
                       <div className="flex flex-col">
                         <span className={`font-semibold ${index === 0 ? 'text-primary' : 'text-on-surface-variant'} text-[12px] leading-[16px] uppercase tracking-wider mb-0.5`}>{purchase.date}</span>
                         <span className="text-[14px] leading-[20px] font-medium text-on-surface">{purchase.item}</span>
-                        <span className="text-[12px] text-on-surface-variant mt-1">{purchase.orderId} • {purchase.amount.toLocaleString()} PKR</span>
+                        <span className="text-[12px] text-on-surface-variant mt-1">{purchase.orderId} • {formatPrice(purchase.amount)}</span>
                       </div>
                     </div>
                   ))}

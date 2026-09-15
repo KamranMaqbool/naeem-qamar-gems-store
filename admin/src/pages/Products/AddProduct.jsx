@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { createProduct, fetchAdminProduct, fetchCategories, isAuthenticated, login, receiveStock, updateProduct, uploadProductImage } from '../../lib/api';
+import { useAdminStoreSettings } from '../../context/StoreSettingsContext';
 
 const categories = [
   { value: '', label: 'Select a category' },
@@ -11,8 +12,16 @@ const categories = [
 ];
 
 const mediaUrl = (value) => value?.replace(/^https?:\/\/backend:8000/, '') || '';
+const countWords = (value = '') => value.trim() ? value.trim().split(/\s+/).length : 0;
+
+function FieldMessage({ messages }) {
+  if (!messages) return null;
+  const text = Array.isArray(messages) ? messages.join(' ') : String(messages);
+  return <p className="mt-1 text-xs text-error-text">{text}</p>;
+}
 
 export default function AddProduct() {
+  const { currency } = useAdminStoreSettings();
   const navigate = useNavigate();
   const { id } = useParams();
   const [formData, setFormData] = useState({
@@ -31,6 +40,8 @@ export default function AddProduct() {
   const [categoryOptions, setCategoryOptions] = useState(categories);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState({});
+  const titleError = fieldErrors.title || fieldErrors.slug;
 
   useEffect(() => {
     (async () => {
@@ -67,6 +78,8 @@ export default function AddProduct() {
       ...prev,
       [name]: type === 'checkbox' ? e.target.checked : type === 'number' ? (value === '' ? 0 : Number(value)) : value,
     }));
+    const apiField = { regularPrice: 'base_price', salePrice: 'sale_price' }[name] || name;
+    setFieldErrors((current) => ({ ...current, [apiField]: undefined }));
   };
 
   const handleDrag = (e) => {
@@ -106,6 +119,7 @@ export default function AddProduct() {
     e.preventDefault();
     setSaving(true);
     setError('');
+    setFieldErrors({});
     try {
       if (!isAuthenticated()) await login('admin@virtuoso-gems.com', 'admin123');
       const slug = formData.title.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
@@ -138,6 +152,7 @@ export default function AddProduct() {
       navigate('/products');
     } catch (submitError) {
       setError(submitError.message || 'Unable to save product. Please try again.');
+      setFieldErrors(submitError.details || {});
     } finally {
       setSaving(false);
     }
@@ -212,7 +227,7 @@ export default function AddProduct() {
               <h1 className="text-[24px] leading-[32px] tracking-[-0.01em] font-semibold text-on-surface">Add New Product</h1>
             </div>
 
-            {error && <div className="mb-6 rounded-lg border border-error/30 bg-error-bg px-4 py-3 text-sm text-error-text">{error}</div>}
+            {error && <div className="mb-6 rounded-lg border border-error/30 bg-error-bg px-4 py-3 text-sm text-error-text" role="alert"><p className="font-semibold">Please correct the highlighted fields.</p><p className="mt-1">{error}</p></div>}
 
             <form id="product-form" onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-6">
               {/* Left Column */}
@@ -227,11 +242,12 @@ export default function AddProduct() {
                         name="title"
                         value={formData.title}
                         onChange={handleChange}
-                        className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-4 py-2 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/10 text-on-surface placeholder:text-outline"
+                        className={`w-full bg-surface-container-lowest border rounded-lg px-4 py-2 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/10 text-on-surface placeholder:text-outline ${titleError ? 'border-error' : 'border-outline-variant'}`}
                         placeholder="Enter product name (e.g., Emerald Cut Diamond Ring)"
                         type="text"
                         required
                       />
+                      <FieldMessage messages={titleError} />
                     </div>
                     <div>
                       <label className="block text-[12px] leading-[16px] font-semibold uppercase tracking-wider text-on-surface-variant mb-1">Description</label>
@@ -239,10 +255,12 @@ export default function AddProduct() {
                         name="description"
                         value={formData.description}
                         onChange={handleChange}
-                        className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-4 py-2 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/10 text-on-surface placeholder:text-outline"
+                        className={`w-full bg-surface-container-lowest border rounded-lg px-4 py-2 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/10 text-on-surface placeholder:text-outline ${fieldErrors.description ? 'border-error' : 'border-outline-variant'}`}
                         placeholder="Detailed product description..."
                         rows={5}
                       />
+                      <div className="mt-1 flex items-center justify-between text-xs text-on-surface-variant"><span>Help customers understand the gemstone, cut, and provenance.</span><span aria-live="polite">{countWords(formData.description)} words</span></div>
+                      <FieldMessage messages={fieldErrors.description} />
                     </div>
                     <div>
                       <label className="block text-[12px] leading-[16px] font-semibold uppercase tracking-wider text-on-surface-variant mb-1">Category</label>
@@ -250,13 +268,14 @@ export default function AddProduct() {
                         name="category"
                         value={formData.category}
                         onChange={handleChange}
-                        className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-4 py-2 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/10 text-on-surface"
+                        className={`w-full bg-surface-container-lowest border rounded-lg px-4 py-2 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/10 text-on-surface ${fieldErrors.category ? 'border-error' : 'border-outline-variant'}`}
                         required
                       >
                         {categoryOptions.map((cat) => (
                           <option key={cat.value} value={cat.value}>{cat.label}</option>
                         ))}
                       </select>
+                      <FieldMessage messages={fieldErrors.category} />
                     </div>
                     <label className="flex items-start gap-3 rounded-lg border border-outline-variant/60 bg-surface-container-low p-4 cursor-pointer">
                       <input name="isFeatured" type="checkbox" checked={formData.isFeatured} onChange={handleChange} className="mt-1 h-4 w-4 rounded border-outline-variant text-primary focus:ring-primary" />
@@ -279,7 +298,7 @@ export default function AddProduct() {
                     <div>
                       <label className="block text-[12px] leading-[16px] font-semibold uppercase tracking-wider text-on-surface-variant mb-1">Regular Price</label>
                       <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">$</span>
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-on-surface-variant">{currency}</span>
                         <input
                           name="regularPrice"
                           type="number"
@@ -287,16 +306,17 @@ export default function AddProduct() {
                           min="0"
                           value={formData.regularPrice}
                           onChange={handleChange}
-                          className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg pl-8 pr-4 py-2 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/10 text-on-surface"
+                          className={`w-full bg-surface-container-lowest border rounded-lg pl-14 pr-4 py-2 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/10 text-on-surface ${fieldErrors.base_price ? 'border-error' : 'border-outline-variant'}`}
                           placeholder="0.00"
                           required
                         />
                       </div>
+                      <FieldMessage messages={fieldErrors.base_price} />
                     </div>
                     <div>
                       <label className="block text-[12px] leading-[16px] font-semibold uppercase tracking-wider text-on-surface-variant mb-1">Discount/Sale Price (Optional)</label>
                       <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">$</span>
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-on-surface-variant">{currency}</span>
                         <input
                           name="salePrice"
                           type="number"
@@ -304,10 +324,11 @@ export default function AddProduct() {
                           min="0"
                           value={formData.salePrice}
                           onChange={handleChange}
-                          className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg pl-8 pr-4 py-2 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/10 text-on-surface"
+                          className={`w-full bg-surface-container-lowest border rounded-lg pl-14 pr-4 py-2 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/10 text-on-surface ${fieldErrors.sale_price ? 'border-error' : 'border-outline-variant'}`}
                           placeholder="0.00"
                         />
                       </div>
+                      <FieldMessage messages={fieldErrors.sale_price} />
                     </div>
                   </div>
                 </div>
@@ -371,10 +392,11 @@ export default function AddProduct() {
                         name="sku"
                         value={formData.sku}
                         onChange={handleChange}
-                        className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-4 py-2 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/10 text-on-surface font-mono text-[13px] leading-[18px] font-medium"
+                        className={`w-full bg-surface-container-lowest border rounded-lg px-4 py-2 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/10 text-on-surface font-mono text-[13px] leading-[18px] font-medium ${fieldErrors.sku ? 'border-error' : 'border-outline-variant'}`}
                         placeholder="e.g. LUX-RG-001"
                         required
                       />
+                      <FieldMessage messages={fieldErrors.sku} />
                     </div>
                     <div>
                       <label className="block text-[12px] leading-[16px] font-semibold uppercase tracking-wider text-on-surface-variant mb-1">Current Quantity</label>

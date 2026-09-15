@@ -13,7 +13,11 @@ export default function SignIn() {
   const submit = async (event) => {
     event.preventDefault();
     setLoading(true); setError('');
-    try { await login(email, password); navigate(location.state?.from?.pathname || '/', { replace: true }); }
+    try {
+      await login(email, password);
+      window.dispatchEvent(new Event('admin-authenticated'));
+      navigate(location.state?.from?.pathname || '/', { replace: true });
+    }
     catch (submitError) { setError(submitError.message || 'Invalid email or password.'); }
     finally { setLoading(false); }
   };
