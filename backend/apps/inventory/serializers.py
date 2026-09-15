@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from apps.catalog.serializers import ProductImageSerializer
 from apps.inventory.models import Inventory, StockLog
 
 
@@ -11,7 +12,12 @@ class InventorySerializer(serializers.ModelSerializer):
 
     def get_product_image(self, obj):
         image = obj.product.images.filter(is_primary=True).first() or obj.product.images.first()
-        return image.image_url if image else ''
+        if not image:
+            return ''
+        # Keep the request context so a relative /media/... upload becomes
+        # an absolute backend URL in production. Otherwise the Vercel admin
+        # app tries to load it from its own domain and receives a 404.
+        return ProductImageSerializer(image, context=self.context).data.get('image_url', '')
 
     class Meta:
         model = Inventory

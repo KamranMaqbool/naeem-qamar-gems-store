@@ -303,6 +303,7 @@ enforces it**, and some seed image URLs are ~300 chars. All `URLField`s were wid
 | Variable | Value |
 |---|---|
 | `VITE_API_URL` | `https://backend-production-d5b4b.up.railway.app/api/v1` |
+| `VITE_STORE_URL` | `https://naeem-qamar-gems-store.vercel.app` (admin project only; Store Live View destination) |
 
 ---
 

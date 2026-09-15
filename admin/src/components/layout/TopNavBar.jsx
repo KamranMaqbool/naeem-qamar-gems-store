@@ -8,6 +8,10 @@ export default function TopNavBar() {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [openMenu, setOpenMenu] = useState(null);
+  const storeUrl = import.meta.env.VITE_STORE_URL
+    || (import.meta.env.PROD
+      ? 'https://naeem-qamar-gems-store.vercel.app'
+      : 'http://localhost:5173');
 
   const submitSearch = (event) => {
     event.preventDefault();
@@ -49,7 +53,7 @@ export default function TopNavBar() {
         {/* Right Section */}
         <div className="flex items-center gap-2 font-label-md text-label-md">
           <a
-            href={import.meta.env.VITE_STORE_URL || 'http://localhost:5173'}
+            href={storeUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="hidden sm:flex items-center gap-2 px-4 py-2 text-on-surface-variant hover:text-primary-container hover:bg-surface-container-low rounded-md transition-colors"
